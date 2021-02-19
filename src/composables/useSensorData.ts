@@ -1,52 +1,40 @@
 
-import {ref } from "vue";
+import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 
-interface Types{
+interface Types {
     [key: string]: any | any[];
 }
 
 export function useSensorData() {
-    const sensors = ref([] as Types) 
+    /* const sensors = ref([] as Types) */
     const sensorNames = ref([] as Types)
- 
-    const {response, error, fetching, fetchData} = useFetch('http://localhost:3000/sensors');
-    
+    /* const selectedSensors = ref([]) */
+    const { response, error, fetching, fetchData } = useFetch('http://localhost:3000/sensors');
 
-    function setSensorNames(){
+
+    function setSensorNames() {
         /* TODO: filter null values */
         sensorNames.value = response.value.map((e: Types, index: number) => {
-           return  {id: index, 'sensorName': Object.keys(e)[0]}
-        } )
-    }
-    
-    function setSensors() {
-        sensors.value = response.value
-        /* sensors.value = response.value.map((e: Types, index: number) => {
-            return  {id: index, 'sensorName': Object.keys(e)[0], data: [response.value[index]['time']]}
-         } ) */
-    
+            return { id: index, 'sensorName': Object.keys(e)[0] }
+        })
     }
 
- /*    function getSelectedSensors(selectedSensors:  string[]) {
-        return sensorNames.value.map((name, index) => selectedSensors.includes(name) ? index : null) 
-    } */
+    function getSensorsById(sensorIds: number[]) {
+        return sensorIds.map(id => response.value[id])
 
+    }
 
-
-
-    fetchData().then(() =>{
-        setSensorNames(),
-        setSensors()
+    fetchData().then(() => {
+        setSensorNames()
     })
-    
-    return{
-        sensors,
-        sensorNames, 
-        error, 
+
+    return {
+        getSensorsById,
+        sensorNames,
+        error,
         fetching,
         fetchData
-        
     }
 }
 
