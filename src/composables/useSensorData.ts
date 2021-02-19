@@ -2,15 +2,9 @@
 import {ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 
-interface SensorTypes{
-    [key: string]: number[] | null[];
-  }
-
 interface Types{
     [key: string]: any | any[];
 }
-
-
 
 export function useSensorData() {
     const sensors = ref([] as Types) 
@@ -20,21 +14,26 @@ export function useSensorData() {
     
 
     function setSensorNames(){
-        sensorNames.value = response.value.map(e => Object.keys(e).values)  /*Object.keys(response.value)   .filter(key => response.value[key][0] != null) */
-        /* sensorNames.value = sensorNames.value.filter(e => e[0] != null) */
+        /* TODO: filter null values */
+        sensorNames.value = response.value.map(e => Object.keys(e)[0])
     }
     
-
     function setSensors() {
-        sensors.value  = response.value /* .filter(sensor => sensorNames.value.contains(Object.keys(sensor))) */
+        sensors.value  = response.value
     }
+
+ /*    function getSelectedSensors(selectedSensors:  string[]) {
+        return sensorNames.value.map((name, index) => selectedSensors.includes(name) ? index : null) 
+    } */
+
+
+
+
     fetchData().then(() =>{
         setSensorNames(),
         setSensors()
     })
     
-    
-
     return{
         sensors,
         sensorNames, 
