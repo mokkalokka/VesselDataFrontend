@@ -90,7 +90,7 @@
           <router-link
             aria-current="page"
             class="nav-link active justify-content-end"
-            to="/"
+            to="/settings"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
