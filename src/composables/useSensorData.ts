@@ -15,11 +15,17 @@ export function useSensorData() {
 
     function setSensorNames(){
         /* TODO: filter null values */
-        sensorNames.value = response.value.map(e => Object.keys(e)[0])
+        sensorNames.value = response.value.map((e: Types, index: number) => {
+           return  {id: index, 'sensorName': Object.keys(e)[0]}
+        } )
     }
     
     function setSensors() {
-        sensors.value  = response.value
+        sensors.value = response.value
+        /* sensors.value = response.value.map((e: Types, index: number) => {
+            return  {id: index, 'sensorName': Object.keys(e)[0], data: [response.value[index]['time']]}
+         } ) */
+    
     }
 
  /*    function getSelectedSensors(selectedSensors:  string[]) {
