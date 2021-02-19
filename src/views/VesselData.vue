@@ -26,7 +26,7 @@
         <div v-for="s of selectedSensors" :key="s.id">
           <p>{{ s["id"] }}</p>
         </div>
-        <Button label="Info" class="p-button-rounded p-button-info" @click="sendSelected"/>
+        <Button label="view selected data" class="p-button-rounded p-button-info" @click="sendSelected"/>
       </template>
     </Card>
   </div>
@@ -41,7 +41,7 @@ export default defineComponent({
   name: "VesselData",
   setup() {
     const selectedSensors = ref([] as []);
-    const { sensorNames, fetchData } = useSensorData();
+    const { sensorNames, fetchData, getSensorsById } = useSensorData();
 
     fetchData()
   
@@ -50,7 +50,8 @@ export default defineComponent({
       selectedSensors.value.map((s) => {
         ids.push(s["id"])
       })
-      console.log(ids)
+      const sensordata = getSensorsById(ids)
+      console.log(sensordata)
     }
 
     return { sensorNames, selectedSensors, sendSelected };
