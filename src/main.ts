@@ -9,6 +9,7 @@ import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Card from 'primevue/card';
+import Button from 'primevue/button';
 
 import 'primevue/resources/themes/saga-blue/theme.css'       //theme
 import 'primevue/resources/primevue.min.css'                 //core css
@@ -20,4 +21,5 @@ createApp(App)
     .component("DataTable", DataTable)
     .component("Column", Column)
     .component("Card", Card)
+    .component("Button", Button)
     .mount('#app')

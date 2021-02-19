@@ -11,19 +11,22 @@
       <template #title> Sensors </template>
       <template #content>
         <DataTable
-      :value="sensors"
+      :value="sensorNames"
       v-model:selection="selectedSensors"
       selectionMode="multiple"
       dataKey="id"
-      @row-select="onRowSelect"
+      :metaKeySelection="false"
+      :scrollable="true" scrollHeight="400px"
+      
     >
-
-      <Column field="name" header="Sensors Name" sortable="true"></Column>
-      <Column field="numpoints" header="Number of points" sortable=true></Column>
+      <Column field="sensorName" header="Sensors Name" sortable="true"></Column>
     </DataTable>
       </template>
       <template #footer>
-        <h3>footer</h3>
+        <div v-for="s of selectedSensors" :key="s.id">
+          <p>{{ s["id"] }}</p>
+        </div>
+        <Button label="Info" class="p-button-rounded p-button-info" @click="sendSelected"/>
       </template>
     </Card>
   </div>
@@ -37,16 +40,20 @@ import { useSensorData } from "@/composables/useSensorData"
 export default defineComponent({
   name: "VesselData",
   setup() {
-    const selectedSensors = ref([]);
-    const { sensors, fetchData } = useSensorData();
+    const selectedSensors = ref([] as []);
+    const { sensorNames, fetchData } = useSensorData();
 
     fetchData()
+  
+    const sendSelected = () => {
+      const ids: number[] = []
+      selectedSensors.value.map((s) => {
+        ids.push(s["id"])
+      })
+      console.log(ids)
+    }
 
-    const onRowSelect = () => {
-      console.log("row selected", selectedSensors);
-    };
-
-    return { sensors, onRowSelect, selectedSensors };
+    return { sensorNames, selectedSensors, sendSelected };
   },
 });
 </script>
