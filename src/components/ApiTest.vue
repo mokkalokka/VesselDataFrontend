@@ -10,7 +10,7 @@
 
       <h1 class="m-5">Selected sensors:</h1>
       <!-- <p>{{getSelectedSensors(['CommonVesselInfo.machinery.auxCons'])}}</p> -->
-      <p>{{sensors}}</p>
+      <p>{{getSensorsById([3])}}</p>
       
       <h1>Error:</h1>
       <p>{{error}}</p>
@@ -28,12 +28,12 @@ export default defineComponent({
     name: "ApiTest",
     setup(){
        /*  const data = ref('hello!') */
-        const {sensors, sensorNames, error, fetching, fetchData} = useSensorData();
+        const {getSensorsById, sensorNames, error, fetching, fetchData} = useSensorData();
         
         fetchData()
 
         return{
-            sensors,
+            getSensorsById,
             sensorNames,
             /* getSelectedSensors, */
             error, 
