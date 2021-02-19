@@ -1,12 +1,13 @@
 <template>
   <div>
-      <!-- <h1>SensorNames:</h1>
-      <ul>
+      <h1>SensorNames:</h1>
+      <!-- <ul>
           <li v-for="(sensorName, index) in sensorNames" :key="index">
               {{sensorName}}
           </li>
           
       </ul> -->
+
       <h1 class="m-5">Selected sensors:</h1>
       <!-- <p>{{getSelectedSensors(['CommonVesselInfo.machinery.auxCons'])}}</p> -->
       <p>{{sensors}}</p>
