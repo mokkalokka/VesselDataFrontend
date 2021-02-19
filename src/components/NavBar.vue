@@ -2,7 +2,10 @@
   <nav class="navbar sticky navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="/"
-        ><h3>Sintef <br/> Ocean</h3></a
+        ><h3>
+          Sintef <br />
+          Ocean
+        </h3></a
       >
       <button
         class="navbar-toggler"
@@ -34,8 +37,9 @@
               class="feather feather-user"
             >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle></svg
-            > My Account</router-link
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            My Account</router-link
           >
           <router-link
             aria-current="page"
@@ -55,8 +59,9 @@
             >
               <circle cx="12" cy="5" r="3"></circle>
               <line x1="12" y1="22" x2="12" y2="8"></line>
-              <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg
-            > Boat Overview</router-link
+              <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+            </svg>
+            Boat Overview</router-link
           >
           <router-link
             aria-current="page"
@@ -76,8 +81,9 @@
             >
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line></svg
-            > About</router-link
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            About</router-link
           >
         </div>
         <div class="navbar-nav ms-auto h4">
@@ -121,15 +127,10 @@ export default {};
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.navbar-light .nav-link{
-  padding-top: 5px;
-}
-
 a {
   color: #002c6d;
   font-size: 20px;
   font-weight: bold;
-
 }
 
 a:focus {
@@ -145,5 +146,4 @@ a:hover {
 a:active {
   background-color: rgb(199, 199, 199);
 }
-
 </style>
