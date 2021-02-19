@@ -1,16 +1,16 @@
 <template>
   <div>
       <h1>SensorNames:</h1>
-      <!-- <ul>
+      <ul>
           <li v-for="(sensorName, index) in sensorNames" :key="index">
               {{sensorName}}
           </li>
           
-      </ul> -->
+      </ul>
 
       <h1 class="m-5">Selected sensors:</h1>
       <!-- <p>{{getSelectedSensors(['CommonVesselInfo.machinery.auxCons'])}}</p> -->
-      <p>{{getSensorsById([3])}}</p>
+      <!-- <p>{{getSensorsById([3])}}</p> -->
       
       <h1>Error:</h1>
       <p>{{error}}</p>
