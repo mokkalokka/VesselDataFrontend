@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import VesselDatatable from '@/VesselDatatable.vue';
+import VesselDatatable from '@/components/VesselDatatable.vue';
 
 export default defineComponent({
   components: {
