@@ -24,13 +24,18 @@
               ></Column>
             </DataTable>
           </AccordionTab>
-          <AccordionTab header="Sensor Data">
+          
+          <AccordionTab :disabled="!showSensorData"  header="Sensor Data">
             <!-- GRAPHS HERE -->
-
-            <div v-for="s of selectedSensors" :key="s.id">
+            <div v-if="showSensorData" >
+              <div v-for="s of selectedSensors" :key="s.id">
               <p>{{ s.sensorName }}</p>
+              <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
             </div>
+            </div>
+            
           </AccordionTab>
+          
         </Accordion>
       </template>
       <template #footer>
@@ -49,27 +54,32 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
+import LineGraph from "@/components/LineGraph.vue";
 
 export default defineComponent({
+  components: { LineGraph },
   name: "VesselData",
   setup() {
     const selectedSensors = ref([] as []);
-    const { sensorNames, fetchData, getSensorsById } = useSensorData();
+    const { sensorNames, fetchData, setSensorNames, initialize } = useSensorData();
     const active = ref(0 as number);
+    const showSensorData = ref(false)
+    const sensordata = ref([] as any)
 
-    fetchData();
+    initialize()
 
     const sendSelected = () => {
+      showSensorData.value = true
       const ids: number[] = [];
       selectedSensors.value.map((s) => {
         ids.push(s["id"]);
       });
-      const sensordata = getSensorsById(ids);
+      /* sensordata.value = getSensorDataById(ids); */
       active.value = 1;
-      console.log(sensordata);
+      /* console.log(sensordata); */
     };
 
-    return { sensorNames, selectedSensors, sendSelected, active };
+    return { sensorNames, selectedSensors, sendSelected, active, showSensorData };
   },
 });
 </script>

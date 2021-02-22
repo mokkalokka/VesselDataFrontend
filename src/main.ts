@@ -22,6 +22,8 @@ import Card from 'primevue/card';
 import Button from 'primevue/button';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import Chart from 'primevue/chart';
+import Slider from 'primevue/slider'
 
 
 createApp(App)
@@ -35,6 +37,9 @@ createApp(App)
     .component("InputText", InputText)
     .component("Accordion", Accordion)
     .component("AccordionTab", AccordionTab)
+    .component("Chart", Chart)
+    .component("Slider", Slider)
+
 
 
     .mount('#app')

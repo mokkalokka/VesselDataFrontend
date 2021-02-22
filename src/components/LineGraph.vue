@@ -1,23 +1,26 @@
 <template>
   <div class="container">
-    <Chart type="line" :data="data.data" />
-    <Slider
-      v-model="sliderValue"
-      :step="1"
-      :min="getRange().min"
-      :max="getRange().max"
-      :range="true"
-    />
-    <button class="btn btn-primary m-3" @click="getData">Get data</button>
+    <div v-if="data.data.labels.length > 1">
+      <Chart  type="line" :data="data.data" />
+      <Slider
+        v-model="sliderValue"
+        :step="1"
+        :min="min"
+        :max="max"
+        :range="true"
+      />
+    </div>
+    
+    <!-- <button class="btn btn-primary m-3" @click="getData">Get data</button> -->
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watchEffect } from "vue";
+import { defineComponent, onMounted, reactive, ref, watchEffect } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 
 export interface Data {
-  basicData: {
+  data: {
     labels: number[];
     datasets: [
       {
@@ -30,89 +33,88 @@ export interface Data {
   };
 }
 
-interface SensorTypes{
-    [key: string]: number[] | null[];
+interface SensorTypes {
+  [key: string]: number[] | null[];
 }
 
 export default defineComponent({
   name: "LineGraph",
+  props: {
+    sensorName: {
+      type: String,
+      required: true,
+    },
+    sensorId: {
+      type: Number,
+      required: true,
+    },
+  },
 
-  setup() {
-    const sensorId = 84
-    const {getSensorsById, fetchData} = useSensorData();
-    fetchData()
+  setup(props) {
+    const {fetching, getSensorDataById, fetchData } = useSensorData();
+    const sensorData = ref([[],[]] as number[][]);
+    const sliderValue = ref([0, 1]);
+    const min = ref(0);
+    const max = ref(1);
 
-    const sensorData = ref([])
-    const sliderValue = ref([0, 10]);
-
-    
-    
     const data = reactive({
       data: {
-        labels: [1,2,3,4],
+        labels: [],
         datasets: [
           {
-            label: "test",
-            data: [1,2,3,4],
+            label: props.sensorName,
+            data: [],
             fill: true,
             borderColor: "#42A5F5",
           },
         ],
       },
-    } );
-
+    } as Data);
 
     const getData = () => {
-      sensorData.value = getSensorsById([0, sensorId]) as any
-      data.data.labels = sensorData.value[0]
-      data.data.datasets[0].data = sensorData.value[1]
-      data.data = {...data.data} 
+      sensorData.value = getSensorDataById([props.sensorId]) as number[][];
+      data.data.labels = sensorData.value[0];
+      data.data.datasets[0].data = sensorData.value[1];
+      
+      min.value = 0;
+      max.value = sensorData.value[0].length - 1;
+      sliderValue.value = [min.value, max.value];
 
+      data.data = { ...data.data };
     };
 
-    const getRange = () => {
-      return {
-        min: Math.min(...data.data.labels),
-        max: Math.max(...data.data.labels),
-      };
-    };
 
-    watchEffect(() =>{
-        console.log(sliderValue.value);
-        console.log(data);
-        
-      /* sliderValue
-      data.basicData.labels = json.time.slice(sliderValue.value[0], sliderValue.value[1])
-      data.basicData = {...data.basicData} */
+    watchEffect(() => {
+      console.log(sliderValue.value);
+
+      data.data.labels = sensorData.value[0].slice(
+        sliderValue.value[0],
+        sliderValue.value[1]
+      );
+      data.data = { ...data.data };
+    });
+
+    /* getData() */
+
+    onMounted(() => {
+      console.log(props.sensorId);
+      console.log("Kjører");
+      
+      
+      fetchData().then(() => {
+        getData()
     })
+      
+    });
 
-    /* const addData = () => {
-      data.basicData.datasets[0].data.push(Math.random());
-      data.basicData.labels.push(data.basicData.labels.length);
-      data.basicData = {...data.basicData}
-
-      sliderValue.value[1] = data.basicData.labels.length -1
-      console.log(data.basicData.labels);
-    }; */
-
-    /*    watch(() => value.value,
-      (value, prevValue) => {
-        data.basicData.labels = labels.value.slice(value[0], value[1])
-        data.basicData.datasets[0].data = dataPoints.value.slice(value[0], value[1])
-        console.log(dataPoints.value);
-        console.log(labels.value);
-        console.log(value);
-        
-        componentKey.value ++
-    }) */
-
+   
     return {
       data,
-      getRange,
       sliderValue,
-      getData
-      
-
+      getData,
+      min,
+      max,
+      fetching
     };
   },
 });

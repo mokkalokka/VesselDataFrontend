@@ -28,12 +28,12 @@ export default defineComponent({
     name: "ApiTest",
     setup(){
        /*  const data = ref('hello!') */
-        const {getSensorsById, sensorNames, error, fetching, fetchData} = useSensorData();
+        const {getSensorDataById, sensorNames, error, fetching, fetchData} = useSensorData();
         
         fetchData()
 
         return{
-            getSensorsById,
+            getSensorDataById,
             sensorNames,
             /* getSelectedSensors, */
             error, 
