@@ -20,7 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'VesselOverview',
     component: () => import('../views/VesselOverview.vue')
   },
-  
+  {
+    path: '/vesseldata',
+    name: 'VesselData',
+    component: () => import('../views/VesselData.vue')
+  },
 ]
 
 const router = createRouter({
