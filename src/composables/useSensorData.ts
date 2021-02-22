@@ -22,7 +22,8 @@ export function useSensorData() {
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.sensorName][0] != (null))}
 
     function getSensorsById(sensorIds: number[]) {
-        return sensorIds.map(id => response.value[id])
+        sensorIds.unshift(0) //Adds time 
+        return sensorIds.map(id => Object.values(response.value[id])[0])
 
     }
 
