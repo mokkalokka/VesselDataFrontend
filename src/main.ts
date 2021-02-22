@@ -20,6 +20,9 @@ import ColumnGroup from 'primevue/columngroup';
 import InputText from "primevue/inputtext"
 import Card from 'primevue/card';
 import Button from 'primevue/button';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+
 
 createApp(App)
     .use(router)
@@ -30,4 +33,8 @@ createApp(App)
     .component("Button", Button)
     .component("ColumnGroup", ColumnGroup)
     .component("InputText", InputText)
+    .component("Accordion", Accordion)
+    .component("AccordionTab", AccordionTab)
+
+
     .mount('#app')
