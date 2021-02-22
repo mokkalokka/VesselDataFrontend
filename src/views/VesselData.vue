@@ -11,35 +11,66 @@
             <DataTable
               :value="sensorNames"
               v-model:selection="selectedSensors"
-              selectionMode="multiple"
               dataKey="id"
-              :metaKeySelection="false"
               :scrollable="true"
-              scrollHeight="400px"
+              scrollHeight="600px"
+              editMode="cell"
+              class="editable-cells-table"
             >
               <Column
                 field="sensorName"
                 header="Sensors Name"
                 sortable="true"
               ></Column>
+              <Column field="startDate" header="Start time" headerStyle="text-align:center">
+                <template #body>
+                  <i class="pi pi-calendar"></i>
+                </template>
+                <template #editor="slotProps">
+                  <div class="p-fluid p-grid p-formgrid">
+                    <div class="p-field p-col-12 p-md-4">
+                      <Calendar
+                        id="min"
+                        v-model="slotProps.data['startDate']"
+                        showOnFocus="false"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </Column>
+              <Column field="stopDate" header="End time" headerStyle="text-align:center">
+                <template #body>
+                  <i class="pi pi-calendar"></i>
+                </template>
+
+                <template #editor="slotProps">
+                  <div class="p-fluid p-grid p-formgrid">
+                    <div class="p-field p-col-12 p-md-4">
+                      <Calendar
+                        id="max"
+                        v-model="slotProps.data['stopDate']"
+                        showOnFocus="false"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </Column>
+              <Column header="Select " selectionMode="multiple"></Column>
             </DataTable>
           </AccordionTab>
-          
-          <AccordionTab :disabled="!showSensorData"  header="Sensor Data">
+
+          <AccordionTab :disabled="!showSensorData" header="Sensor Data">
             <!-- GRAPHS HERE -->
-            <div v-if="showSensorData" >
+            <div v-if="showSensorData">
               <div v-for="s of selectedSensors" :key="s.id">
-              <p>{{ s.sensorName }}</p>
-              <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+                <p>{{ s.sensorName }}</p>
+                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+              </div>
             </div>
-            </div>
-            
           </AccordionTab>
-          
         </Accordion>
       </template>
       <template #footer>
-      
         <Button
           label="view selected data"
           icon="pi pi-table"
@@ -61,15 +92,25 @@ export default defineComponent({
   name: "VesselData",
   setup() {
     const selectedSensors = ref([] as []);
-    const { sensorNames, fetchData, setSensorNames, initialize } = useSensorData();
+    const today = new Date();
+    const minDate = today.getMonth();
+    const maxDate = today.getMonth() + 3;
+    const startDate = ref(null);
+    const stopDate = ref(null);
+    const {
+      sensorNames,
+      fetchData,
+      setSensorNames,
+      initialize,
+    } = useSensorData();
     const active = ref(0 as number);
-    const showSensorData = ref(false)
-    const sensordata = ref([] as any)
+    const showSensorData = ref(false);
+    const sensordata = ref([] as any);
 
-    initialize()
+    initialize();
 
     const sendSelected = () => {
-      showSensorData.value = true
+      showSensorData.value = true;
       const ids: number[] = [];
       selectedSensors.value.map((s) => {
         ids.push(s["id"]);
@@ -79,7 +120,17 @@ export default defineComponent({
       /* console.log(sensordata); */
     };
 
-    return { sensorNames, selectedSensors, sendSelected, active, showSensorData };
+    return {
+      sensorNames,
+      selectedSensors,
+      sendSelected,
+      active,
+      showSensorData,
+      minDate,
+      maxDate,
+      startDate,
+      stopDate,
+    };
   },
 });
 </script>

@@ -24,7 +24,8 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import Chart from 'primevue/chart';
 import Slider from 'primevue/slider'
-
+import Calendar from 'primevue/calendar';
+import CheckBox from 'primevue/checkbox'
 
 createApp(App)
     .use(router)
@@ -39,6 +40,9 @@ createApp(App)
     .component("AccordionTab", AccordionTab)
     .component("Chart", Chart)
     .component("Slider", Slider)
+    .component("Calendar", Calendar)
+    .component("CheckBox", CheckBox)
+
 
 
 
