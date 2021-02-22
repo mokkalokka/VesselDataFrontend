@@ -2,16 +2,22 @@
   
     <div class="container">
 
-        <div>
+        <div class="card">
 
         <DataTable :value="vessels" v-model:selection="selectedVessel" selectionMode="single" dataKey="id"
-            :filters="filters">
+            :filters="filters" @row-select="onRowSelect">
+
+            
             <template #header>
+                
                 Vessels
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search" />
-                    <InputText type="text" v-model="filters['name']" placeholder="Keyword Search" />
-                </span>
+
+                
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText type="text" v-model="filters['name']" placeholder="Vessel name" />
+                    </span>
+
             </template>
     
             <Column field="name" header="Name" sortable filterMatchMode="contains"></Column>
@@ -23,6 +29,7 @@
 </template>
 
 <script lang="ts">
+import router from "@/router";
 import { defineComponent, onMounted, ref } from "vue";
 
 
@@ -50,10 +57,13 @@ export default defineComponent({
                 {"name": "test4", "id": 4} as Vessel,
                 {"name": "test5", "id": 5} as Vessel
             ]
-
         });
 
-        return {vessels, selectedVessel, filters};
+       function onRowSelect() {
+            router.push({name: "About", params: {id: selectedVessel.value.id}})
+        }
+
+        return {vessels, selectedVessel, filters, onRowSelect };
 
     }
 
@@ -68,6 +78,17 @@ interface Vessel {
 
 </script>
 
-<style>
+<style lang="scss">
+
+.card {
+    margin: 20px;
+}
+
+.search {
+    text-align: right;
+    display: inline-block;
+}
+
+
 
 </style>
