@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div v-if="data.data.labels.length > 1">
       <Chart  type="line" :data="data.data" />
       <Slider
