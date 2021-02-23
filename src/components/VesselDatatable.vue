@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="p-md-12 p-p-3 card">
+    <div class="card">
       <DataTable
         :value="vessels"
         v-model:selection="selectedVessel"
@@ -8,20 +8,15 @@
         dataKey="id"
         :filters="filters"
         @row-select="onRowSelect"
+        :paginator="true"
+        :rows="10"
       >
         <template #header>
-
-            Vessels
-
-
-          <div class="p-d-flex p-jc-end">
+          <div class="p-d-flex p-ai-center p-jc-between">
+            <h5 class="p-m-0">Vessels</h5>
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText
-                type="text"
-                v-model="filters['name']"
-                placeholder="Vessel name"
-              />
+              <InputText v-model="filters['name']" placeholder="Vessel name" />
             </span>
           </div>
         </template>
