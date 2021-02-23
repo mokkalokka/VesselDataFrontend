@@ -20,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'VesselOverview',
     component: () => import('../views/VesselOverview.vue')
   },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('../views/Settings.vue')
+  },
   
 ]
 
