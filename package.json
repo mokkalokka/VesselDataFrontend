@@ -13,6 +13,7 @@
     "bootstrap": "^5.0.0-beta1",
     "core-js": "^3.6.5",
     "json-server": "^0.16.3",
+    "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
     "primevue": "^3.2.2",
     "vue": "^3.0.0",
