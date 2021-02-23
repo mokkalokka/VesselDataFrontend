@@ -1,73 +1,82 @@
 <template>
-  
-    <div class="container">
+  <div class="container">
+    <div class="card">
+      <DataTable
+        :value="vessels"
+        v-model:selection="selectedVessel"
+        selectionMode="single"
+        dataKey="id"
+        :filters="filters"
+        @row-select="onRowSelect"
+        :paginator="true"
+        :rows="10"
+      >
+        <template #header>
+          <div class="p-d-flex p-ai-center p-jc-between">
+            <h5 class="p-m-0">Vessels</h5>
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText v-model="filters['name']" placeholder="Vessel name" />
+            </span>
+          </div>
+        </template>
 
-        <div>
-
-        <DataTable :value="vessels" v-model:selection="selectedVessel" selectionMode="single" dataKey="id"
-            :filters="filters">
-            <template #header>
-                Vessels
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search" />
-                    <InputText type="text" v-model="filters['name']" placeholder="Keyword Search" />
-                </span>
-            </template>
-    
-            <Column field="name" header="Name" sortable filterMatchMode="contains"></Column>
-
-        </DataTable>
-        </div>
+        <Column
+          field="name"
+          header="Name"
+          sortable
+          filterMatchMode="contains"
+        ></Column>
+      </DataTable>
     </div>
-
+  </div>
 </template>
 
 <script lang="ts">
+import router from "@/router";
 import { defineComponent, onMounted, ref } from "vue";
 
-
-
 export default defineComponent({
-    
-    name: "VesselDataTable",
+  name: "VesselDataTable",
 
-    setup:  () => {
+  setup: () => {
+    const vessels = ref([] as Vessel[]);
+    const selectedVessel = ref({} as Vessel);
+    const filters = ref({
+      name: "",
+    });
 
-        const vessels = ref([] as Vessel[])
-        const selectedVessel = ref({} as Vessel)
-        const filters = ref({
+    onMounted(() => {
+      vessels.value = [
+        { name: "test1", id: 1 } as Vessel,
+        { name: "test2", id: 2 } as Vessel,
+        { name: "test3", id: 3 } as Vessel,
+        { name: "test4", id: 4 } as Vessel,
+        { name: "test5", id: 5 } as Vessel,
+      ];
+    });
 
-            "name" : ""
-
-        });
-
-        onMounted(() => {
-
-            vessels.value = [
-                {"name": "test1", "id": 1} as Vessel,
-                {"name": "test2", "id": 2} as Vessel,
-                {"name": "test3", "id": 3} as Vessel,
-                {"name": "test4", "id": 4} as Vessel,
-                {"name": "test5", "id": 5} as Vessel
-            ]
-
-        });
-
-        return {vessels, selectedVessel, filters};
-
+    function onRowSelect() {
+      router.push({ name: "About", params: { id: selectedVessel.value.id } });
     }
 
+    return { vessels, selectedVessel, filters, onRowSelect };
+  },
 });
 
 interface Vessel {
-
-    name: string;
-    id: number;
-
+  name: string;
+  id: number;
 }
-
 </script>
 
-<style>
+<style lang="scss">
+.card {
+  margin: 20px;
+}
 
+.search {
+  text-align: right;
+  display: inline-block;
+}
 </style>
