@@ -78,7 +78,7 @@ export default defineComponent({
 
       time.value = sensorData.value[0].map((e) => {
         const date = new Date(parseInt(String(e))).toLocaleTimeString();
-        console.log(date);
+        //console.log(date);
         return date;
       });
       data.data.labels = time.value;
@@ -93,7 +93,7 @@ export default defineComponent({
     };
 
     watchEffect(() => {
-      console.log(sliderValue.value);
+      //console.log(sliderValue.value);
       data.data.labels = time.value.slice(
         sliderValue.value[0],
         sliderValue.value[1]
@@ -102,8 +102,8 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log(props.sensorId);
-      console.log("Kjører");
+      //console.log(props.sensorId);
+      //console.log("Kjører");
 
       fetchData().then(() => {
         getData();

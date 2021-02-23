@@ -1,64 +1,19 @@
 <template>
-  <div class="p-d-flex p-p-3 card">
+  <div class="p-md-12 p-p-3 card">
     <Card>
       <template #header>
-        <h1>Header here</h1>
+        <h1><i class="pi pi-compass"></i></h1>
       </template>
       <template #title> Sensors </template>
       <template #content>
         <Accordion v-model:activeIndex="active">
           <AccordionTab header="Sensor table">
-            <DataTable
-              :value="sensorNames"
-              v-model:selection="selectedSensors"
-              dataKey="id"
-              :scrollable="true"
-              scrollHeight="600px"
-              editMode="cell"
-              class="editable-cells-table"
-            >
-              <Column
-                field="sensorName"
-                header="Sensors Name"
-                sortable="true"
-              ></Column>
-              <Column field="startDate" header="Start time" headerStyle="text-align:center">
-                <template #body>
-                  <i class="pi pi-calendar"></i>
-                </template>
-                <template #editor="slotProps">
-                  <div class="p-fluid p-grid p-formgrid">
-                    <div class="p-field p-col-12 p-md-4">
-                      <Calendar
-                        id="min"
-                        v-model="slotProps.data['startDate']"
-                        showOnFocus="false"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </Column>
-              <Column field="stopDate" header="End time" headerStyle="text-align:center">
-                <template #body>
-                  <i class="pi pi-calendar"></i>
-                </template>
-
-                <template #editor="slotProps">
-                  <div class="p-fluid p-grid p-formgrid">
-                    <div class="p-field p-col-12 p-md-4">
-                      <Calendar
-                        id="max"
-                        v-model="slotProps.data['stopDate']"
-                        showOnFocus="false"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </Column>
-              <Column header="Select " selectionMode="multiple"></Column>
-            </DataTable>
+            <!-- SENSOR TABLE HERE -->
+            <SensorTable
+              :sensorNames="sensorNames"
+              :selectedSensors="selectedSensors"
+            />
           </AccordionTab>
-
           <AccordionTab :disabled="!showSensorData" header="Sensor Data">
             <!-- GRAPHS HERE -->
             <div v-if="showSensorData">
@@ -83,54 +38,42 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watchEffect } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
+import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
+import SensorTable from "@/components/SensorTable.vue";
 
 export default defineComponent({
-  components: { LineGraph },
+  components: { LineGraph, SensorTable },
   name: "VesselData",
   setup() {
-    const selectedSensors = ref([] as []);
-    const today = new Date();
-    const minDate = today.getMonth();
-    const maxDate = today.getMonth() + 3;
-    const startDate = ref(null);
-    const stopDate = ref(null);
-    const {
-      sensorNames,
-      fetchData,
-      setSensorNames,
-      initialize,
-    } = useSensorData();
-    const active = ref(0 as number);
+    const selectedSensors = useSelectedSensors();
     const showSensorData = ref(false);
-    const sensordata = ref([] as any);
-
-    initialize();
+    const active = ref(0 as number);
+    
 
     const sendSelected = () => {
       showSensorData.value = true;
       const ids: number[] = [];
       selectedSensors.value.map((s) => {
         ids.push(s["id"]);
+        console.log(s["startTime"], s["endTime"]);
+        
       });
       /* sensordata.value = getSensorDataById(ids); */
       active.value = 1;
       /* console.log(sensordata); */
     };
 
-    return {
-      sensorNames,
-      selectedSensors,
-      sendSelected,
-      active,
-      showSensorData,
-      minDate,
-      maxDate,
-      startDate,
-      stopDate,
-    };
+    // From server
+    const { sensorNames, initialize } = useSensorData();
+
+    initialize();
+
+
+    
+    return { active, showSensorData, sensorNames, selectedSensors, sendSelected };
   },
 });
 </script>
