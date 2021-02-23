@@ -12,8 +12,7 @@
 
       <Column field="value" header="Value">
         <template #editor="slotProps">
-          <InputText v-model="slotProps.data.value" />
-          <p>{{slotProps.data.value}}</p>
+          <InputText v-model="slotProps.data.value"/>
         </template>
       </Column>
     </DataTable>
