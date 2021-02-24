@@ -1,6 +1,8 @@
 
 <template>
+  <div class="container">
     <VesselDatatable/>
+  </div>
 </template>
 
 

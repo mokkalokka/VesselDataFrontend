@@ -1,34 +1,32 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <DataTable
-        :value="vessels"
-        v-model:selection="selectedVessel"
-        selectionMode="single"
-        dataKey="id"
-        :filters="filters"
-        @row-select="onRowSelect"
-        :paginator="true"
-        :rows="10"
-      >
-        <template #header>
-          <div class="p-d-flex p-ai-center p-jc-between">
-            <h5 class="p-m-0">Vessels</h5>
-            <span class="p-input-icon-left">
-              <i class="pi pi-search" />
-              <InputText v-model="filters['name']" placeholder="Vessel name" />
-            </span>
-          </div>
-        </template>
+  <div class="card">
+    <DataTable
+      :value="vessels"
+      v-model:selection="selectedVessel"
+      selectionMode="single"
+      dataKey="id"
+      :filters="filters"
+      @row-select="onRowSelect"
+      :paginator="true"
+      :rows="10"
+    >
+      <template #header>
+        <div class="p-d-flex p-ai-center p-jc-between">
+          <h5 class="p-m-0">Vessels</h5>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="filters['name']" placeholder="Vessel name" />
+          </span>
+        </div>
+      </template>
 
-        <Column
-          field="name"
-          header="Name"
-          sortable
-          filterMatchMode="contains"
-        ></Column>
-      </DataTable>
-    </div>
+      <Column
+        field="name"
+        header="Name"
+        sortable
+        filterMatchMode="contains"
+      ></Column>
+    </DataTable>
   </div>
 </template>
 

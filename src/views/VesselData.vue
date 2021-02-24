@@ -1,84 +1,94 @@
 <template>
-  <div class="p-d-flex p-p-3 card">
-    <Card>
-      <template #header>
-        <h1>Header here</h1>
-      </template>
-      <template #title> Sensors </template>
-      <template #content>
-        <Accordion v-model:activeIndex="active">
-          <AccordionTab header="Sensor table">
-            <DataTable
-              :value="sensorNames"
-              v-model:selection="selectedSensors"
-              dataKey="id"
-              :scrollable="true"
-              scrollHeight="600px"
-              editMode="cell"
-              class="editable-cells-table"
-            >
-              <Column
-                field="sensorName"
-                header="Sensors Name"
-                sortable="true"
-              ></Column>
-              <Column field="startDate" header="Start time" headerStyle="text-align:center">
-                <template #body>
-                  <i class="pi pi-calendar"></i>
-                </template>
-                <template #editor="slotProps">
-                  <div class="p-fluid p-grid p-formgrid">
-                    <div class="p-field p-col-12 p-md-4">
-                      <Calendar
-                        id="min"
-                        v-model="slotProps.data['startDate']"
-                        showOnFocus="false"
-                      />
+  <div class="container">
+    <div class="p-d-flex p-p-3 card">
+      <Card>
+        <template #header>
+          <h1>Header here</h1>
+        </template>
+        <template #title> Sensors </template>
+        <template #content>
+          <Accordion v-model:activeIndex="active">
+            <AccordionTab header="Sensor table">
+              <DataTable
+                :value="sensorNames"
+                v-model:selection="selectedSensors"
+                dataKey="id"
+                :scrollable="true"
+                scrollHeight="600px"
+                editMode="cell"
+                class="editable-cells-table"
+              >
+                <Column
+                  field="sensorName"
+                  header="Sensors Name"
+                  sortable="true"
+                ></Column>
+                <Column
+                  field="startDate"
+                  header="Start time"
+                  headerStyle="text-align:center"
+                >
+                  <template #body>
+                    <i class="pi pi-calendar"></i>
+                  </template>
+                  <template #editor="slotProps">
+                    <div class="p-fluid p-grid p-formgrid">
+                      <div class="p-field p-col-12 p-md-4">
+                        <Calendar
+                          id="min"
+                          v-model="slotProps.data['startDate']"
+                          showOnFocus="false"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </Column>
-              <Column field="stopDate" header="End time" headerStyle="text-align:center">
-                <template #body>
-                  <i class="pi pi-calendar"></i>
-                </template>
+                  </template>
+                </Column>
+                <Column
+                  field="stopDate"
+                  header="End time"
+                  headerStyle="text-align:center"
+                >
+                  <template #body>
+                    <i class="pi pi-calendar"></i>
+                  </template>
 
-                <template #editor="slotProps">
-                  <div class="p-fluid p-grid p-formgrid">
-                    <div class="p-field p-col-12 p-md-4">
-                      <Calendar
-                        id="max"
-                        v-model="slotProps.data['stopDate']"
-                        showOnFocus="false"
-                      />
+                  <template #editor="slotProps">
+                    <div class="p-fluid p-grid p-formgrid">
+                      <div class="p-field p-col-12 p-md-4">
+                        <Calendar
+                          id="max"
+                          v-model="slotProps.data['stopDate']"
+                          showOnFocus="false"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </Column>
-              <Column header="Select " selectionMode="multiple"></Column>
-            </DataTable>
-          </AccordionTab>
+                  </template>
+                </Column>
+                <Column header="Select " selectionMode="multiple"></Column>
+              </DataTable>
+            </AccordionTab>
 
-          <AccordionTab :disabled="!showSensorData" header="Sensor Data">
-            <!-- GRAPHS HERE -->
-            <div v-if="showSensorData">
-              <div v-for="s of selectedSensors" :key="s.id">
-                <p>{{ s.sensorName }}</p>
-                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+            <AccordionTab :disabled="!showSensorData" header="Sensor Data">
+              <!-- GRAPHS HERE -->
+              <div v-if="showSensorData">
+                <div v-for="s of selectedSensors" :key="s.id">
+                  <p>{{ s.sensorName }}</p>
+                  <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+                </div>
               </div>
-            </div>
-          </AccordionTab>
-        </Accordion>
-      </template>
-      <template #footer>
-        <Button
-          label="view selected data"
-          icon="pi pi-table"
-          class="p-button-rounded p-button-info"
-          @click="sendSelected"
-        />
-      </template>
-    </Card>
+            </AccordionTab>
+          </Accordion>
+        </template>
+        <template #footer>
+          <Button
+            label="view selected data"
+            icon="pi pi-table"
+            class="p-button-rounded p-button-info"
+            @click="sendSelected"
+          />
+        </template>
+      </Card>
+    </div>
   </div>
 </template>
 
