@@ -12,7 +12,7 @@
 
       <Column field="value" header="Value">
         <template #editor="slotProps">
-          <InputText v-model="slotProps.data.value"/>
+          <InputText v-model="slotProps.data.value" />
         </template>
       </Column>
     </DataTable>
@@ -20,14 +20,19 @@
     <button class="btn btn-danger m-3" @click="setDefault">
       Revert to default
     </button>
+
+
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
 
+
 export default defineComponent({
   name: "Settings",
+  
+
   setup() {
     let settings = reactive([
       { description: "Color theme", value: "Light" },
