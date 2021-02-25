@@ -2,7 +2,9 @@
   <div class="my-5 ">
     <div v-if="data.data.labels.length > 1">
       <Chart type="line" :data="data.data" />
+
       <Slider
+        class="mx-3"
         v-model="sliderValue"
         :step="1"
         :min="min"

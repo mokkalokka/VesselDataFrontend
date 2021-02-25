@@ -1,42 +1,45 @@
 <template>
   <div class="card my-4">
-    <Accordion v-model:activeIndex="active">
+    <div class="p-d-flex p-jc-center"></div>
+    <Accordion :activeIndex="active" :multiple="true">
       <AccordionTab header="Sensor table">
         <!-- SENSOR TABLE HERE -->
         <SensorTable
           :sensorNames="sensorNames"
           :selectedSensors="selectedSensors"
         />
+        <div class="p-d-flex p-jc-center" v-if="selectedSensors.length != 0">
+          <Button
+            label="view selected data"
+            icon="pi pi-table"
+            class="p-button-rounded p-button-info p-m-4"
+            @click="sendSelected"
+          />
+        </div>
       </AccordionTab>
+
       <AccordionTab :disabled="!showSensorData" header="Sensor Data">
         <!-- GRAPHS HERE -->
-        <InputText
-            v-model="graphFilter"
-            placeholder="Keyword Search"
-          />
-          <p>{{graphFilter}}</p>
+        <div class="p-d-flex p-jc-center pt-2">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="graphFilter" placeholder="Keyword Search" />
+          </span>
+        </div>
+
         <div v-if="showSensorData">
           <div v-for="s of selectedSensors" :key="s.id">
-            <div >
-              <p>{{ s.sensorName }}</p>
+            <div v-if="s.sensorName.includes(graphFilter)">
+              <!-- <h1>{{ s.sensorName }}</h1> -->
               <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
             </div>
-            
           </div>
         </div>
       </AccordionTab>
-      <AccordionTab header="Map" v-model:activeIndex="active">
-            <Map/>
+      <AccordionTab header="Map">
+        <Map />
       </AccordionTab>
     </Accordion>
-      <div class="p-d-flex p-jc-center">
-        <Button
-          label="view selected data"
-          icon="pi pi-table"
-          class="p-button-rounded p-button-info p-m-4"
-          @click="sendSelected"
-        />
-    </div>
   </div>
 </template>
 
@@ -54,10 +57,8 @@ export default defineComponent({
   setup() {
     const selectedSensors = useSelectedSensors();
     const showSensorData = ref(false);
-    const active = ref(2 as number);
-    const graphFilter = ref("")
-    const filteredSensors = ref([])
-    
+    const active = ref([0, 2] as number[]);
+    const graphFilter = ref("");
 
     const sendSelected = () => {
       showSensorData.value = true;
@@ -67,12 +68,9 @@ export default defineComponent({
         console.log(s["startTime"], s["endTime"]);
       });
       /* sensordata.value = getSensorDataById(ids); */
-      active.value = 1;
+      active.value = [1];
       /* console.log(sensordata); */
     };
-
-
-
 
     // From server
     const { sensorNames, initialize } = useSensorData();
@@ -85,11 +83,14 @@ export default defineComponent({
       sensorNames,
       selectedSensors,
       sendSelected,
-      graphFilter
+      graphFilter,
     };
   },
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+.p-accordion .p-accordion-content {
+  padding: 0;
+}
 </style>

@@ -5,7 +5,7 @@
     v-model:filters="sensorFilters"
     dataKey="id"
     editMode="cell"
-    class="editable-cells-table"
+    class="editable-cells-table p-p-0"
     :scrollable="true"
     scrollHeight="400px"
   >

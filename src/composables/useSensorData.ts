@@ -3,11 +3,17 @@ import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 import { mapToStyles } from "@popperjs/core/lib/modifiers/computeStyles";
 
-interface Types {
-    [key: string]: any | any[];
+interface SensorName {
+    id: number;
+    filterkey: string;
+    sensorName: string;
+    description: string;
+    startTime: Date;
+    endTime: Date;
 }
 
-const sensorNames = ref([] as Types)
+
+const sensorNames = ref([] as SensorName[])
 const data = ref([])
 const position = ref([] as any)
 
@@ -25,13 +31,16 @@ export function useSensorData() {
         const endTime = new Date(response.value[0]["time"][3599])
         
 
-        sensorNames.value = response.value.map((e: Types, index: number) => {
+        sensorNames.value = response.value.map((e: SensorName, index: number) => {
             const namefields = Object.keys(e)[0].split(".");
-            return { id: index, 
-                'filterkey': Object.keys(e)[0],
-                'sensorName':  (namefields.length > 1 ? namefields[namefields.length - 2] + " " + namefields[namefields.length - 1] : namefields[0]),
-                'description': namefields[0], startTime: startTime, endTime: endTime }
-        })
+            return { 
+                id: index, 
+                filterkey: Object.keys(e)[0],
+                sensorName:  (namefields.length > 1 ? namefields[namefields.length - 2] + " " + namefields[namefields.length - 1] : namefields[0]),
+                description: namefields[0], 
+                startTime: startTime, 
+                endTime: endTime } 
+        } ) as SensorName[]
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))
     }
 
