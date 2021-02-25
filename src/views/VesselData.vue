@@ -1,48 +1,39 @@
 <template>
-  <div class="p-md-12 p-p-3 card">
-    <Card>
-      <template #header>
-        <h1><i class="pi pi-compass"></i></h1>
-      </template>
-      <template #title> Sensors </template>
-      <template #content>
-        <Accordion v-model:activeIndex="active">
-          <AccordionTab header="Sensor table">
-            <!-- SENSOR TABLE HERE -->
-            <SensorTable
-              :sensorNames="sensorNames"
-              :selectedSensors="selectedSensors"
-            />
-          </AccordionTab>
-          <AccordionTab :disabled="!showSensorData" header="Sensor Data">
-            <!-- GRAPHS HERE -->
-            <div v-if="showSensorData">
-              <div v-for="s of selectedSensors" :key="s.id">
-                <p>{{ s.sensorName }}</p>
-                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-              </div>
-            </div>
-          </AccordionTab>
-          <AccordionTab header="Map" v-model:activeIndex="active">
+  <div class="card my-4">
+    <Accordion v-model:activeIndex="active">
+      <AccordionTab header="Sensor table">
+        <!-- SENSOR TABLE HERE -->
+        <SensorTable
+          :sensorNames="sensorNames"
+          :selectedSensors="selectedSensors"
+        />
+      </AccordionTab>
+      <AccordionTab :disabled="!showSensorData" header="Sensor Data">
+        <!-- GRAPHS HERE -->
+        <div v-if="showSensorData">
+          <div v-for="s of selectedSensors" :key="s.id">
+            <p>{{ s.sensorName }}</p>
+            <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+          </div>
+        </div>
+      </AccordionTab>
+      <AccordionTab header="Map" v-model:activeIndex="active">
             <Map/>
-          </AccordionTab>
-        </Accordion>
-        
-      </template>
-      <template #footer>
+      </AccordionTab>
+    </Accordion>
+      <div class="p-d-flex p-jc-center">
         <Button
           label="view selected data"
           icon="pi pi-table"
-          class="p-button-rounded p-button-info"
+          class="p-button-rounded p-button-info p-m-4"
           @click="sendSelected"
         />
-      </template>
-    </Card>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from "vue";
+import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
@@ -64,7 +55,6 @@ export default defineComponent({
       selectedSensors.value.map((s) => {
         ids.push(s["id"]);
         console.log(s["startTime"], s["endTime"]);
-        
       });
       /* sensordata.value = getSensorDataById(ids); */
       active.value = 1;
@@ -76,9 +66,13 @@ export default defineComponent({
 
     initialize();
 
-
-    
-    return { active, showSensorData, sensorNames, selectedSensors, sendSelected };
+    return {
+      active,
+      showSensorData,
+      sensorNames,
+      selectedSensors,
+      sendSelected,
+    };
   },
 });
 </script>

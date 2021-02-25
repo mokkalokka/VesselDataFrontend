@@ -2,13 +2,35 @@
   <DataTable
     :value="sensorNames"
     v-model:selection="selectedSensors"
+    v-model:filters="sensorFilters"
     dataKey="id"
-    :paginator="true"
-    :rows="10"
     editMode="cell"
     class="editable-cells-table"
+    :paginator="true"
+    :rows="10"
   >
-    <Column field="sensorName" header="Sensors Name" sortable="true"></Column>
+    <template #header>
+      <div class="p-d-flex p-jc-between">
+        <Button
+          type="button"
+          icon="pi pi-filter-slash"
+          label="Clear"
+          class="p-button-outlined"
+          @click="clearFilter()"
+        />
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" />
+          <InputText
+            v-model="sensorFilters['sensorName']"
+            placeholder="Keyword Search"
+          />
+        </span>
+      </div>
+    </template>
+    <template #empty> No Sensors found. </template>
+    <template #loading> Loading sensors. Please wait. </template>
+
+    <Column field="sensorName" header="Sensors Name" sortable filterMatchMode="contains"></Column>
     <Column
       field="startTime"
       header="Start time"
@@ -81,12 +103,19 @@ import { useSelectedSensors } from "@/composables/useSelectedSensors";
 export default defineComponent({
   name: "SensorTable",
   props: ["sensorNames"],
-  setup: (props) => {
+  setup: () => {
     //component specific
+    const sensorFilters = ref({ sensorName: "" });
     const selectedSensors = useSelectedSensors();
+
+    const clearFilter = () => {
+      sensorFilters.value["sensorName"] = "";
+    };
 
     return {
       selectedSensors,
+      sensorFilters,
+      clearFilter,
     };
   },
 });
