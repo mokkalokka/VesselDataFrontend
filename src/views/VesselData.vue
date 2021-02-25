@@ -10,10 +10,18 @@
       </AccordionTab>
       <AccordionTab :disabled="!showSensorData" header="Sensor Data">
         <!-- GRAPHS HERE -->
+        <InputText
+            v-model="graphFilter"
+            placeholder="Keyword Search"
+          />
+          <p>{{graphFilter}}</p>
         <div v-if="showSensorData">
           <div v-for="s of selectedSensors" :key="s.id">
-            <p>{{ s.sensorName }}</p>
-            <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+            <div >
+              <p>{{ s.sensorName }}</p>
+              <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+            </div>
+            
           </div>
         </div>
       </AccordionTab>
@@ -47,6 +55,8 @@ export default defineComponent({
     const selectedSensors = useSelectedSensors();
     const showSensorData = ref(false);
     const active = ref(2 as number);
+    const graphFilter = ref("")
+    const filteredSensors = ref([])
     
 
     const sendSelected = () => {
@@ -61,6 +71,9 @@ export default defineComponent({
       /* console.log(sensordata); */
     };
 
+
+
+
     // From server
     const { sensorNames, initialize } = useSensorData();
 
@@ -72,6 +85,7 @@ export default defineComponent({
       sensorNames,
       selectedSensors,
       sendSelected,
+      graphFilter
     };
   },
 });
