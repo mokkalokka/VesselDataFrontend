@@ -20,7 +20,7 @@
 
       <AccordionTab :disabled="!showSensorData" header="Sensor Data">
         <!-- GRAPHS HERE -->
-        <div class="p-d-flex p-jc-center pt-2">
+        <div class="p-d-flex p-jc-end graphSearch p-3">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText v-model="graphFilter" placeholder="Keyword Search" />
@@ -30,7 +30,7 @@
         <div v-if="showSensorData">
           <div v-for="s of selectedSensors" :key="s.id">
             <div v-if="s.sensorName.includes(graphFilter)">
-              <!-- <h1>{{ s.sensorName }}</h1> -->
+              <h1 class="p-d-flex p-jc-center m-2">{{ s.sensorName }}</h1>
               <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
             </div>
           </div>
@@ -92,5 +92,10 @@ export default defineComponent({
 <style lang="scss">
 .p-accordion .p-accordion-content {
   padding: 0;
+}
+
+.graphSearch{
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
 }
 </style>
