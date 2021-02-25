@@ -6,8 +6,8 @@
     dataKey="id"
     editMode="cell"
     class="editable-cells-table"
-    :paginator="true"
-    :rows="10"
+    :scrollable="true"
+    scrollHeight="400px"
   >
     <template #header>
       <div class="p-d-flex p-jc-between">
@@ -30,13 +30,26 @@
     <template #empty> No Sensors found. </template>
     <template #loading> Loading sensors. Please wait. </template>
 
-    <Column field="sensorName" header="Sensors Name" sortable filterMatchMode="contains"></Column>
+    <Column
+      field="sensorName"
+      header="Sensors Name"
+      sortable
+      filterMatchMode="contains"
+    ></Column>
+    <Column
+      field="description"
+      header="Description"
+      headerStyle="text-align:center"
+            bodyStyle="text-align:center"
+
+    ></Column>
     <Column
       field="startTime"
       header="Start time"
       headerStyle="text-align:center"
       bodyStyle="text-align:center"
     >
+
       <template #body="slotProps">
         <p>
           <i class="pi pi-calendar"></i>
@@ -45,8 +58,6 @@
       </template>
 
       <template #editor="slotProps">
-        <div class="p-fluid p-grid p-formgrid">
-          <div class="p-field p-col-12 p-md-4">
             <Calendar
               id="min"
               v-model="slotProps.data['startTime']"
@@ -55,8 +66,6 @@
               :maxDate="sensorNames[0].endTime"
               :manualInput="false"
             />
-          </div>
-        </div>
       </template>
     </Column>
     <Column
@@ -73,8 +82,6 @@
       </template>
 
       <template #editor="slotProps">
-        <div class="p-fluid p-grid p-formgrid">
-          <div class="p-field p-col-12 p-md-4">
             <Calendar
               id="max"
               v-model="slotProps.data['endTime']"
@@ -83,8 +90,6 @@
               :maxDate="sensorNames[0].endTime"
               :manualInput="false"
             />
-          </div>
-        </div>
       </template>
     </Column>
     <Column
@@ -107,6 +112,7 @@ export default defineComponent({
     //component specific
     const sensorFilters = ref({ sensorName: "" });
     const selectedSensors = useSelectedSensors();
+    
 
     const clearFilter = () => {
       sensorFilters.value["sensorName"] = "";
@@ -116,6 +122,7 @@ export default defineComponent({
       selectedSensors,
       sensorFilters,
       clearFilter,
+      
     };
   },
 });
