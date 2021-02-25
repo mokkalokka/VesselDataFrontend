@@ -1,15 +1,20 @@
 
 import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
+import { mapToStyles } from "@popperjs/core/lib/modifiers/computeStyles";
 
 interface Types {
     [key: string]: any | any[];
 }
 
+const sensorNames = ref([] as Types)
+const data = ref([])
+const position = ref([] as any)
+
 export function useSensorData() {
     /* const sensors = ref([] as Types) */
-    const sensorNames = ref([] as Types)
-    const data = ref([])
+    
+    
     /* const selectedSensors = ref([]) */
     const { response, error, fetching, fetchData } = useFetch('http://localhost:3000/sensors');
 
@@ -35,9 +40,23 @@ export function useSensorData() {
         return sensorIds.map(id => Object.values(response.value[id])[0])
     }
 
-    function initialize() {
+    function setPosition() {
+        const lat = response.value[81]['Nav_Pos.lat'] as number[]
+        const lon = response.value[82]['Nav_Pos.lon'] as number[]
+
+        position.value = lat.map((_ , index) =>{
+            /* return {lat: lat[index], lng: lon[index]} */
+            return [lat[index], lon[index]]
+        })
+        
+    }
+
+
+    function initialize(){
         fetchData().then(() => {
             setSensorNames()
+            data.value = response.value
+            setPosition()
 
         })
     }
@@ -49,7 +68,9 @@ export function useSensorData() {
         fetching,
         fetchData,
         setSensorNames,
-        initialize
+        initialize,
+        setPosition,
+        position
     }
 }
 

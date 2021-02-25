@@ -17,6 +17,9 @@
           </div>
         </div>
       </AccordionTab>
+      <AccordionTab header="Map" v-model:activeIndex="active">
+            <Map/>
+      </AccordionTab>
     </Accordion>
       <div class="p-d-flex p-jc-center">
         <Button
@@ -35,14 +38,16 @@ import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import SensorTable from "@/components/SensorTable.vue";
+import Map from "@/components/Map.vue";
 
 export default defineComponent({
-  components: { LineGraph, SensorTable },
+  components: { LineGraph, SensorTable, Map },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
     const showSensorData = ref(false);
-    const active = ref(0 as number);
+    const active = ref(2 as number);
+    
 
     const sendSelected = () => {
       showSensorData.value = true;
