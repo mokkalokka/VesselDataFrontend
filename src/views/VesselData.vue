@@ -28,12 +28,18 @@
         </div>
 
         <div v-if="showSensorData">
-          <div v-for="s of selectedSensors" :key="s.id">
-            <div v-if="s.sensorName.includes(graphFilter)">
-              <h1 class="p-d-flex p-jc-center m-2">{{ s.sensorName }}</h1>
+          <Accordion
+            v-for="s in selectedSensors"
+            :key="s.id"
+            :activeIndex="graphActive"
+            :multiple="true"
+            v-show="filter(s.sensorName)"
+          >
+            <AccordionTab :header="s.sensorName">
+              <!-- <h1 class="p-d-flex p-jc-center m-2">{{ s.sensorName }}</h1> -->
               <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-            </div>
-          </div>
+            </AccordionTab>
+          </Accordion>
         </div>
       </AccordionTab>
       <AccordionTab header="Map">
@@ -59,17 +65,22 @@ export default defineComponent({
     const showSensorData = ref(false);
     const active = ref([0, 2] as number[]);
     const graphFilter = ref("");
+    const graphActive = ref([0] as number[]);
 
     const sendSelected = () => {
       showSensorData.value = true;
       const ids: number[] = [];
       selectedSensors.value.map((s) => {
         ids.push(s["id"]);
-        console.log(s["startTime"], s["endTime"]);
+        /* console.log(s["startTime"], s["endTime"]); */
       });
       /* sensordata.value = getSensorDataById(ids); */
       active.value = [1];
       /* console.log(sensordata); */
+    };
+
+    const filter = (sensorName: string) => {
+      return sensorName.toLowerCase().includes(graphFilter.value.toLowerCase());
     };
 
     // From server
@@ -84,6 +95,8 @@ export default defineComponent({
       selectedSensors,
       sendSelected,
       graphFilter,
+      graphActive,
+      filter,
     };
   },
 });
@@ -94,7 +107,7 @@ export default defineComponent({
   padding: 0;
 }
 
-.graphSearch{
+.graphSearch {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
 }

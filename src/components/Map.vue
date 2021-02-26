@@ -41,7 +41,7 @@ export default {
       const zoom = ref(7)
       const {initialize, position, fetching } = useSensorData()
 
-      initialize()
+      /* initialize() */
 
       return {
           zoom,
