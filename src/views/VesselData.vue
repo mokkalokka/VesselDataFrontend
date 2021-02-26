@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <div class="card my-4">
     <div class="p-d-flex p-jc-center"></div>
     <Accordion :activeIndex="active" :multiple="true">
@@ -46,6 +47,7 @@
         <Map />
       </AccordionTab>
     </Accordion>
+  </div>
   </div>
 </template>
 
