@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar sticky navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="/"
         ><h3>
@@ -101,6 +101,10 @@ export default {};
 
 
 <style scoped lang="scss">
+.navbar {
+  height: 10vh;
+}
+
 .navbar-light .navbar-brand h3 {
   color: hsl(204deg 100% 20%);
   font-weight: bold;
