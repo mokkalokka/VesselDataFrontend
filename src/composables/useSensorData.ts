@@ -1,5 +1,5 @@
 
-import { ref } from "vue";
+import { ReactiveEffect, ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 
 interface SensorName {
@@ -12,8 +12,10 @@ interface SensorName {
 }
 
 
+
+
 const sensorNames = ref([] as SensorName[])
-const position = ref([] as any)
+const position = ref([[],[]] as number[][])
 
 
 export function useSensorData() {
@@ -44,13 +46,17 @@ export function useSensorData() {
         return sensorIds.map(id => Object.values(response.value[id])[0])
     }
 
-    function setPosition() {
+    function getPosition() {
         const lat = response.value[81]['Nav_Pos.lat'] as number[]
         const lon = response.value[82]['Nav_Pos.lon'] as number[]
+        const time = response.value[0]['time'] as number[]
+        
+        
 
         position.value = lat.map((_ , index) =>{
-            return [lat[index], lon[index]]
+            return [lat[index], lon[index], time[index]]
         })
+        return position
         
     }
 
@@ -58,8 +64,6 @@ export function useSensorData() {
     function initialize(){
         fetchData().then(() => {
             setSensorNames()
-            setPosition()
-
         })
     }
 
@@ -71,7 +75,7 @@ export function useSensorData() {
         fetchData,
         setSensorNames,
         initialize,
-        setPosition,
+        getPosition,
         position
     }
 }
