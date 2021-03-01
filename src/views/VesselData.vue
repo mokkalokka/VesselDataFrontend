@@ -14,7 +14,7 @@
             label="view selected data"
             icon="pi pi-table"
             class="p-button-rounded p-button-info p-m-4"
-            @click="sendSelected"
+            @click="setSensorsToRender"
           />
         </div>
       </AccordionTab>
@@ -30,14 +30,13 @@
 
         <div v-if="showSensorData">
           <Accordion
-            v-for="s in selectedSensors"
+            v-for="s in sensorsToRender"
             :key="s.id"
             :activeIndex="graphActive"
             :multiple="true"
             v-show="filter(s.sensorName)"
           >
             <AccordionTab :header="s.sensorName">
-              <!-- <h1 class="p-d-flex p-jc-center m-2">{{ s.sensorName }}</h1> -->
               <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
             </AccordionTab>
           </Accordion>
@@ -59,6 +58,16 @@ import LineGraph from "@/components/LineGraph.vue";
 import SensorTable from "@/components/SensorTable.vue";
 import Map from "@/components/Map.vue";
 
+
+interface SensorName {
+    id: number;
+    filterkey: string;
+    sensorName: string;
+    description: string;
+    startTime: Date;
+    endTime: Date;
+}
+
 export default defineComponent({
   components: { LineGraph, SensorTable, Map },
   name: "VesselData",
@@ -68,17 +77,12 @@ export default defineComponent({
     const active = ref([0, 2] as number[]);
     const graphFilter = ref("");
     const graphActive = ref([0] as number[]);
+    const sensorsToRender = ref([] as SensorName[])
 
-    const sendSelected = () => {
+    const setSensorsToRender = () => {
       showSensorData.value = true;
-      const ids: number[] = [];
-      selectedSensors.value.map((s) => {
-        ids.push(s["id"]);
-        /* console.log(s["startTime"], s["endTime"]); */
-      });
-      /* sensordata.value = getSensorDataById(ids); */
+      sensorsToRender.value = [...selectedSensors.value]
       active.value = [1];
-      /* console.log(sensordata); */
     };
 
     const filter = (sensorName: string) => {
@@ -95,10 +99,11 @@ export default defineComponent({
       showSensorData,
       sensorNames,
       selectedSensors,
-      sendSelected,
+      setSensorsToRender,
       graphFilter,
       graphActive,
       filter,
+      sensorsToRender
     };
   },
 });
