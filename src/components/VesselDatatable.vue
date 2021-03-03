@@ -1,33 +1,32 @@
 <template>
-  <div class="card">
+  <div class="card mt-4">
     
     <table class="table table-bordered table-hover">
       <thead>
         <tr>
           <th>
             <div class="row">
-            <div class="col">Name </div>
-            <div class="col"><button type="button" class="btn btn-primary" @click="sort">sort</button></div>
-            <div class="col"><input type="text" class="form-control" placeholder="Vessel name" v-model="input"></div>
+            <div class="col-md-9 order-1 order-md-0"><button type="button" class="btn btn-outline-primary" @click="sort">Navn <BIconArrowDownUp/> </button> </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+              <input type="text" class="form-control" placeholder="Fartøy navn" v-model="input">
+              </div>
             </div>
             </th>
-            
-        </tr>
+        </tr> 
       </thead>
       <tbody>
         <tr v-for="vessel in vessels" :vessel="vessel" :key="vessel.name">
           <td v-show="filter(vessel)">
-              <!-- <th scope="row"><a href="#awdawdawd" class="stretched-link">wadwawad</a> </th> -->
             <th scope="row" ><router-link :to="{  name: 'VesselData', params: { id: vessel.id } }">{{ vessel.name }}</router-link></th>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+  
 </template>
 
 <script lang="ts">
-import router from "@/router";
 import { defineComponent, ref } from "vue";
 import { useFetch } from "@/composables/useFetch";
 
@@ -39,10 +38,8 @@ export default defineComponent({
     const selectedVessel = ref({} as Vessel);
     const input = ref("" as string);
 
-    const { response, error, fetching, fetchData } = useFetch(
-      "http://localhost:3000/vessels"
-    );
-    
+    const { response, fetchData } = useFetch("http://localhost:3000/vessels");
+
     fetchData().then(() => {
       vessels.value = response.value;
     });
@@ -54,7 +51,6 @@ export default defineComponent({
     const sort = () => {
       vessels.value = vessels.value.reverse();
     };
-
 
     return {
       selectedVessel,
@@ -73,7 +69,4 @@ interface Vessel {
 </script>
 
 <style lang="scss">
-.card {
-  margin: 20px;
-}
 </style>
