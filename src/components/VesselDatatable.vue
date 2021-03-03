@@ -1,6 +1,7 @@
 <template>
   <div class="card">
-    <!-- <table class="table table-striped table-bordered table-hover">
+    
+    <table class="table table-bordered table-hover">
       <thead>
         <tr>
           <th>
@@ -16,39 +17,12 @@
       <tbody>
         <tr v-for="vessel in vessels" :vessel="vessel" :key="vessel.name">
           <td v-show="filter(vessel)">
-              awdawdawdadth scope="row"><a href="#awdawdawd" class="stretched-link">wadwawad</a></th> 
-            <th scope="row" ><router-link class="strecthed-link" :to="{  name: 'VesselData', params: { id: vessel.id } }">{{ vessel.name }}</router-link></th>
+              <!-- <th scope="row"><a href="#awdawdawd" class="stretched-link">wadwawad</a> </th> -->
+            <th scope="row" ><router-link :to="{  name: 'VesselData', params: { id: vessel.id } }">{{ vessel.name }}</router-link></th>
           </td>
         </tr>
       </tbody>
-    </table> -->
-
-    <DataTable
-      :value="vessels"
-      v-model:selection="selectedVessel"
-      selectionMode="single"
-      dataKey="id"
-      filterDisplay="menu"
-      @row-select="onRowSelect"
-      :filters="filters"
-    >
-      <template #header>
-        <div class="p-d-flex p-ai-center p-jc-between">
-          <h5 class="p-m-0">Vessels</h5>
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="filters['name']" placeholder="Vessel name" />
-          </span>
-        </div>
-      </template>
-
-      <Column
-        field="name"
-        header="Name"
-        sortable
-        filterMatchMode="contains"
-      ></Column>
-    </DataTable>
+    </table>
   </div>
 </template>
 
@@ -63,14 +37,12 @@ export default defineComponent({
   setup: () => {
     const vessels = ref([] as Vessel[]);
     const selectedVessel = ref({} as Vessel);
-    const filters = ref({
-      name: "",
-    });
     const input = ref("" as string);
 
     const { response, error, fetching, fetchData } = useFetch(
       "http://localhost:3000/vessels"
     );
+    
     fetchData().then(() => {
       vessels.value = response.value;
     });
@@ -83,17 +55,9 @@ export default defineComponent({
       vessels.value = vessels.value.reverse();
     };
 
-    function onRowSelect() {
-      router.push({
-        name: "VesselData",
-        params: { id: selectedVessel.value.id },
-      });
-    }
 
     return {
       selectedVessel,
-      filters,
-      onRowSelect,
       vessels,
       input,
       sort,
