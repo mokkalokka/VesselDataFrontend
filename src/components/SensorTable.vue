@@ -3,7 +3,6 @@
     :value="sensorNames"
     v-model:selection="selectedSensors"
     v-model:filters="sensorFilters"
-    :globalFilterFields="['sensorName', 'description']"
     dataKey="id"
     editMode="cell"
     class="editable-cells-table p-p-0"
@@ -20,9 +19,10 @@
           @click="clearFilter()"
         />
         <span class="p-input-icon-left">
+          
           <i class="pi pi-search" />
           <InputText
-            v-model="sensorFilters['global']"
+            v-model="sensorFilters['sensorName']"
             placeholder="Keyword Search"
           />
         </span>
@@ -42,7 +42,6 @@
       header="Description"
       headerStyle="text-align:center"
       bodyStyle="text-align:center"
-
     ></Column>
     <Column
       field="startTime"
@@ -112,13 +111,13 @@ export default defineComponent({
   setup: () => {
     //component specific
     const sensorFilters = ref({ 
-      global: ""});
+      sensorName: ""});
   
     const selectedSensors = useSelectedSensors();
     
 
     const clearFilter = () => {
-      sensorFilters.value["global"] = "";
+      sensorFilters.value["sensorName"] = "";
       
     };
 
