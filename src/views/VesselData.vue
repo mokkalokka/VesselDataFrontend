@@ -53,7 +53,7 @@
 
   <div class="container">
     <div class="card my-4">
-      <div class="accordion accordion-flush" id="accordionFlushExample">
+      <div class="accordion accordion-flush open" id="accordionFlushExample">
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
             <button
@@ -69,7 +69,7 @@
           </h2>
           <div
             id="flush-collapseOne"
-            class="accordion-collapse collapse"
+            class="accordion-collapse collapse multi-collapse"
             aria-labelledby="flush-headingOne"
             data-bs-parent="#accordionFlushExample"
           >
@@ -80,7 +80,15 @@
                   :selectedSensors="selectedSensors"
                 />
                 <div class="" v-if="selectedSensors.length != 0">
-                <button class="btn btn-primary justify-content-center" @click="setSensorsToRender">view selected data</button>
+                  <button
+                    class="btn btn-primary"
+                    data-bs-target=".multi-collapse"
+                    data-bs-toggle="collapse"
+                    aria-controls="flush-collapseOne flush-collapseTwo"
+                    @click="setSensorsToRender"
+                  >
+                    Select Graph layout
+                  </button>
                 </div>
               </div>
             </div>
@@ -101,21 +109,19 @@
           </h2>
           <div
             id="flush-collapseTwo"
-            class="accordion-collapse collapse"
+            class="accordion-collapse collapse multi-collapse"
             aria-labelledby="flush-headingTwo"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               Sensor data for selected sensors here ;)
             </div>
           </div>
         </div>
-        <div class="accordion-item">
+        <div class="accordion-item" disabled="!showSensorData">
           <h2 class="accordion-header" id="flush-headingThree">
             <button
               class="accordion-button collapsed"
               type="button"
-              
               data-bs-toggle="collapse"
               data-bs-target="#flush-collapseThree"
               aria-expanded="false"
@@ -128,13 +134,12 @@
             id="flush-collapseThree"
             class="accordion-collapse collapse"
             aria-labelledby="flush-headingThree"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               <div v-if="showSensorData">
-              <div v-for="s in sensorsToRender" :key="s.id">
-                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-              </div>
+                <div v-for="s in sensorsToRender" :key="s.id">
+                  <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+                </div>
               </div>
             </div>
           </div>
@@ -146,7 +151,7 @@
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#flush-collapseFour"
-              aria-expanded="false"
+              aria-expanded="true"
               aria-controls="flush-collapseFour"
             >
               Map
@@ -156,7 +161,6 @@
             id="flush-collapseFour"
             class="accordion-collapse collapse show"
             aria-labelledby="flush-headingFour"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               <Map />
