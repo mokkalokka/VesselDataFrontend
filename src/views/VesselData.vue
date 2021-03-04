@@ -1,10 +1,11 @@
 <template>
+  <!--
 <div class="container">
   <div class="card my-4">
     <div class="p-d-flex p-jc-center"></div>
     <Accordion :activeIndex="active" :multiple="true">
       <AccordionTab header="Sensor table">
-        <!-- SENSOR TABLE HERE -->
+         SENSOR TABLE HERE
         <SensorTable
           :sensorNames="sensorNames"
           :selectedSensors="selectedSensors"
@@ -20,7 +21,7 @@
       </AccordionTab>
 
       <AccordionTab :disabled="!showSensorData" header="Sensor Data">
-        <!-- GRAPHS HERE -->
+        GRAPHS HERE
         <div class="p-d-flex p-jc-end graphSearch p-3">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
@@ -48,6 +49,123 @@
     </Accordion>
   </div>
   </div>
+  -->
+
+  <div class="container">
+    <div class="card my-4">
+      <div class="accordion accordion-flush" id="accordionFlushExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingOne">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseOne"
+              aria-expanded="false"
+              aria-controls="flush-collapseOne"
+            >
+              Sensor
+            </button>
+          </h2>
+          <div
+            id="flush-collapseOne"
+            class="accordion-collapse collapse"
+            aria-labelledby="flush-headingOne"
+            data-bs-parent="#accordionFlushExample"
+          >
+            <div class="accordion-body">
+              <div class="table table-responsive">
+                <SensorTable
+                  :sensorNames="sensorNames"
+                  :selectedSensors="selectedSensors"
+                />
+                <div class="" v-if="selectedSensors.length != 0">
+                <button class="btn btn-primary justify-content-center" @click="setSensorsToRender">view selected data</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingTwo">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseTwo"
+              aria-expanded="false"
+              aria-controls="flush-collapseTwo"
+            >
+              Sensor data
+            </button>
+          </h2>
+          <div
+            id="flush-collapseTwo"
+            class="accordion-collapse collapse"
+            aria-labelledby="flush-headingTwo"
+            data-bs-parent="#accordionFlushExample"
+          >
+            <div class="accordion-body">
+              Sensor data for selected sensors here ;)
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingThree">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseThree"
+              aria-expanded="false"
+              aria-controls="flush-collapseThree"
+            >
+              Graphs
+            </button>
+          </h2>
+          <div
+            id="flush-collapseThree"
+            class="accordion-collapse collapse"
+            aria-labelledby="flush-headingThree"
+            data-bs-parent="#accordionFlushExample"
+          >
+            <div class="accordion-body">
+              <div v-if="showSensorData">
+              <div v-for="s in sensorsToRender" :key="s.id">
+                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingFour">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseFour"
+              aria-expanded="false"
+              aria-controls="flush-collapseFour"
+            >
+              Map
+            </button>
+          </h2>
+          <div
+            id="flush-collapseFour"
+            class="accordion-collapse collapse show"
+            aria-labelledby="flush-headingFour"
+            data-bs-parent="#accordionFlushExample"
+          >
+            <div class="accordion-body">
+              <Map />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -58,14 +176,13 @@ import LineGraph from "@/components/LineGraph.vue";
 import SensorTable from "@/components/SensorTable.vue";
 import Map from "@/components/Map.vue";
 
-
 interface SensorName {
-    id: number;
-    filterkey: string;
-    sensorName: string;
-    description: string;
-    startTime: Date;
-    endTime: Date;
+  id: number;
+  filterkey: string;
+  sensorName: string;
+  description: string;
+  startTime: Date;
+  endTime: Date;
 }
 
 export default defineComponent({
@@ -77,11 +194,11 @@ export default defineComponent({
     const active = ref([0, 2] as number[]);
     const graphFilter = ref("");
     const graphActive = ref([0] as number[]);
-    const sensorsToRender = ref([] as SensorName[])
+    const sensorsToRender = ref([] as SensorName[]);
 
     const setSensorsToRender = () => {
       showSensorData.value = true;
-      sensorsToRender.value = [...selectedSensors.value]
+      sensorsToRender.value = [...selectedSensors.value];
       active.value = [1];
     };
 
@@ -103,7 +220,7 @@ export default defineComponent({
       graphFilter,
       graphActive,
       filter,
-      sensorsToRender
+      sensorsToRender,
     };
   },
 });
