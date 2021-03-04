@@ -9,9 +9,9 @@
             <div class="col-md-9 order-1 order-md-0"><button type="button" class="btn btn-outline-primary" @click="sort">Navn <BIconArrowDownUp/> </button> </div>
             <div class="col-md-3 mb-2 mb-md-0">
               <input type="text" class="form-control" placeholder="Fartøy navn" v-model="input">
-              </div>
             </div>
-            </th>
+            </div>
+          </th>
         </tr> 
       </thead>
       <tbody>
@@ -69,4 +69,9 @@ interface Vessel {
 </script>
 
 <style lang="scss">
+a {
+  text-decoration: none;
+  color: black;
+  font-weight: 400;
+}
 </style>
