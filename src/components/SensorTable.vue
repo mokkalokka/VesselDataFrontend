@@ -1,10 +1,10 @@
 <template>
   <div class="card my-4">
-    <div class="table table-responsive">
+    <div class="table-responsive">
       <table id="sensorTable" class="table table-bordered table-hover">
         <thead>
-          <tr class="table-secondary">
-            <th scope="col">Sensor Name</th>
+          <tr>
+            <th scope="col"><button type="button" class="active sort-btn-hover btn bg-transparent shadow-0 border-0" @click="sort">Sensor Name <BIconArrowDownUp/></button></th>
             <th scope="col">Description</th>
             <th scope="col">Start Time</th>
             <th scope="col">End Time</th>
@@ -148,4 +148,5 @@ a:focus.page-link {
 a:hover.page-link {
   cursor: pointer;
 }
+
 </style>
