@@ -28,9 +28,12 @@ import Slider from 'primevue/slider'
 import Calendar from 'primevue/calendar';
 import CheckBox from 'primevue/checkbox'
 
+import VueApexCharts from "vue3-apexcharts";
+
 createApp(App)
     .use(router)
     .use(PrimeVue)
+    .use(VueApexCharts)
     .component("DataTable", DataTable)
     .component("Column", Column)
     .component("Card", Card)

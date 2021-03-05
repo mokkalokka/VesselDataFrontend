@@ -1,6 +1,7 @@
 <template>
 <div style="height: 80vh; width: 100%">
-  <div style="height: 70vh; width: 100%">
+  <div v-if="max > 1" style="height: 70vh; width: 100%">
+
     <l-map
       v-model="zoom"
       v-model:zoom="zoom"

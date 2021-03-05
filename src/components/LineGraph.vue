@@ -1,70 +1,32 @@
 <template>
-  <div class="my-5 ">
-    <div v-if="data.data.labels.length > 1">
-      <Chart type="line" :data="data.data" />
-
-      <Slider
-        @mouseup="changeInterval"
-        class="mx-2"
-        v-model="sliderValue"
-        :step="1"
-        :min="min"
-        :max="max"
-        :range="true"
-      />
-      
-      <div class="p-d-flex p-jc-center graphSearch p-3">
-            <div class="p-3"><InputText v-on:keyup.enter="changeInterval" v-model="sliderValue[0]" /></div>
-            <div class="p-3"><InputText v-on:keyup.enter="changeInterval" v-model="sliderValue[1]" /></div>
-            <div class="p-3"><button @click="changeInterval" class="btn btn-primary">Update interval</button> </div>
-            <!-- <Calendar 
-            v-model="sliderTime[0]" 
-            id="min"
-            :showTime="true" 
-            :timeOnly="true"
-            :minDate="minTime" 
-            :maxDate="maxTime"
-            :showSeconds="true" />
-
-        
-            <Calendar 
-            v-model="sliderTime[1]" 
-            id="max"
-            :showTime="true" 
-            :timeOnly="true" 
-            :showSeconds="true"
-            :minDate="minTime" 
-            :maxDate="maxTime"/> -->
-            
-        </div>
+  <div>
+    <div id="wrapper" v-if="sensorData[0].data.length > 2">
+      <div id="chart-line2">
+        <apexchart
+          type="line"
+          height="400"
+          :options="chartOptions"
+          :series="sensorData"
+        ></apexchart>
+      </div>
+      <div id="chart-line">
+        <apexchart
+          type="area"
+          height="100"
+          :options="chartOptionsLine"
+          :series="sensorData"
+        ></apexchart>
+      </div>
     </div>
   </div>
-  
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, reactive, ref, watchEffect } from "vue";
+<script>
 import { useSensorData } from "@/composables/useSensorData";
+import { ref } from "vue";
+import { std, mean, max, min } from "mathjs";
 
-export interface Data {
-  data: {
-    labels: string[];
-    datasets: [
-      {
-        label: string;
-        data: number[] | null[];
-        fill: boolean;
-        borderColor: string;
-      }
-    ];
-  };
-}
-
-interface SensorTypes {
-  [key: string]: number[] | null[];
-}
-
-export default defineComponent({
+export default {
   name: "LineGraph",
   props: {
     sensorName: {
@@ -78,108 +40,189 @@ export default defineComponent({
   },
 
   setup(props) {
-    const { fetching, getSensorDataById, fetchData } = useSensorData();
-    const sensorData = ref([[], []] as [string[], number[]]);
-    const sliderValue = ref([0, 1]);
-    const min = ref(0);
-    const max = ref(1);
-    const time = ref([] as string[]);
-    const sliderTime = ref([new Date, new Date])
-    /* const minTime = ref(new Date)
-    const maxTime = ref(new Date) */
+    const { getSensorDataById, fetchData } = useSensorData();
+    const res = ref([[], []]);
+    const sensorData = ref([{ data: [[], []] }]);
 
-    const data = reactive({
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: props.sensorName,
-            data: [],
-            fill: true,
-            borderColor: "#42A5F5",
-          },
-        ],
+    const chartOptions = ref({
+      chart: {
+        id: "chart" + props.sensorId + "1",
+        type: "line",
+        height: 230,
+        toolbar: {
+          autoSelected: "pan",
+          show: true,
+        },
       },
-    } as Data);
+      stroke: {
+        width: 1,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      fill: {
+        opacity: 1,
+      },
+      markers: {
+        size: 0,
+      },
+      xaxis: {
+        type: "datetime",
+        tickAmount: 15,
+      },
+      yaxis: {
+        tickAmount: 4,
+        decimalsInFloat: 2,
+      },
+    });
+    const chartOptionsLine = ref({
+      chart: {
+        id: "chart" + props.sensorId + "2",
+        height: 100,
+        type: "area",
+        brush: {
+          target: "chart" + props.sensorId + "1",
+          enabled: true,
+        },
+        selection: {
+          enabled: true,
+        },
+      },
+      colors: ["#008FFB"],
+      fill: {
+        type: "gradient",
+        gradient: {
+          opacityFrom: 0.91,
+          opacityTo: 0.1,
+        },
+      },
+      xaxis: {
+        type: "datetime",
+        tooltip: {
+          enabled: false,
+        },
+      },
+      yaxis: {
+        tickAmount: 2,
+        decimalsInFloat: 2,
+      },
+    });
 
-    const getData = () => {
-      sensorData.value = getSensorDataById([props.sensorId]) as [
-        string[],
-        number[]
-      ];
+    fetchData().then(() => {
+      res.value = getSensorDataById([props.sensorId]);
 
-      time.value = sensorData.value[0].map((e) => {
-        const date = new Date(parseInt(String(e))).toLocaleTimeString();
-        //console.log(date);
-        return date;
+      sensorData.value[0].data = res.value[0].map((e, index) => {
+        return [new Date(res.value[0][index]), res.value[1][index]];
       });
-      data.data.labels = time.value;
+      sensorData.value[0].name = props.sensorName;
 
-      data.data.datasets[0].data = sensorData.value[1];
+      /* Analyse data */
+      const maxVal = max(res.value[1]);
+      const minVal = min(res.value[1]);
+      const avarage = mean(res.value[1]);
+      const stdDeviation = std(res.value[1]);
 
-      min.value = 0 ;
-      max.value = sensorData.value[0].length - 1;
-      sliderValue.value = [min.value, max.value];
-      sliderTime.value = [
-        new Date(parseInt(String(sensorData.value[0][0]))),
-        new Date(parseInt(String(sensorData.value[0][sensorData.value[0].length - 1])))]
-      
-      /* minTime.value = sliderTime.value[0]
-      maxTime.value = sliderTime.value[1] */
-
-      data.data = { ...data.data };
-    };
-
-/*     watchEffect(() => {
-      //console.log(sliderValue.value);
-      data.data.labels = time.value.slice(
-        sliderValue.value[0],
-        sliderValue.value[1]
-      );
-      data.data = { ...data.data };
-    }); */
-
-
-    const changeInterval = () =>{
-        console.log("slider has changed!");
-        
-        data.data.labels = time.value.slice(
-        sliderValue.value[0],
-        sliderValue.value[1]
-      );
-      data.data = { ...data.data };
-    }
-
-    const onTimeChange = () =>{
-     /*  const tempTime = parseInt((sliderTime.value[0].getTime() / 1000).toFixed(0)) + "778"
-      console.log(tempTime);
-      console.log(sensorData.value[0][1]);
-      console.log(sensorData.value[0].indexOf(tempTime)); */
-      
-    }
-
-    onMounted(() => {
-      //console.log(props.sensorId);
-      //console.log("Kjører");
-
-      fetchData().then(() => {
-        getData();
-      });
+      chartOptions.value = chartOptions.value = {
+        ...chartOptions.value,
+        ...{
+          annotations: {
+            yaxis: [
+              {
+                y: maxVal,
+                strokeDashArray: 10,
+                borderColor: "#00E396",
+                label: {
+                  borderColor: "#00E396",
+                  style: {
+                    color: "#fff",
+                    background: "#00E396",
+                  },
+                  text: "Maks",
+                },
+              },
+              {
+                y: minVal,
+                strokeDashArray: 10,
+                borderColor: "#00E396",
+                label: {
+                  borderColor: "#00E396",
+                  style: {
+                    color: "#fff",
+                    background: "#00E396",
+                  },
+                  text: "Minimum",
+                },
+              },
+              {
+                y: avarage,
+                strokeDashArray: 10,
+                borderColor: "#775DD0",
+                label: {
+                  borderColor: "#775DD0",
+                  style: {
+                    color: "#fff",
+                    background: "#775DD0",
+                  },
+                  text: "Gjennomsnitt",
+                },
+              },
+              {
+                y: avarage + stdDeviation,
+                y2: avarage - stdDeviation,
+                strokeDashArray: 10,
+                borderColor: "#00E396",
+                fillColor: "#00E396",
+                opacity: 0.1,
+                label: {
+                  borderColor: "#00E396",
+                  position: "left",
+                  offsetX: 50,
+                  style: {
+                    color: "#fff",
+                    background: "#00E396",
+                  },
+                  text: "1 standardavvik",
+                },
+              },
+              {
+                y: avarage - stdDeviation,
+                y2: avarage - 2 * stdDeviation,
+                strokeDashArray: 10,
+                borderColor: "#FF0000",
+                fillColor: "#FF0000",
+                opacity: 0.1,
+                label: {
+                  borderColor: "#FF0000",
+                  position: "left",
+                  offsetX: 50,
+                  style: {
+                    color: "#fff",
+                    background: "#FF0000",
+                  },
+                  text: "2 standardavvik",
+                },
+              },
+              {
+                y: avarage + stdDeviation,
+                y2: avarage + 2 * stdDeviation,
+                strokeDashArray: 10,
+                borderColor: "#FF0000",
+                fillColor: "#FF0000",
+                opacity: 0.1,
+              },
+            ],
+          },
+        },
+      };
     });
 
     return {
-      data,
-      sliderValue,
-      getData,
-      min,
-      max,
-      fetching,
-      changeInterval,
-      sliderTime,
-      onTimeChange
+      chartOptions,
+      chartOptionsLine,
+      sensorData,
     };
   },
-});
+};
 </script>
 
 <style>
