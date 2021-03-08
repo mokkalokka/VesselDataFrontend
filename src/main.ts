@@ -29,9 +29,12 @@ import Slider from 'primevue/slider'
 import Calendar from 'primevue/calendar';
 import CheckBox from 'primevue/checkbox'
 
+import Multiselect from "@vueform/multiselect";
+
 createApp(App)
     .use(router)
     .use(PrimeVue)
+    .component("Multiselect", Multiselect)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("DataTable", DataTable)
     .component("Column", Column)

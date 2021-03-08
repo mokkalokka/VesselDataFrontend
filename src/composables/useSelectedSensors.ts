@@ -1,15 +1,7 @@
 import { ref } from 'vue'
+import { Sensor } from "@/composables/sensorInterface"
 
-interface SensorName {
-    id: number;
-    filterkey: string;
-    sensorName: string;
-    description: string;
-    startTime: Date;
-    endTime: Date;
-}
-
-const selectedSensors = ref([] as SensorName[])
+const selectedSensors = ref([] as Sensor[])
 export function useSelectedSensors(){
     
     return selectedSensors;

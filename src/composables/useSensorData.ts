@@ -1,20 +1,9 @@
 
 import { ReactiveEffect, ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
+import { Sensor } from "@/composables/sensorInterface"
 
-interface SensorName {
-    id: number;
-    filterkey: string;
-    sensorName: string;
-    description: string;
-    startTime: Date;
-    endTime: Date;
-}
-
-
-
-
-const sensorNames = ref([] as SensorName[])
+const sensorNames = ref([] as Sensor[])
 const position = ref([[],[]] as number[][])
 
 
@@ -28,7 +17,7 @@ export function useSensorData() {
         const endTime = new Date(response.value[0]["time"][3599])
         
 
-        sensorNames.value = response.value.map((e: SensorName, index: number) => {
+        sensorNames.value = response.value.map((e: Sensor, index: number) => {
             const namefields = Object.keys(e)[0].split(".");
             return { 
                 id: index, 
@@ -36,8 +25,12 @@ export function useSensorData() {
                 sensorName:  (namefields.length > 1 ? namefields[namefields.length - 2] + " " + namefields[namefields.length - 1] : namefields[0]),
                 description: namefields[0], 
                 startTime: startTime, 
-                endTime: endTime } 
-        } ) as SensorName[]
+                endTime: endTime,
+                group: 1,
+                grahpsToCompare: [],
+                graphType: "Linje",
+                } 
+        } ) as Sensor[]
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))
     }
 

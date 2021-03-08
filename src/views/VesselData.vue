@@ -106,7 +106,7 @@
             data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
-              Sensor data for selected sensors here ;)
+              <AddedSensorTable/>
             </div>
           </div>
         </div>
@@ -174,6 +174,7 @@ import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import SensorTable from "@/components/SensorTable.vue";
+import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import Map from "@/components/Map.vue";
 
 interface SensorName {
@@ -186,7 +187,7 @@ interface SensorName {
 }
 
 export default defineComponent({
-  components: { LineGraph, SensorTable, Map },
+  components: { LineGraph, SensorTable, Map, AddedSensorTable},
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
