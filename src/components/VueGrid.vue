@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="h-100 w-100"> <!-- style="width: 100% height: 100%" -->
     <div class="content">
       <h1 class="text-center">Group {{group}}</h1>
 
@@ -14,7 +14,19 @@
           Manual reordering</label
         >
       </div>
-      <grid-layout
+      <div class="form-check form-switch d-flex justify-content-center">
+        <input
+          @click="toggleMap"
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault"
+        />
+        <label class="form-check-label" for="flexSwitchCheckDefault">
+          Toggle map</label
+        >
+      </div>
+      <grid-layout 
+        :key="updated"
         v-model:layout="layout"
         :col-num="12"
         :row-height="200"
@@ -33,7 +45,11 @@
           :i="item.i"
         >
 
-          <line-graph :sensorName="item.sensorName" :sensorId="item.i" />
+          <line-graph v-if="item.i != 9999999" :sensorName="item.sensorName" :sensorId="item.i" />
+          <div v-if="item.i == 9999999" class="card h-100 v-100">
+              <Map  />
+          </div>
+          
         </grid-item>
       </grid-layout>
     </div>
@@ -44,10 +60,11 @@
 import { defineComponent, ref } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
+import Map from "@/components/Map.vue";
 
 export default defineComponent({
   name: "VueGrid",
-  components: { LineGraph },
+  components: { LineGraph, Map },
   props: {
     group: {
       type: Number,
@@ -72,6 +89,8 @@ export default defineComponent({
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
+    const updated = ref(1)
+    const showMap = ref(false)
 
     const toggleReorder = () => {
       draggable.value = !draggable.value;
@@ -90,6 +109,26 @@ export default defineComponent({
       document.getElementById("content").style.width = width + "px";
     };
 
+    const toggleMap = () => {
+      
+      if (!showMap.value){
+        layout.value.push({
+        x: 0,
+        y: layout.value[layout.value.length -1].y + layout.value[layout.value.length -1].h,
+        w: 12,
+        h: 3,
+        i: 9999999,
+        sensorName: "map"
+      });
+      }
+      else{
+        layout.value.splice(layout.value.indexOf({sensorName:"map"}), 1)
+      }
+      showMap.value = !showMap.value
+      updated.value ++
+      
+    }
+
     return {
       increaseWidth,
       decreaseWidth,
@@ -98,6 +137,8 @@ export default defineComponent({
       resizable,
       compact,
       toggleReorder,
+      toggleMap,
+      updated
     };
   },
 });

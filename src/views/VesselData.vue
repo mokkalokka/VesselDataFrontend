@@ -145,7 +145,7 @@
             </div>
           </div>
         </div>
-        <div class="accordion-item">
+        <!-- <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingFour">
             <button
               class="accordion-button collapsed"
@@ -167,7 +167,7 @@
               <Map />
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -179,7 +179,7 @@ import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 /* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
-import Map from "@/components/Map.vue";
+/* import Map from "@/components/Map.vue"; */
 import VueGrid from "@/components/VueGrid.vue"
 
 interface SensorName {
@@ -192,7 +192,7 @@ interface SensorName {
 }
 
 export default defineComponent({
-  components: { /* LineGraph, */ SensorTable, Map, VueGrid },
+  components: { /* LineGraph, */ SensorTable, /* Map */ VueGrid },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
