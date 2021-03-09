@@ -5,6 +5,7 @@ import router from './router'
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BIconArrowDownUp } from 'bootstrap-icons-vue';
+import { BIconSearch } from 'bootstrap-icons-vue';
 
 import PrimeVue from 'primevue/config';
 
@@ -33,6 +34,7 @@ createApp(App)
     .use(router)
     .use(PrimeVue)
     .component("BIconArrowDownUp", BIconArrowDownUp)
+    .component("BIconSearch", BIconSearch)
     .component("DataTable", DataTable)
     .component("Column", Column)
     .component("Card", Card)
