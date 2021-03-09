@@ -137,7 +137,7 @@
           >
             <div class="accordion-body">
               <div v-if="showSensorData">
-                <vue-grid />
+                <vue-grid  :key="sensorListUpdated"/>
                 <!-- <div v-for="s in sensorsToRender" :key="s.id">
                   <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
                 </div> -->
@@ -201,8 +201,10 @@ export default defineComponent({
     const graphFilter = ref("");
     const graphActive = ref([0] as number[]);
     const sensorsToRender = ref([] as SensorName[]);
+    const sensorListUpdated = ref(1)
 
     const setSensorsToRender = () => {
+      sensorListUpdated.value ++
       showSensorData.value = true;
       sensorsToRender.value = [...selectedSensors.value];
       active.value = [1];
@@ -227,6 +229,7 @@ export default defineComponent({
       graphActive,
       filter,
       sensorsToRender,
+      sensorListUpdated
     };
   },
 });
