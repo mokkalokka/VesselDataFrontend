@@ -14,10 +14,13 @@
           </th>
         </tr> 
       </thead>
-      <tbody>
+      <tbody
+        data-link="row"
+        class="rowlink"
+      >
         <tr v-for="vessel in vessels" :vessel="vessel" :key="vessel.name">
-          <td v-show="filter(vessel)">
-            <th scope="row" ><router-link :to="{  name: 'VesselData', params: { id: vessel.id } }">{{ vessel.name }}</router-link></th>
+          <td scope="row" v-show="filter(vessel)" @click="routeToVessel(vessel)">
+            {{ vessel.name }}
           </td>
         </tr>
       </tbody>
@@ -29,6 +32,8 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useFetch } from "@/composables/useFetch";
+import router from "@/router";
+
 
 export default defineComponent({
   name: "VesselDataTable",
@@ -52,12 +57,17 @@ export default defineComponent({
       vessels.value = vessels.value.reverse();
     };
 
+    const routeToVessel = (vessel: Vessel) => {
+      router.push({  name: 'VesselData', params: { id: vessel.id } });
+    }
+
     return {
       selectedVessel,
       vessels,
       input,
       sort,
       filter,
+      routeToVessel
     };
   },
 });
@@ -73,5 +83,9 @@ a {
   text-decoration: none;
   color: black;
   font-weight: 400;
+}
+
+td:hover {
+  cursor: pointer;
 }
 </style>
