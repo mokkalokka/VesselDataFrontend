@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    /* "suppressImplicitAnyIndexErrors": true, /* <--- delete */ 
-    "strict": true,
+    /* "suppressImplicitAnyIndexErrors": true, */  /* <--- delete  */
+    "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",

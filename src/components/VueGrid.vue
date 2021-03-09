@@ -1,0 +1,154 @@
+<template>
+  <div style="width: 100%">
+    <div class="content">
+      <h1 class="text-center">Group {{group}}</h1>
+
+      <div class="form-check form-switch d-flex justify-content-center">
+        <input
+          @click="toggleReorder"
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault"
+        />
+        <label class="form-check-label" for="flexSwitchCheckDefault">
+          Manual reordering</label
+        >
+      </div>
+      <grid-layout
+        v-model:layout="layout"
+        :col-num="12"
+        :row-height="200"
+        :is-draggable="draggable"
+        :is-resizable="resizable"
+        :vertical-compact="compact"
+        :use-css-transforms="true"
+      >
+        <grid-item
+          v-for="item in layout"
+          :key="item.i"
+          :x="item.x"
+          :y="item.y"
+          :w="item.w"
+          :h="item.h"
+          :i="item.i"
+        >
+
+          <line-graph :sensorName="item.sensorName" :sensorId="item.i" />
+        </grid-item>
+      </grid-layout>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "vue";
+import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import LineGraph from "@/components/LineGraph.vue";
+
+export default defineComponent({
+  name: "VueGrid",
+  components: { LineGraph },
+  props: {
+    group: {
+      type: Number,
+      default: 1
+    }
+
+  },
+
+  setup() {
+    const selectedSensors = useSelectedSensors();
+    const layout = ref([]);
+    selectedSensors.value.map((e) => {
+      layout.value.push({
+        x: 0,
+        y: 0,
+        w: 12,
+        h: 2,
+        i: e.id,
+        sensorName: e.sensorName,
+      });
+    }); 
+    const draggable = ref(false);
+    const resizable = ref(false);
+    const compact = true;
+
+    const toggleReorder = () => {
+      draggable.value = !draggable.value;
+      resizable.value = !resizable.value;
+    };
+
+    const increaseWidth = () => {
+      let width = document.getElementById("content").offsetWidth;
+      width += 20;
+      document.getElementById("content").style.width = width + "px";
+    };
+
+    const decreaseWidth = () => {
+      let width = document.getElementById("content").offsetWidth;
+      width -= 20;
+      document.getElementById("content").style.width = width + "px";
+    };
+
+    return {
+      increaseWidth,
+      decreaseWidth,
+      layout,
+      draggable,
+      resizable,
+      compact,
+      toggleReorder,
+    };
+  },
+});
+</script>
+
+<style>
+.content {
+  width: 100%;
+}
+
+
+.layoutJSON {
+  border: 1px solid black;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.columns {
+  -moz-columns: 120px;
+  -webkit-columns: 120px;
+  columns: 120px;
+}
+
+.vue-resizable-handle {
+  z-index: 5000;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  box-sizing: border-box;
+  cursor: se-resize;
+}
+
+.vue-grid-item.resizing {
+  opacity: 0.9;
+}
+
+.vue-grid-item .text {
+  font-size: 24px;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 24px;
+}
+
+.vue-grid-item .minMax {
+  font-size: 12px;
+}
+</style>

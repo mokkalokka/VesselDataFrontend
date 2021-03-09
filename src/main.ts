@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+import VueGridLayout from 'vue-grid-layout'
+
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BIconArrowDownUp } from 'bootstrap-icons-vue';
@@ -35,6 +37,7 @@ createApp(App)
     .use(router)
     .use(PrimeVue)
     .use(VueApexCharts)
+    .use(VueGridLayout)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("DataTable", DataTable)
     .component("Column", Column)
