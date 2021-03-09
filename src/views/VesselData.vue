@@ -137,9 +137,10 @@
           >
             <div class="accordion-body">
               <div v-if="showSensorData">
-                <div v-for="s in sensorsToRender" :key="s.id">
+                <vue-grid />
+                <!-- <div v-for="s in sensorsToRender" :key="s.id">
                   <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -176,9 +177,10 @@
 import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import LineGraph from "@/components/LineGraph.vue";
+/* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import Map from "@/components/Map.vue";
+import VueGrid from "@/components/VueGrid.vue"
 
 interface SensorName {
   id: number;
@@ -190,7 +192,7 @@ interface SensorName {
 }
 
 export default defineComponent({
-  components: { LineGraph, SensorTable, Map },
+  components: { /* LineGraph, */ SensorTable, Map, VueGrid },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();

@@ -1,5 +1,5 @@
 
-import { ReactiveEffect, ref } from "vue";
+import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 
 interface SensorName {

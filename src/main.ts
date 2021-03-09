@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+import VueGridLayout from 'vue-grid-layout'
+
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BIconArrowDownUp } from 'bootstrap-icons-vue';
@@ -30,9 +32,13 @@ import Slider from 'primevue/slider'
 import Calendar from 'primevue/calendar';
 import CheckBox from 'primevue/checkbox'
 
+import VueApexCharts from "vue3-apexcharts";
+
 createApp(App)
     .use(router)
     .use(PrimeVue)
+    .use(VueApexCharts)
+    .use(VueGridLayout)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("BIconSearch", BIconSearch)
     .component("DataTable", DataTable)
