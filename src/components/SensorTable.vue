@@ -113,6 +113,7 @@ export default defineComponent({
     // number for which page in paginator is active
     const activePage = ref(0 as number);
 
+
     //filter-method
     const searchFilter = (sensor: any) => {
       const nameContains = sensor.sensorName.toLowerCase().includes(input.value.toLowerCase());
@@ -128,7 +129,7 @@ export default defineComponent({
 
       sensorPages.value.length = 0;
       sensors.value = props.sensorNames.filter((s: {}) => searchFilter(s));
-      
+
       const size = 10;
       const subArrSize: number = Math.ceil(sensors.value.length / size);
       //console.log(subArrSize);
@@ -138,18 +139,11 @@ export default defineComponent({
         const sliced: {}[] = sensors.value.slice(from, to);
         sensorPages.value.push(sliced);
       }
+
+      activePage.value = 0
     };
 
-    // watch(
-    //   () => props.sensorNames,
-    //   (sensorPages) => {
-    //     sensorPages.value = fillPagesArray();
-    //     //console.log(activePage.value);
-    //   }
-    // );
-
-
-    watchEffect(input => {
+    watchEffect(()  => {
       fillPagesArray();
     })
 
@@ -164,7 +158,7 @@ export default defineComponent({
       }
     };
 
-    
+
 
     return {
       selectedSensors,
@@ -173,7 +167,7 @@ export default defineComponent({
       sensorPages,
       activePage,
       input,
-      searchFilter
+      searchFilter,
     };
   },
 });
