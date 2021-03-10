@@ -53,7 +53,7 @@
 
   <div class="container">
     <div class="card my-4">
-      <div class="accordion accordion-flush" id="accordionFlushExample">
+      <div class="accordion accordion-flush open" id="accordionFlushExample">
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
             <button
@@ -69,7 +69,7 @@
           </h2>
           <div
             id="flush-collapseOne"
-            class="accordion-collapse collapse"
+            class="accordion-collapse collapse multi-collapse"
             aria-labelledby="flush-headingOne"
             data-bs-parent="#accordionFlushExample"
           >
@@ -80,7 +80,15 @@
                   :selectedSensors="selectedSensors"
                 />
                 <div class="" v-if="selectedSensors.length != 0">
-                <button class="btn btn-primary justify-content-center" @click="setSensorsToRender">view selected data</button>
+                  <button
+                    class="btn btn-primary"
+                    data-bs-target=".multi-collapse"
+                    data-bs-toggle="collapse"
+                    aria-controls="flush-collapseOne flush-collapseTwo"
+                    @click="setSensorsToRender"
+                  >
+                    Select Graph layout
+                  </button>
                 </div>
               </div>
             </div>
@@ -101,21 +109,19 @@
           </h2>
           <div
             id="flush-collapseTwo"
-            class="accordion-collapse collapse"
+            class="accordion-collapse collapse multi-collapse"
             aria-labelledby="flush-headingTwo"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               <AddedSensorTable/>
             </div>
           </div>
         </div>
-        <div class="accordion-item">
+        <div class="accordion-item" disabled="!showSensorData">
           <h2 class="accordion-header" id="flush-headingThree">
             <button
               class="accordion-button collapsed"
               type="button"
-              
               data-bs-toggle="collapse"
               data-bs-target="#flush-collapseThree"
               aria-expanded="false"
@@ -128,25 +134,25 @@
             id="flush-collapseThree"
             class="accordion-collapse collapse"
             aria-labelledby="flush-headingThree"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               <div v-if="showSensorData">
-              <div v-for="s in sensorsToRender" :key="s.id">
-                <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-              </div>
+                <vue-grid  :key="sensorListUpdated"/>
+                <!-- <div v-for="s in sensorsToRender" :key="s.id">
+                  <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
+                </div> -->
               </div>
             </div>
           </div>
         </div>
-        <div class="accordion-item">
+        <!-- <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingFour">
             <button
               class="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#flush-collapseFour"
-              aria-expanded="false"
+              aria-expanded="true"
               aria-controls="flush-collapseFour"
             >
               Map
@@ -156,13 +162,12 @@
             id="flush-collapseFour"
             class="accordion-collapse collapse show"
             aria-labelledby="flush-headingFour"
-            data-bs-parent="#accordionFlushExample"
           >
             <div class="accordion-body">
               <Map />
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -172,10 +177,12 @@
 import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import LineGraph from "@/components/LineGraph.vue";
+/* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import Map from "@/components/Map.vue";
+/* import Map from "@/components/Map.vue"; */
+import VueGrid from "@/components/VueGrid.vue"
 
 interface SensorName {
   id: number;
@@ -187,7 +194,7 @@ interface SensorName {
 }
 
 export default defineComponent({
-  components: { LineGraph, SensorTable, Map, AddedSensorTable},
+  components: { /* LineGraph, */ SensorTable, /* Map */ VueGrid, AddedSensorTable },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
@@ -196,8 +203,10 @@ export default defineComponent({
     const graphFilter = ref("");
     const graphActive = ref([0] as number[]);
     const sensorsToRender = ref([] as SensorName[]);
+    const sensorListUpdated = ref(1)
 
     const setSensorsToRender = () => {
+      sensorListUpdated.value ++
       showSensorData.value = true;
       sensorsToRender.value = [...selectedSensors.value];
       active.value = [1];
@@ -222,6 +231,7 @@ export default defineComponent({
       graphActive,
       filter,
       sensorsToRender,
+      sensorListUpdated
     };
   },
 });

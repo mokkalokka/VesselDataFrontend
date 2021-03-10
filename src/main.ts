@@ -2,9 +2,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+import VueGridLayout from 'vue-grid-layout'
+
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BIconArrowDownUp } from 'bootstrap-icons-vue';
+import { BIconSearch } from 'bootstrap-icons-vue';
 
 import PrimeVue from 'primevue/config';
 
@@ -30,12 +33,16 @@ import Calendar from 'primevue/calendar';
 import CheckBox from 'primevue/checkbox'
 
 import Multiselect from "@vueform/multiselect";
+import VueApexCharts from "vue3-apexcharts";
 
 createApp(App)
     .use(router)
     .use(PrimeVue)
     .component("Multiselect", Multiselect)
+    .use(VueApexCharts)
+    .use(VueGridLayout)
     .component("BIconArrowDownUp", BIconArrowDownUp)
+    .component("BIconSearch", BIconSearch)
     .component("DataTable", DataTable)
     .component("Column", Column)
     .component("Card", Card)

@@ -1,10 +1,26 @@
 <template>
   <div class="card my-4">
-    <div class="table table-responsive">
+    <div class="card-header bg-transparent">
+        <div class="input-group searchgroup mb-3">
+          <input
+            type="text"
+            class="form-control border-end-0"
+            placeholder="Search Sensors..."
+            aria-label="Sensor Name"
+            aria-describedby="sensorsearch-addon"
+            v-model="input"
+          >
+          <span class="input-group-text bg-transparent" id="sensorsearch-addon">
+            <BIconSearch/>
+          </span>
+        </div>
+
+      </div>
+    <div class="table-responsive">
       <table id="sensorTable" class="table table-bordered table-hover">
         <thead>
-          <tr class="table-secondary">
-            <th scope="col">Sensor Name</th>
+          <tr>
+            <th scope="col"><button type="button" class="active sort-btn-hover btn bg-transparent shadow-0 border-0" @click="sort">Sensor Name <BIconArrowDownUp/></button></th>
             <th scope="col">Description</th>
             <th scope="col">Start Time</th>
             <th scope="col">End Time</th>
@@ -20,6 +36,7 @@
             v-bind:id="sensor.id"
             @click="toggleSelectedSensor(sensor)"
             v-bind:class="{ 'table-active': activeRows.includes(sensor.id) }"
+            
           >
             <td>{{ sensor.sensorName }}</td>
             <td>{{ sensor.description }}</td>
@@ -45,7 +62,7 @@
             <a
               class="page-link"
               href="#"
-              @click="activePage = sensorPages.indexOf(page)"
+              @click.prevent="activePage = sensorPages.indexOf(page)"
               >{{ sensorPages.indexOf(page) + 1 }}</a
             >
           </li>
@@ -70,45 +87,67 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 
 export default defineComponent({
   name: "SensorTable",
   props: ["sensorNames"],
   setup: (props) => {
-    const sensorFilters = ref({
-      sensorName: "",
-    });
+
+    // array for selected sensors
     const selectedSensors = useSelectedSensors();
 
+    //mutable sensor array
+    const sensors = ref([] as []);
+
+    // search string input
+    const input = ref("" as string);
+
+    // array for active (selected) rows in table
     const activeRows = ref([] as number[]);
+    
+    //2D-array containing pages of sensors for paginator 
     const sensorPages = ref([] as {}[][]);
+
+    // number for which page in paginator is active
     const activePage = ref(0 as number);
 
+
+    //filter-method
+    const searchFilter = (sensor: any) => {
+      const nameContains = sensor.sensorName.toLowerCase().includes(input.value.toLowerCase());
+      const descriptionContains = sensor.description.toLowerCase().includes(input.value.toLowerCase());
+
+      return nameContains || descriptionContains;
+
+    };
+
+    // method for dividing sensor array into pages array
     const fillPagesArray = () => {
       //console.log("Kjører fillpages");
 
-      const sensors = ref(props.sensorNames as []);
+      sensorPages.value.length = 0;
+      sensors.value = props.sensorNames.filter((s: {}) => searchFilter(s));
+
       const size = 10;
       const subArrSize: number = Math.ceil(sensors.value.length / size);
-      console.log(subArrSize);
+      //console.log(subArrSize);
       for (let i = 0; i < subArrSize; i++) {
         const from: number = size * i;
         const to: number = size * (1 + i);
         const sliced: {}[] = sensors.value.slice(from, to);
         sensorPages.value.push(sliced);
       }
+
+      activePage.value = 0
     };
 
-    watch(
-      () => props.sensorNames,
-      (sensorPages) => {
-        sensorPages.value = fillPagesArray();
-        console.log(activePage.value);
-      }
-    );
+    watchEffect(()  => {
+      fillPagesArray();
+    })
 
+    // method for adding/removing sensor from active sensor array depending if clicked or unclicked
     const toggleSelectedSensor = (sensor: any) => {
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
@@ -119,18 +158,16 @@ export default defineComponent({
       }
     };
 
-    const clearFilter = () => {
-      sensorFilters.value["sensorName"] = "";
-    };
+
 
     return {
       selectedSensors,
-      sensorFilters,
-      clearFilter,
       toggleSelectedSensor,
       activeRows,
       sensorPages,
       activePage,
+      input,
+      searchFilter,
     };
   },
 });
@@ -148,4 +185,9 @@ a:focus.page-link {
 a:hover.page-link {
   cursor: pointer;
 }
+
+th button{
+  font-weight: bold;
+}
+
 </style>
