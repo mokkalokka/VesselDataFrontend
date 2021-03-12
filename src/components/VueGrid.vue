@@ -1,7 +1,8 @@
 <template>
-  <div class="h-100 w-100"> <!-- style="width: 100% height: 100%" -->
+  <div class="h-100 w-100">
+    <!-- style="width: 100% height: 100%" -->
     <div class="content">
-      <h1 class="text-center">Group {{group}}</h1>
+      <h1 class="text-center">Group {{ group }}</h1>
 
       <div class="form-check form-switch d-flex justify-content-center">
         <input
@@ -25,7 +26,7 @@
           Toggle map</label
         >
       </div>
-      <grid-layout 
+      <grid-layout
         :key="updated"
         v-model:layout="layout"
         :col-num="12"
@@ -36,20 +37,22 @@
         :use-css-transforms="true"
       >
         <grid-item
-          v-for="item in layout"
-          :key="item.i"
+          v-for="(item, index) in layout"
+          :key="index"
           :x="item.x"
           :y="item.y"
           :w="item.w"
           :h="item.h"
           :i="item.i"
         >
-
-          <line-graph v-if="item.i != 9999999" :sensorName="item.sensorName" :sensorId="item.i" />
+          <line-graph
+            v-if="item.i != 9999999"
+            :sensorName="item.sensorName"
+            :sensorIds="item.sensorIds"
+          />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
-              <Map  />
+            <Map />
           </div>
-          
         </grid-item>
       </grid-layout>
     </div>
@@ -57,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
@@ -68,29 +71,34 @@ export default defineComponent({
   props: {
     group: {
       type: Number,
-      default: 1
-    }
-
+      default: 1,
+    },
   },
 
-  setup() {
+  setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
+
     selectedSensors.value.map((e) => {
-      layout.value.push({
-        x: 0,
-        y: 0,
-        w: 12,
-        h: 2,
-        i: e.id,
-        sensorName: e.sensorName,
-      });
-    }); 
+      if (e.group == props.group) {
+        layout.value.push({
+          x: 0,
+          y: 0,
+          w: 12,
+          h: 2,
+          i: e.id,
+          sensorIds: e.grahpsToCompare.concat(e.id),
+          sensorName: e.sensorName,
+        });
+      }
+    });
+
+
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
-    const updated = ref(1)
-    const showMap = ref(false)
+    const updated = ref(1);
+    const showMap = ref(false);
 
     const toggleReorder = () => {
       draggable.value = !draggable.value;
@@ -110,24 +118,23 @@ export default defineComponent({
     };
 
     const toggleMap = () => {
-      
-      if (!showMap.value){
+      if (!showMap.value) {
         layout.value.push({
-        x: 0,
-        y: layout.value[layout.value.length -1].y + layout.value[layout.value.length -1].h,
-        w: 12,
-        h: 3,
-        i: 9999999,
-        sensorName: "map"
-      });
+          x: 0,
+          y:
+            layout.value[layout.value.length - 1].y +
+            layout.value[layout.value.length - 1].h,
+          w: 12,
+          h: 3,
+          i: 9999999,
+          sensorName: "map",
+        });
+      } else {
+        layout.value.splice(layout.value.indexOf({ sensorName: "map" }), 1);
       }
-      else{
-        layout.value.splice(layout.value.indexOf({sensorName:"map"}), 1)
-      }
-      showMap.value = !showMap.value
-      updated.value ++
-      
-    }
+      showMap.value = !showMap.value;
+      updated.value++;
+    };
 
     return {
       increaseWidth,
@@ -138,7 +145,7 @@ export default defineComponent({
       compact,
       toggleReorder,
       toggleMap,
-      updated
+      updated,
     };
   },
 });
@@ -148,7 +155,6 @@ export default defineComponent({
 .content {
   width: 100%;
 }
-
 
 .layoutJSON {
   border: 1px solid black;
