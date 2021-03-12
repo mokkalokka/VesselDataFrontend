@@ -1,7 +1,7 @@
 
 import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
-import { Sensor } from "@/composables/sensorInterface"
+import { Sensor } from "@/Interfaces/sensorInterface"
 
 const sensorNames = ref([] as Sensor[])
 const position = ref([[],[]] as number[][])

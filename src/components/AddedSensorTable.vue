@@ -1,24 +1,28 @@
 <template>
   <div class="card mt-4">
     <div class="accordion accordion-flush">
-      <div v-for="number in groups" :key="number">
+      <div
+        v-for="group in tempGroups"
+        :key="group.id"
+        v-show="group.sensors.length != 0"
+      >
         <div class="accordion-item">
-          <h2 class="accordion-header" :id="'heading' + number">
+          <h2 class="accordion-header" :id="'heading' + group.id">
             <button
               class="accordion-button"
               type="button"
               data-bs-toggle="collapse"
-              :data-bs-target="'#collapse' + number"
+              :data-bs-target="'#collapse' + group.id"
               aria-expanded="true"
-              :aria-controls="'collapse' + number"
+              :aria-controls="'collapse' + group.id"
             >
-              Gruppe {{ number }}
+              Gruppe {{ group.id }}
             </button>
           </h2>
           <div
-            :id="'collapse' + number"
+            :id="'collapse' + group.id"
             class="accordion-collapse collapse show"
-            :aria-labelledby="'heading' + number"
+            :aria-labelledby="'heading' + group.id"
           >
             <div class="accordion-body p-0">
               <div class="card my-2">
@@ -40,9 +44,10 @@
                               class="form-check-input"
                               type="checkbox"
                               checked
+                              @click="group.groupDate = !group.groupDate"
                             />
                             <label class="form-check-label">
-                              Datovisning
+                              Datovisning {{ group.groupDate }}
                             </label>
                           </div>
                         </td>
@@ -96,11 +101,12 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
+                      <!-- <tr
                         v-for="sensor in selectedSensors"
                         :key="sensor.id"
-                        v-show="number == sensor.group"
-                      >
+                        v-show="group.id == sensor.group"
+                      > -->
+                      <tr v-for="sensor in group.sensors" :key="sensor.id">
                         <td>{{ sensor.sensorName }}</td>
                         <td>
                           <input
@@ -135,14 +141,25 @@
                           />
                         </td>
                         <td>
-                          <input
-                            type="number"
-                            class="form-control"
-                            :placeholder="sensor.group"
-                            v-model.number.lazy="sensor.group"
-                            v-on:change="checkNumber(sensor)"
-                            min="1"
-                          />
+                          <select>
+                            <option
+                              :value="group.id"
+                              v-for="group in tempGroups"
+                              :key="group.id"
+                              @click="addSensorToGroup(sensor, $event)"
+                              :selected="
+                                true ? sensor.group == group.id : false
+                              "
+                            >
+                              {{ group.id }}
+                            </option>
+                            <option
+                              :value="tempGroups.length + 1"
+                              @click="addGroup(sensor)"
+                            >
+                              Legg til ny gruppe
+                            </option>
+                          </select>
                         </td>
                         <td>
                           <Multiselect
@@ -152,11 +169,6 @@
                             v-model="sensor.grahpsToCompare"
                             :options="filterSensors(sensor)"
                           />
-                          <!-- <select v-model="sensor.grahpsToCompare" multiple>
-              <option v-for="s in filterSensors(sensor)" :key="s.id">
-                {{ s.sensorName }}
-              </option>
-            </select> -->
                         </td>
                         <td>
                           <select
@@ -187,7 +199,9 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import { Sensor } from "@/composables/Interfaces/sensorInterface";
+import { useGroups } from "@/composables/useGroups";
+import { Sensor } from "@/Interfaces/sensorInterface";
+import { Group } from "@/Interfaces/groupInterface";
 
 export default defineComponent({
   name: "AddedSensorTable",
@@ -200,33 +214,55 @@ export default defineComponent({
       { type: "Pai", value: "Pai" },
     ];
 
-    const groups = ref([] as (string | number)[]);
+    const groups = useGroups();
+    const tempGroups = ref([] as Group[]);
 
-    const checkNumber = (sensor: Sensor) => {
-      if (sensor.group == "" || sensor.group <= 0) {
-        sensor.group = 1;
-      }
+    tempGroups.value.push({
+      id: 1,
+      sensors: [],
+      groupDate: true,
+      fromDate: null,
+      toDate: null,
+    });
+
+    const addGroup = (sensor: Sensor) => {
+      tempGroups.value[sensor.group - 1].sensors.splice(
+        tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
+        1
+      );
+      sensor.group = tempGroups.value.length + 1;
+
+      tempGroups.value.push({
+        id: tempGroups.value.length + 1,
+        sensors: [sensor],
+        groupDate: true,
+        fromDate: null,
+        toDate: null,
+      });
     };
 
-    watch(
-      selectedSensors.value,
-      (selectedSensors: Sensor[], prevSelectedSensors: Sensor[]) => {
-        groups.value = [
-          ...new Set(
-            selectedSensors
-              .map((s) => s.group)
-              .filter((input) => typeof input === "number")
-          ),
-        ];
-      }
-    );
+    const addSensorToGroup = (sensor: Sensor, event: any) => {
+      const newGroupNumber = parseInt(event.target.value);
 
-    /*
-    const filterSensors = (sensor: Sensor) => {
-      return selectedSensors.value.filter(
-        (s) => s.sensorName != sensor.sensorName
+      tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
+      tempGroups.value[sensor.group - 1].sensors.splice(
+        tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
+        1
       );
-    };*/
+      sensor.group = newGroupNumber;
+    };
+
+    const uniqeGroupId = ref([] as number[]);
+
+    watch(
+      selectedSensors,
+      (selectedSensors: Sensor[], prevSelectedSensors: Sensor[]) => {
+        tempGroups.value[0].sensors = selectedSensors.filter(
+          (sensor) => sensor.group == 1
+        );
+      },
+      { deep: true }
+    );
 
     const filterSensors = (sensor: Sensor) => {
       return selectedSensors.value
@@ -234,7 +270,15 @@ export default defineComponent({
         .map((s) => ({ value: s.id, label: s.sensorName }));
     };
 
-    return { graphTypes, selectedSensors, filterSensors, groups, checkNumber };
+    return {
+      graphTypes,
+      selectedSensors,
+      filterSensors,
+      uniqeGroupId,
+      tempGroups,
+      addGroup,
+      addSensorToGroup,
+    };
   },
 });
 </script>

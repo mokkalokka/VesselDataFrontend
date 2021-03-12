@@ -6,6 +6,6 @@ export interface Sensor {
     startTime: Date;
     endTime: Date;
     group: number;
-    grahpsToCompare: Sensor[];
+    grahpsToCompare: number[];
     graphType: string;
 }
