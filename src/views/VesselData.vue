@@ -69,7 +69,7 @@
           </h2>
           <div
             id="flush-collapseOne"
-            class="accordion-collapse collapse multi-collapse"
+            class="accordion-collapse collapse multi-collapse show"
             aria-labelledby="flush-headingOne"
             data-bs-parent="#accordionFlushExample"
           >
@@ -79,22 +79,37 @@
                   :sensorNames="sensorNames"
                   :selectedSensors="selectedSensors"
                 />
-                <div class="" v-if="selectedSensors.length != 0">
+                <!-- <div class="" v-if="selectedSensors.length != 0">
                   <button
                     class="btn btn-primary"
+                    @click="showSensorData = true"
+                  >
+                    Select Graph layout
+                  </button>
+                </div> -->
+                <div v-show="selectedSensors.length != 0">
+                  <div class="d-flex justify-content-center">
+                  <h2 >Valgte sensorer</h2>
+                  </div>
+                  <AddedSensorTable/>
+                  <div class="d-flex justify-content-center mt-4">
+                  <button
+                  type="button"
+                    class="btn btn-outline-primary"
                     data-bs-target=".multi-collapse"
                     data-bs-toggle="collapse"
                     aria-controls="flush-collapseOne flush-collapseTwo"
                     @click="setSensorsToRender"
                   >
-                    Select Graph layout
+                    Show graphs
                   </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="accordion-item">
+        <!-- <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingTwo">
             <button
               class="accordion-button collapsed"
@@ -116,7 +131,7 @@
               <AddedSensorTable/>
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="accordion-item" disabled="!showSensorData">
           <h2 class="accordion-header" id="flush-headingThree">
             <button
@@ -132,11 +147,11 @@
           </h2>
           <div
             id="flush-collapseThree"
-            class="accordion-collapse collapse"
+            class="accordion-collapse collapse multi-collapse"
             aria-labelledby="flush-headingThree"
           >
             <div class="accordion-body">
-              <div v-if="showSensorData">
+              <div v-if="showGraphs">
                 <vue-grid  :key="sensorListUpdated"/>
                 <!-- <div v-for="s in sensorsToRender" :key="s.id">
                   <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
@@ -198,19 +213,22 @@ export default defineComponent({
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
-    const showSensorData = ref(false);
+    const showSensorData = ref(false as boolean);
+    const showGraphs = ref(false as boolean)
     const active = ref([0, 2] as number[]);
-    const graphFilter = ref("");
+    const graphFilter = ref("" as string);
     const graphActive = ref([0] as number[]);
     const sensorsToRender = ref([] as SensorName[]);
-    const sensorListUpdated = ref(1)
+    const sensorListUpdated = ref(1 as number)
 
     const setSensorsToRender = () => {
       sensorListUpdated.value ++
-      showSensorData.value = true;
+      showGraphs.value = true;
       sensorsToRender.value = [...selectedSensors.value];
       active.value = [1];
     };
+
+
 
     const filter = (sensorName: string) => {
       return sensorName.toLowerCase().includes(graphFilter.value.toLowerCase());
@@ -224,6 +242,7 @@ export default defineComponent({
     return {
       active,
       showSensorData,
+      showGraphs,
       sensorNames,
       selectedSensors,
       setSensorsToRender,
