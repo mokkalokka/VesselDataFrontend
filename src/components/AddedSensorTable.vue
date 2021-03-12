@@ -141,22 +141,18 @@
                           />
                         </td>
                         <td>
-                          <select>
+                          <select @change="addSensorToGroup(sensor, $event)">
                             <option
                               :value="group.id"
                               v-for="group in tempGroups"
                               :key="group.id"
-                              @click="addSensorToGroup(sensor, $event)"
                               :selected="
                                 true ? sensor.group == group.id : false
                               "
                             >
                               {{ group.id }}
                             </option>
-                            <option
-                              :value="tempGroups.length + 1"
-                              @click="addGroup(sensor)"
-                            >
+                            <option :value="tempGroups.length + 1">
                               Legg til ny gruppe
                             </option>
                           </select>
@@ -225,34 +221,31 @@ export default defineComponent({
       toDate: null,
     });
 
-    const addGroup = (sensor: Sensor) => {
-      tempGroups.value[sensor.group - 1].sensors.splice(
-        tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
-        1
-      );
-      sensor.group = tempGroups.value.length + 1;
-
-      tempGroups.value.push({
-        id: tempGroups.value.length + 1,
-        sensors: [sensor],
-        groupDate: true,
-        fromDate: null,
-        toDate: null,
-      });
-    };
-
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);
 
-      tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
+      // Remove the sensor from the group it was in
       tempGroups.value[sensor.group - 1].sensors.splice(
         tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
         1
       );
-      sensor.group = newGroupNumber;
-    };
 
-    const uniqeGroupId = ref([] as number[]);
+      // Change the sensor object to contain right id
+      sensor.group = newGroupNumber;
+
+      // Check if group exits. If it exits add sensor to the group, if not create the group and add sensor
+      if (tempGroups.value[newGroupNumber - 1] === undefined) {
+        tempGroups.value.push({
+          id: tempGroups.value.length + 1,
+          sensors: [sensor],
+          groupDate: true,
+          fromDate: null,
+          toDate: null,
+        });
+      } else {
+        tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
+      }
+    };
 
     watch(
       selectedSensors,
@@ -274,9 +267,7 @@ export default defineComponent({
       graphTypes,
       selectedSensors,
       filterSensors,
-      uniqeGroupId,
       tempGroups,
-      addGroup,
       addSensorToGroup,
     };
   },
