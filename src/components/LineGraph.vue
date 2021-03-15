@@ -1,6 +1,6 @@
 <template>
   <div class="card p-2 pb-4 shadow-sm h-100">
-    <div id="wrapper" class="h-100" v-if="sensorData[0].data.length > 2">
+    <div id="wrapper" class="h-100" v-if="showGraphs">
       <div
         :key="showStatistics"
         id="chart-line2"
@@ -10,20 +10,31 @@
           type="line"
           height="100%"
           :options="chartOptions"
-          :series="sensorData"
+          :series="series"
         ></apexchart>
       </div>
-      <div v-if="showTimeLine" id="chart-line" class="h-25">
-        <apexchart
-          type="area"
-          height="100%"
-          :options="chartOptionsLine"
-          :series="sensorData"
-        ></apexchart>
+      <div v-if="showTimeLine" id="chart-line" class="h-25 container">
+        <div class="row">
+        <div class="col m-auto">
+          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time tilbake"><BIconPlus /></button>
+        </div>
+        <div class="col-10">
+          <apexchart
+            type="area"
+            height="60%"
+            :options="chartOptionsLine"
+            :series="series"
+          ></apexchart>
+        </div>
+        <div class="col m-auto">
+          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time frem"><BIconPlus /></button>
+        </div>
+      </div>
       </div>
       <div class="container">
-        <div class="row ">
+        <div class="row">
           <div
+            v-if="numberOfSensors == 1"
             class="form-check form-switch col d-flex justify-content-center"
           >
             <input
@@ -36,9 +47,7 @@
               Show Statistics</label
             >
           </div>
-          <div
-            class="form-check form-switch col d-flex justify-content-center"
-          >
+          <div class="form-check form-switch col d-flex justify-content-center">
             <input
               checked
               @click="toggleTimeLine"
@@ -64,22 +73,29 @@ import { std, mean, max, min } from "mathjs";
 export default {
   name: "LineGraph",
   props: {
-    sensorName: {
-      type: String,
+    sensorNames: {
+      type: Array[String],
       required: true,
     },
-    sensorId: {
+    sensorIds: {
+      type: Array[Number],
+      required: true,
+    },
+    groupId: {
       type: Number,
-      required: true,
-    },
+      required: true
+    }
   },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
     const res = ref([[], []]);
-    const sensorData = ref([{ data: [[], []] }]);
+    const series = ref([]);
     const showTimeLine = ref(true);
     const showStatistics = ref(false);
+    const showGraphs = ref(false);
+    const time = ref([]);
+    const numberOfSensors = ref(0);
     let maxVal = 0;
     let minVal = 0;
     let avarage = 0;
@@ -87,17 +103,17 @@ export default {
 
     const chartOptions = ref({
       chart: {
-        id: "chart" + props.sensorId + "1",
+        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
         type: "line",
         toolbar: {
           autoSelected: "pan",
           show: false,
         },
         animations: {
-         enabled: false
-         },
+          enabled: false,
+        },
       },
-       
+
       stroke: {
         width: 1,
       },
@@ -126,18 +142,17 @@ export default {
     });
     const chartOptionsLine = ref({
       chart: {
-        id: "chart" + props.sensorId + "2",
-        /* height: 100, */
+        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#2",
         type: "area",
         brush: {
-          target: "chart" + props.sensorId + "1",
+          target: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
           enabled: true,
         },
         selection: {
           enabled: true,
         },
       },
-      colors: ["#008FFB"],
+      /* colors: ["#008FFB"], */
       fill: {
         type: "gradient",
         gradient: {
@@ -152,18 +167,39 @@ export default {
         },
       },
       yaxis: {
-        tickAmount: 2,
-        decimalsInFloat: 2,
+        /* show: false, */
+        floating: false,
+        axisTicks: {
+          show: false,
+        },
+        axisBorder: {
+          show: true,
+        },
+        labels: {
+          show: false,
+        },
       },
     });
+    console.log(chartOptionsLine.value.chart.id)
 
     fetchData().then(() => {
-      res.value = getSensorDataById([props.sensorId]);
+      res.value = getSensorDataById(props.sensorIds);
+      time.value = res.value[0];
 
-      sensorData.value[0].data = res.value[0].map((e, index) => {
-        return [new Date(res.value[0][index]), res.value[1][index]];
+      // adding all the sensors into the series
+      res.value.map((s, index) => {
+        if (index != 0) {
+          numberOfSensors.value++;
+          series.value.push({
+            name: props.sensorNames[index - 1],
+            data: time.value.map((e, i) => {
+              return [time.value[i], s[i]];
+            }),
+          });
+        }
       });
-      sensorData.value[0].name = props.sensorName;
+
+      showGraphs.value = true;
 
       /* Analyse data */
       maxVal = max(res.value[1]);
@@ -176,7 +212,7 @@ export default {
       showStatistics.value = !showStatistics.value;
 
       if (showStatistics.value) {
-        chartOptions.value = chartOptions.value = {
+        chartOptions.value = {
           ...chartOptions.value,
           ...{
             annotations: {
@@ -269,7 +305,7 @@ export default {
           },
         };
       } else {
-        delete chartOptions.value.annotations
+        delete chartOptions.value.annotations;
         chartOptions.value = {
           ...chartOptions.value,
         };
@@ -283,11 +319,13 @@ export default {
     return {
       chartOptions,
       chartOptionsLine,
-      sensorData,
+      series,
       showTimeLine,
       toggleTimeLine,
       toggleStatistics,
-      showStatistics
+      showStatistics,
+      showGraphs,
+      numberOfSensors,
     };
   },
 };

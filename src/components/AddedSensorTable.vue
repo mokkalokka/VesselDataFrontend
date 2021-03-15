@@ -217,19 +217,20 @@ export default defineComponent({
 
     const tempGroups = useTempGroups();
 
-    const currentDate = new Date();
-
-    tempGroups.value.push({
-      id: 1,
-      sensors: [],
-      groupDate: true,
-      fromDate: currentDate.toISOString().slice(0, 10),
-      fromTime: currentDate.toLocaleTimeString("en-GB"),
-      toDate: currentDate.toISOString().slice(0, 10),
-      toTime: currentDate.toLocaleTimeString("en-GB"),
-      fromDateTime: currentDate,
-      toDateTime: currentDate,
-    });
+    if (tempGroups.value.length === 0) {
+      const currentDate = new Date();
+      tempGroups.value.push({
+        id: 1,
+        sensors: [],
+        groupDate: true,
+        fromDate: currentDate.toISOString().slice(0, 10),
+        fromTime: currentDate.toLocaleTimeString("en-GB"),
+        toDate: currentDate.toISOString().slice(0, 10),
+        toTime: currentDate.toLocaleTimeString("en-GB"),
+        fromDateTime: currentDate,
+        toDateTime: currentDate,
+      });
+    }
 
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);

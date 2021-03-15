@@ -6,8 +6,9 @@ import VueGridLayout from 'vue-grid-layout'
 
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BIconArrowDownUp } from 'bootstrap-icons-vue';
+import { BIconArrowDownUp, BIconPlus } from 'bootstrap-icons-vue';
 import { BIconSearch } from 'bootstrap-icons-vue';
+
 
 import PrimeVue from 'primevue/config';
 
@@ -35,14 +36,16 @@ import CheckBox from 'primevue/checkbox'
 import Multiselect from "@vueform/multiselect";
 import VueApexCharts from "vue3-apexcharts";
 
+
 createApp(App)
     .use(router)
     .use(PrimeVue)
-    .component("Multiselect", Multiselect)
     .use(VueApexCharts)
     .use(VueGridLayout)
+    .component("Multiselect", Multiselect)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("BIconSearch", BIconSearch)
+    .component("BIconPlus", BIconPlus)
     .component("DataTable", DataTable)
     .component("Column", Column)
     .component("Card", Card)
@@ -55,8 +58,4 @@ createApp(App)
     .component("Slider", Slider)
     .component("Calendar", Calendar)
     .component("CheckBox", CheckBox)
-
-
-
-
     .mount('#app')

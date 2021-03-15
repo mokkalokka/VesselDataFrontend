@@ -39,8 +39,15 @@ export function useSensorData() {
     }
 
     function getSensorDataById(sensorIds: number[]) {
-        sensorIds.unshift(0) //Adds time   
-        return sensorIds.map(id => Object.values(response.value[id])[0])
+        //Adds time 
+        sensorIds.unshift(0)   
+
+        // Extract the sensors from the response
+        const sensors = sensorIds.map(id => Object.values(response.value[id])[0]) as [Date[], ]
+        
+        // Parse dates
+        sensors[0] = sensors[0].map(t => new Date(t))
+        return sensors
     }
 
     function getPosition() {
