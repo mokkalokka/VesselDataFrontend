@@ -27,7 +27,7 @@
         >
       </div>
       <grid-layout
-        :key="updated"
+        
         v-model:layout="layout"
         :col-num="12"
         :row-height="200"
@@ -46,6 +46,7 @@
           :i="item.i"
         >
           <line-graph
+            
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
