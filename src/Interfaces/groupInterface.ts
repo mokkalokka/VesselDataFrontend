@@ -5,6 +5,10 @@ export interface Group {
     id: number;
     sensors: Sensor[];
     groupDate: boolean;
-    fromDate: Date;
-    toDate: Date;
+    fromDate: String;
+    fromTime: String;
+    toDate: String;
+    toTime: String;
+    fromDateTime: Date,
+    toDateTime: Date,
 }

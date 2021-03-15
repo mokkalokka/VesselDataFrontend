@@ -8,4 +8,8 @@ export interface Sensor {
     group: number;
     grahpsToCompare: number[];
     graphType: string;
+    fromDate: String;
+    fromTime: String;
+    toDate: String;
+    toTime: String;
 }
