@@ -81,6 +81,10 @@ export default {
       type: Array[Number],
       required: true,
     },
+    groupId: {
+      type: Number,
+      required: true
+    }
   },
 
   setup(props) {
@@ -99,7 +103,7 @@ export default {
 
     const chartOptions = ref({
       chart: {
-        id: "chart" + props.sensorId + "1",
+        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
         type: "line",
         toolbar: {
           autoSelected: "pan",
@@ -138,10 +142,10 @@ export default {
     });
     const chartOptionsLine = ref({
       chart: {
-        id: "chart" + props.sensorId + "2",
+        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#2",
         type: "area",
         brush: {
-          target: "chart" + props.sensorId + "1",
+          target: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
           enabled: true,
         },
         selection: {
@@ -176,6 +180,7 @@ export default {
         },
       },
     });
+    console.log(chartOptionsLine.value.chart.id)
 
     fetchData().then(() => {
       res.value = getSensorDataById(props.sensorIds);
