@@ -2,7 +2,7 @@
   <div class="h-100 w-100">
     <!-- style="width: 100% height: 100%" -->
     <div class="content">
-      <h1 class="text-center">Group {{ group }}</h1>
+      <h1 class="text-center">Group {{group.id}}</h1>
 
       <div class="form-check form-switch d-flex justify-content-center">
         <input
@@ -49,6 +49,7 @@
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
+            :groupId="group.id"
           />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
             <Map />
@@ -62,29 +63,28 @@
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import { useGroups } from "@/composables/useGroups";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
+import {Group} from '@/Interfaces/groupInterface'
 
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
-  props: {
+  props: ['group'],
+  
+ /*  props: {
     group: {
       type: Number,
       default: 1,
     },
-  },
+  }, */
+ 
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
-    const groups = useGroups();
 
-    const currentGroup = groups.value.filter((e) => e.id == props.group);
-
-    currentGroup[0].sensors.map((e) => {
-      if (e.group == props.group) {
+    props.group.sensors.map((e) => {
         layout.value.push({
           x: 0,
           y: 0,
@@ -99,9 +99,7 @@ export default defineComponent({
               }
             })
         });
-      }
     });
-    /* console.log(layout.value.map((e) => e.sensorIds)); */
 
     const draggable = ref(false);
     const resizable = ref(false);
