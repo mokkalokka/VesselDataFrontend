@@ -47,7 +47,7 @@
         >
           <line-graph
             v-if="item.i != 9999999"
-            :sensorName="item.sensorName"
+            :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
           />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
@@ -62,6 +62,7 @@
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { useGroups } from "@/composables/useGroups";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
 
@@ -78,8 +79,11 @@ export default defineComponent({
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
+    const groups = useGroups();
 
-    selectedSensors.value.map((e) => {
+    const currentGroup = groups.value.filter((e) => e.id == props.group);
+
+    currentGroup[0].sensors.map((e) => {
       if (e.group == props.group) {
         layout.value.push({
           x: 0,
@@ -88,11 +92,16 @@ export default defineComponent({
           h: 2,
           i: e.id,
           sensorIds: e.grahpsToCompare.concat(e.id),
-          sensorName: e.sensorName,
+          sensorNames:
+            selectedSensors.value.map((s) => {
+              if (e.grahpsToCompare.concat(e.id).includes(s.id)) {
+                return s.sensorName;
+              }
+            })
         });
       }
     });
-
+    /* console.log(layout.value.map((e) => e.sensorIds)); */
 
     const draggable = ref(false);
     const resizable = ref(false);

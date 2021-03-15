@@ -67,14 +67,14 @@
 
 <script>
 import { useSensorData } from "@/composables/useSensorData";
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import { std, mean, max, min } from "mathjs";
 
 export default {
   name: "LineGraph",
   props: {
-    sensorName: {
-      type: String,
+    sensorNames: {
+      type: Array[String],
       required: true,
     },
     sensorIds: {
@@ -178,7 +178,7 @@ export default {
     });
 
     fetchData().then(() => {
-      res.value = getSensorDataById([105, 106]);
+      res.value = getSensorDataById(props.sensorIds);
       time.value = res.value[0];
 
       // adding all the sensors into the series
@@ -186,7 +186,7 @@ export default {
         if (index != 0) {
           numberOfSensors.value++;
           series.value.push({
-            name: props.sensorName,
+            name: props.sensorNames[index - 1],
             data: time.value.map((e, i) => {
               return [time.value[i], s[i]];
             }),
