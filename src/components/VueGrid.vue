@@ -1,7 +1,7 @@
 <template>
   <div class="h-100 w-100"> <!-- style="width: 100% height: 100%" -->
     <div class="content">
-      <h1 class="text-center">Group {{group}}</h1>
+      <h1 class="text-center">Group {{group.id}}</h1>
 
       <div class="form-check form-switch d-flex justify-content-center">
         <input
@@ -65,18 +65,20 @@ import Map from "@/components/Map.vue";
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
+  props: ['group'],
+  /*
   props: {
     group: {
       type: Number,
       default: 1
     }
-
   },
+  */
 
-  setup() {
-    const selectedSensors = useSelectedSensors();
+  setup(props) {
+    //const selectedSensors = useSelectedSensors();
     const layout = ref([]);
-    selectedSensors.value.map((e) => {
+    props.group.sensors.map((e) => {
       layout.value.push({
         x: 0,
         y: 0,

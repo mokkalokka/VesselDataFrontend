@@ -52,7 +52,9 @@
   -->
 
   <div class="container">
-    <div class="card my-4">
+    <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
+    <div class="card my-4"> 
+      
       <div class="accordion accordion-flush open" id="accordionFlushExample">
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
@@ -64,7 +66,7 @@
               aria-expanded="false"
               aria-controls="flush-collapseOne"
             >
-              Sensor
+              Sensorer for "Båtnavn"
             </button>
           </h2>
           <div
@@ -101,7 +103,7 @@
                     aria-controls="flush-collapseOne flush-collapseTwo"
                     @click="setSensorsToRender"
                   >
-                    Show graphs
+                    Vis grafer
                   </button>
                   </div>
                 </div>
@@ -142,7 +144,7 @@
               aria-expanded="false"
               aria-controls="flush-collapseThree"
             >
-              Graphs
+              Grafer
             </button>
           </h2>
           <div
@@ -152,7 +154,9 @@
           >
             <div class="accordion-body">
               <div v-if="showGraphs">
-                <vue-grid  :key="sensorListUpdated"/>
+                <div v-for="group in groups" :key="group.id">
+                  <vue-grid :group="group"/>
+                </div>
                 <!-- <div v-for="s in sensorsToRender" :key="s.id">
                   <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
                 </div> -->
@@ -192,6 +196,7 @@
 import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { useGroups, useTempGroups } from "@/composables/useGroups";
 /* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
@@ -220,12 +225,15 @@ export default defineComponent({
     const graphActive = ref([0] as number[]);
     const sensorsToRender = ref([] as SensorName[]);
     const sensorListUpdated = ref(1 as number)
+    const groups = useGroups();
+    const tempGroups = useTempGroups();
 
     const setSensorsToRender = () => {
-      sensorListUpdated.value ++
+      // sensorListUpdated.value ++
+      // sensorsToRender.value = [...selectedSensors.value];
+      // active.value = [1];
+      groups.value = tempGroups.value;
       showGraphs.value = true;
-      sensorsToRender.value = [...selectedSensors.value];
-      active.value = [1];
     };
 
 
@@ -240,7 +248,7 @@ export default defineComponent({
     initialize();
 
     return {
-      active,
+      //active,
       showSensorData,
       showGraphs,
       sensorNames,
@@ -249,8 +257,10 @@ export default defineComponent({
       graphFilter,
       graphActive,
       filter,
-      sensorsToRender,
-      sensorListUpdated
+      //sensorsToRender,
+      //sensorListUpdated,
+      groups,
+  
     };
   },
 });

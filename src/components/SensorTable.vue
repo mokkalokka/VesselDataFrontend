@@ -5,7 +5,7 @@
           <input
             type="text"
             class="form-control border-end-0"
-            placeholder="Search Sensors..."
+            placeholder="Søk etter sensorer..."
             aria-label="Sensor Name"
             aria-describedby="sensorsearch-addon"
             v-model="input"
@@ -20,10 +20,10 @@
       <table id="sensorTable" class="table table-bordered table-hover">
         <thead>
           <tr>
-            <th scope="col"><button type="button" class="active sort-btn-hover btn bg-transparent shadow-0 border-0" @click="sort">Sensor Name <BIconArrowDownUp/></button></th>
-            <th scope="col">Description</th>
-            <th scope="col">Start Time</th>
-            <th scope="col">End Time</th>
+            <th scope="col"><button type="button" class="active sort-btn-hover btn bg-transparent shadow-0 border-0" @click="sort">Sensornavn <BIconArrowDownUp/></button></th>
+            <th scope="col">Beskrivelse</th>
+            <th scope="col">Fra-tid</th>
+            <th scope="col">Til-tid</th>
           </tr>
         </thead>
         <tbody
@@ -89,6 +89,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { Sensor } from "@/Interfaces/sensorInterface";
 
 export default defineComponent({
   name: "SensorTable",
@@ -115,7 +116,7 @@ export default defineComponent({
 
 
     //filter-method
-    const searchFilter = (sensor: any) => {
+    const searchFilter = (sensor: Sensor) => {
       const nameContains = sensor.sensorName.toLowerCase().includes(input.value.toLowerCase());
       const descriptionContains = sensor.description.toLowerCase().includes(input.value.toLowerCase());
 
@@ -128,7 +129,7 @@ export default defineComponent({
       //console.log("Kjører fillpages");
 
       sensorPages.value.length = 0;
-      sensors.value = props.sensorNames.filter((s: {}) => searchFilter(s));
+      sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
 
       const size = 10;
       const subArrSize: number = Math.ceil(sensors.value.length / size);
@@ -148,10 +149,10 @@ export default defineComponent({
     })
 
     // method for adding/removing sensor from active sensor array depending if clicked or unclicked
-    const toggleSelectedSensor = (sensor: any) => {
+    const toggleSelectedSensor = (sensor: Sensor) => {
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
-        selectedSensors.value.splice(activeRows.value.indexOf(sensor.id), 1);
+        selectedSensors.value.splice(selectedSensors.value.indexOf(sensor), 1);
       } else {
         activeRows.value.push(sensor.id);
         selectedSensors.value.push(sensor);

@@ -195,7 +195,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import { useGroups } from "@/composables/useGroups";
+import { useGroups, useTempGroups } from "@/composables/useGroups";
 import { Sensor } from "@/Interfaces/sensorInterface";
 import { Group } from "@/Interfaces/groupInterface";
 
@@ -210,8 +210,7 @@ export default defineComponent({
       { type: "Pai", value: "Pai" },
     ];
 
-    const groups = useGroups();
-    const tempGroups = ref([] as Group[]);
+    const tempGroups = useTempGroups();
 
     tempGroups.value.push({
       id: 1,
