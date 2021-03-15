@@ -29,6 +29,10 @@ export function useSensorData() {
                 group: 1,
                 grahpsToCompare: [],
                 graphType: "Linje",
+                fromDate: startTime.toISOString().slice(0, 10),
+                fromTime: startTime.toLocaleTimeString("en-GB"),
+                toDate: endTime.toISOString().slice(0, 10),
+                toTime: endTime.toLocaleTimeString("en-GB"),
                 } 
         } ) as Sensor[]
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))

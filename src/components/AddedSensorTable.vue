@@ -47,7 +47,7 @@
                               @click="group.groupDate = !group.groupDate"
                             />
                             <label class="form-check-label">
-                              Datovisning {{ group.groupDate }}
+                              Datovisning
                             </label>
                           </div>
                         </td>
@@ -55,30 +55,38 @@
                           <input
                             type="date"
                             class="form-control"
-                            value="2021-03-10"
-                            disabled
+                            v-model="group.fromDate"
+                            :disabled="!group.groupDate"
+                            :max="group.toDate"
+                            @change="updateSensorsInGroup(group)"
                           />
                           <input
                             type="time"
                             class="form-control"
-                            value="11:11:11"
+                            v-model="group.fromTime"
                             step="1"
-                            disabled
+                            :disabled="!group.groupDate"
+                            :max="group.toTime"
+                            @change="updateSensorsInGroup(group)"
                           />
                         </td>
                         <td>
                           <input
                             type="date"
                             class="form-control"
-                            value="2021-03-10"
-                            disabled
+                            v-model="group.toDate"
+                            :disabled="!group.groupDate"
+                            :min="group.fromDate"
+                            @change="updateSensorsInGroup(group)"
                           />
                           <input
                             type="time"
                             class="form-control"
-                            value="12:12:12"
+                            v-model="group.toTime"
                             step="1"
-                            disabled
+                            :disabled="!group.groupDate"
+                            :min="group.fromTime"
+                            @change="updateSensorsInGroup(group)"
                           />
                         </td>
                       </tr>
@@ -101,43 +109,40 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <!-- <tr
-                        v-for="sensor in selectedSensors"
-                        :key="sensor.id"
-                        v-show="group.id == sensor.group"
-                      > -->
                       <tr v-for="sensor in group.sensors" :key="sensor.id">
                         <td>{{ sensor.sensorName }}</td>
                         <td>
                           <input
                             type="date"
                             class="form-control"
-                            :value="sensor.startTime.toISOString().slice(0, 10)"
-                            disabled
+                            v-model="sensor.fromDate"
+                            :disabled="group.groupDate"
+                            :max="sensor.toDate"
                           />
                           <input
                             type="time"
                             class="form-control"
-                            :value="
-                              sensor.startTime.toLocaleTimeString('en-GB')
-                            "
+                            v-model="sensor.fromTime"
                             step="1"
-                            disabled
+                            :disabled="group.groupDate"
+                            :max="sensor.fromTime"
                           />
                         </td>
                         <td>
                           <input
                             type="date"
                             class="form-control"
-                            :value="sensor.endTime.toISOString().slice(0, 10)"
-                            disabled
+                            v-model="sensor.toDate"
+                            :disabled="group.groupDate"
+                            :min="sensor.toDate"
                           />
                           <input
                             type="time"
                             class="form-control"
-                            :value="sensor.endTime.toLocaleTimeString('en-GB')"
+                            v-model="sensor.toTime"
                             step="1"
-                            disabled
+                            :disabled="group.groupDate"
+                            :min="sensor.toTime"
                           />
                         </td>
                         <td>
@@ -193,9 +198,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, watch } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import { useGroups } from "@/composables/useGroups";
+import { useTempGroups } from "@/composables/useGroups";
 import { Sensor } from "@/Interfaces/sensorInterface";
 import { Group } from "@/Interfaces/groupInterface";
 
@@ -210,15 +215,20 @@ export default defineComponent({
       { type: "Pai", value: "Pai" },
     ];
 
-    const groups = useGroups();
-    const tempGroups = ref([] as Group[]);
+    const tempGroups = useTempGroups();
+
+    const currentDate = new Date();
 
     tempGroups.value.push({
       id: 1,
       sensors: [],
       groupDate: true,
-      fromDate: null,
-      toDate: null,
+      fromDate: currentDate.toISOString().slice(0, 10),
+      fromTime: currentDate.toLocaleTimeString("en-GB"),
+      toDate: currentDate.toISOString().slice(0, 10),
+      toTime: currentDate.toLocaleTimeString("en-GB"),
+      fromDateTime: currentDate,
+      toDateTime: currentDate,
     });
 
     const addSensorToGroup = (sensor: Sensor, event: any) => {
@@ -239,8 +249,12 @@ export default defineComponent({
           id: tempGroups.value.length + 1,
           sensors: [sensor],
           groupDate: true,
-          fromDate: null,
-          toDate: null,
+          fromDate: sensor.startTime.toISOString().slice(0, 10),
+          fromTime: sensor.startTime.toLocaleTimeString("en-GB"),
+          toDate: sensor.endTime.toISOString().slice(0, 10),
+          toTime: sensor.endTime.toLocaleTimeString("en-GB"),
+          fromDateTime: sensor.startTime,
+          toDateTime: sensor.endTime,
         });
       } else {
         tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
@@ -257,6 +271,15 @@ export default defineComponent({
       { deep: true }
     );
 
+    const updateSensorsInGroup = (group: Group) => {
+      group.sensors.map((sensor) => {
+        sensor.fromDate = group.fromDate;
+        sensor.fromTime = group.fromTime;
+        sensor.toDate = group.toDate;
+        sensor.toTime = group.toTime;
+      });
+    };
+
     const filterSensors = (sensor: Sensor) => {
       return selectedSensors.value
         .filter((s) => s.id != sensor.id)
@@ -269,6 +292,7 @@ export default defineComponent({
       filterSensors,
       tempGroups,
       addSensorToGroup,
+      updateSensorsInGroup,
     };
   },
 });
