@@ -1,60 +1,7 @@
 <template>
-  <!--
-<div class="container">
-  <div class="card my-4">
-    <div class="p-d-flex p-jc-center"></div>
-    <Accordion :activeIndex="active" :multiple="true">
-      <AccordionTab header="Sensor table">
-         SENSOR TABLE HERE
-        <SensorTable
-          :sensorNames="sensorNames"
-          :selectedSensors="selectedSensors"
-        />
-        <div class="p-d-flex p-jc-center" v-if="selectedSensors.length != 0">
-          <Button
-            label="view selected data"
-            icon="pi pi-table"
-            class="p-button-rounded p-button-info p-m-4"
-            @click="setSensorsToRender"
-          />
-        </div>
-      </AccordionTab>
-
-      <AccordionTab :disabled="!showSensorData" header="Sensor Data">
-        GRAPHS HERE
-        <div class="p-d-flex p-jc-end graphSearch p-3">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="graphFilter" placeholder="Keyword Search" />
-          </span>
-        </div>
-
-        <div v-if="showSensorData">
-          <Accordion
-            v-for="s in sensorsToRender"
-            :key="s.id"
-            :activeIndex="graphActive"
-            :multiple="true"
-            v-show="filter(s.sensorName)"
-          >
-            <AccordionTab :header="s.sensorName">
-              <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-            </AccordionTab>
-          </Accordion>
-        </div>
-      </AccordionTab>
-      <AccordionTab header="Map">
-        <Map />
-      </AccordionTab>
-    </Accordion>
-  </div>
-  </div>
-  -->
-
   <div class="container">
     <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
-    <div class="card my-4"> 
-      
+    <div class="card my-4">
       <div class="accordion accordion-flush open" id="accordionFlushExample">
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
@@ -81,59 +28,36 @@
                   :sensorNames="sensorNames"
                   :selectedSensors="selectedSensors"
                 />
-                <!-- <div class="" v-if="selectedSensors.length != 0">
+                <!-- <div  v-if="selectedSensors.length != 0">
                   <button
-                    class="btn btn-primary"
-                    @click="showSensorData = true"
+                    class="btn btn-danger"
+                    @click="clearSelectedSensors"
                   >
-                    Select Graph layout
+                    Fjern valgte sensorer
                   </button>
                 </div> -->
                 <div v-show="selectedSensors.length != 0">
                   <div class="d-flex justify-content-center">
-                  <h2 >Valgte sensorer</h2>
+                    <h2>Valgte sensorer</h2>
                   </div>
-                  <AddedSensorTable/>
+                  <AddedSensorTable />
                   <div class="d-flex justify-content-center mt-4">
-                  <button
-                  type="button"
-                    class="btn btn-outline-primary"
-                    data-bs-target=".multi-collapse"
-                    data-bs-toggle="collapse"
-                    aria-controls="flush-collapseOne flush-collapseTwo"
-                    @click="setSensorsToRender"
-                  >
-                    Vis grafer
-                  </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      data-bs-target=".multi-collapse"
+                      data-bs-toggle="collapse"
+                      aria-controls="flush-collapseOne flush-collapseTwo"
+                      @click="setSensorsToRender"
+                    >
+                      Vis grafer
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingTwo">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseTwo"
-              aria-expanded="false"
-              aria-controls="flush-collapseTwo"
-            >
-              Sensor data
-            </button>
-          </h2>
-          <div
-            id="flush-collapseTwo"
-            class="accordion-collapse collapse multi-collapse"
-            aria-labelledby="flush-headingTwo"
-          >
-            <div class="accordion-body">
-              <AddedSensorTable/>
-            </div>
-          </div>
-        </div> -->
         <div class="accordion-item" disabled="!showSensorData">
           <h2 class="accordion-header" id="flush-headingThree">
             <button
@@ -153,13 +77,10 @@
             aria-labelledby="flush-headingThree"
           >
             <div class="accordion-body">
-              <div v-if="showGraphs">
+              <div v-if="showGraphs" :key="sensorListUpdated">
                 <div v-for="group in groups" :key="group.id">
-                  <vue-grid :group="group"/>
+                  <vue-grid v-show="group.sensors.length != 0" :group="group" />
                 </div>
-                <!-- <div v-for="s in sensorsToRender" :key="s.id">
-                  <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-                </div> -->
               </div>
             </div>
           </div>
@@ -195,14 +116,17 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
-import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import { useGroups, useTempGroups } from "@/composables/useGroups";
+import {
+  resetSelectedSensors,
+  useSelectedSensors,
+} from "@/composables/useSelectedSensors";
+import { useGroups, useTempGroups, resetGroups } from "@/composables/useGroups";
 /* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import Map from "@/components/Map.vue";
 /* import Map from "@/components/Map.vue"; */
-import VueGrid from "@/components/VueGrid.vue"
+import VueGrid from "@/components/VueGrid.vue";
 
 interface SensorName {
   id: number;
@@ -214,29 +138,30 @@ interface SensorName {
 }
 
 export default defineComponent({
-  components: { /* LineGraph, */ SensorTable, /* Map */ VueGrid, AddedSensorTable },
+  components: {
+    /* LineGraph, */ SensorTable,
+    /* Map */ VueGrid,
+    AddedSensorTable,
+  },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
     const showSensorData = ref(false as boolean);
-    const showGraphs = ref(false as boolean)
-    const active = ref([0, 2] as number[]);
+    const showGraphs = ref(false as boolean);
     const graphFilter = ref("" as string);
     const graphActive = ref([0] as number[]);
-    const sensorsToRender = ref([] as SensorName[]);
-    const sensorListUpdated = ref(1 as number)
+    const sensorListUpdated = ref(1 as number);
     const groups = useGroups();
     const tempGroups = useTempGroups();
 
+    resetGroups();
+    resetSelectedSensors();
+
     const setSensorsToRender = () => {
-      // sensorListUpdated.value ++
-      // sensorsToRender.value = [...selectedSensors.value];
-      // active.value = [1];
+      sensorListUpdated.value++;
       groups.value = tempGroups.value;
       showGraphs.value = true;
     };
-
-
 
     const filter = (sensorName: string) => {
       return sensorName.toLowerCase().includes(graphFilter.value.toLowerCase());
@@ -248,7 +173,6 @@ export default defineComponent({
     initialize();
 
     return {
-      //active,
       showSensorData,
       showGraphs,
       sensorNames,
@@ -257,10 +181,8 @@ export default defineComponent({
       graphFilter,
       graphActive,
       filter,
-      //sensorsToRender,
-      //sensorListUpdated,
+      sensorListUpdated,
       groups,
-  
     };
   },
 });

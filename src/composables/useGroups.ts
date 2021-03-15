@@ -11,3 +11,8 @@ export function useGroups() {
 export function useTempGroups() {
     return tempGroups;
 }
+
+export function resetGroups() {
+    tempGroups.value = [];
+    groups.value = [];
+}

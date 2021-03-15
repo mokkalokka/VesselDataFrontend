@@ -212,13 +212,15 @@ export default defineComponent({
 
     const tempGroups = useTempGroups();
 
-    tempGroups.value.push({
-      id: 1,
-      sensors: [],
-      groupDate: true,
-      fromDate: null,
-      toDate: null,
-    });
+    if (tempGroups.value.length === 0) {
+      tempGroups.value.push({
+        id: 1,
+        sensors: [],
+        groupDate: true,
+        fromDate: null,
+        toDate: null,
+      });
+    }
 
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);
