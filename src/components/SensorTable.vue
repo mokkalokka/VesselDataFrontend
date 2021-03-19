@@ -29,8 +29,8 @@
               </button>
             </th>
             <th scope="col">Beskrivelse</th>
-            <th scope="col">Fra-tid</th>
-            <th scope="col">Til-tid</th>
+            <!-- <th scope="col">Fra-tid</th>
+            <th scope="col">Til-tid</th> -->
           </tr>
         </thead>
         <tbody
@@ -46,8 +46,8 @@
           >
             <td>{{ sensor.sensorName }}</td>
             <td>{{ sensor.description }}</td>
-            <td>{{ sensor.startTime }}</td>
-            <td>{{ sensor.endTime }}</td>
+            <!-- <td>{{ sensor.startTime }}</td>
+            <td>{{ sensor.endTime }}</td> -->
           </tr>
         </tbody>
       </table>
@@ -123,7 +123,7 @@ export default defineComponent({
     const selectedSensors = useSelectedSensors();
 
     //mutable sensor array
-    const sensors = ref([] as []);
+    const sensors = ref([] as Sensor[]);
 
     // search string input
     const input = ref("" as string);
@@ -132,7 +132,7 @@ export default defineComponent({
     const activeRows = ref([] as number[]);
 
     //2D-array containing pages of sensors for paginator
-    const sensorPages = ref([] as {}[][]);
+    const sensorPages = ref([] as Sensor[][]);
 
     // number for which page in paginator is active
     const activePage = ref(0 as number);
@@ -165,7 +165,7 @@ export default defineComponent({
       for (let i = 0; i < subArrSize; i++) {
         const from: number = size * i;
         const to: number = size * (1 + i);
-        const sliced: {}[] = sensors.value.slice(from, to);
+        const sliced: Sensor[] = sensors.value.slice(from, to);
         sensorPages.value.push(sliced);
       }
 

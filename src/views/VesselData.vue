@@ -2,25 +2,25 @@
   <div class="container">
     <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
     <div class="card my-4">
-      <div class="accordion accordion-flush open" id="accordionFlushExample">
+      <div class="accordion accordion-flush" id="sensorAccordion">
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
             <button
               class="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseOne"
+              data-bs-target="#sensorTableCollapse"
               aria-expanded="false"
-              aria-controls="flush-collapseOne"
+              aria-controls="sensorTableCollapse"
             >
               Sensorer for "Båtnavn"
             </button>
           </h2>
           <div
-            id="flush-collapseOne"
+            id="sensorTableCollapse"
             class="accordion-collapse collapse multi-collapse show"
             aria-labelledby="flush-headingOne"
-            data-bs-parent="#accordionFlushExample"
+            data-bs-parent="#sensorAccordion"
           >
             <div class="accordion-body">
               <div class="table table-responsive">
@@ -47,7 +47,7 @@
                       class="btn btn-outline-primary"
                       data-bs-target=".multi-collapse"
                       data-bs-toggle="collapse"
-                      aria-controls="flush-collapseOne flush-collapseTwo"
+                      aria-controls="sensorTableCollapse graphCollapse"
                       @click="setSensorsToRender"
                     >
                       Vis grafer
@@ -63,18 +63,20 @@
             <button
               class="accordion-button collapsed"
               type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseThree"
+              :disabled="!showGraphs"
+              data-bs-toggle="collapse" 
+              data-bs-target="#graphCollapse"
               aria-expanded="false"
-              aria-controls="flush-collapseThree"
+              aria-controls="graphCollapse"
+              v-bind:class='!showGraphs ? "bg-light" : "bg-default"'
             >
               Grafer
             </button>
           </h2>
           <div
-            id="flush-collapseThree"
-            class="accordion-collapse collapse multi-collapse"
+            id="graphCollapse"
             aria-labelledby="flush-headingThree"
+            v-bind:class="graphToggleClass"
           >
             <div class="accordion-body">
               <div v-if="showGraphs" :key="sensorListUpdated">
@@ -91,15 +93,15 @@
               class="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseFour"
+              data-bs-target="#mapCollapse"
               aria-expanded="true"
-              aria-controls="flush-collapseFour"
+              aria-controls="mapCollapse"
             >
               Map
             </button>
           </h2>
           <div
-            id="flush-collapseFour"
+            id="mapCollapse"
             class="accordion-collapse collapse show"
             aria-labelledby="flush-headingFour"
           >
@@ -114,7 +116,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import {
   resetSelectedSensors,
@@ -153,10 +155,17 @@ export default defineComponent({
     const sensorListUpdated = ref(1 as number);
     const groups = useGroups();
     const tempGroups = useTempGroups();
+    const graphToggleClass = ref("accordion-collapse collapse multi-collapse")
 
     resetGroups();
     resetSelectedSensors();
 
+    onMounted(() => {
+      document.getElementById("graphCollapse").addEventListener('show.bs.collapse', function () {
+        graphToggleClass.value = "accordion-collapse collapse"
+      })
+    })
+      
     const setSensorsToRender = () => {
       sensorListUpdated.value++;
       groups.value = tempGroups.value;
@@ -169,6 +178,8 @@ export default defineComponent({
 
     // From server
     const { sensorNames, initialize } = useSensorData();
+
+    
 
     initialize();
 
@@ -183,6 +194,7 @@ export default defineComponent({
       filter,
       sensorListUpdated,
       groups,
+      graphToggleClass
     };
   },
 });

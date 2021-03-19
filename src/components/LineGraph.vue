@@ -113,12 +113,16 @@ export default {
           enabled: false,
         },
       },
+       legend: {
+      show: true,
+      showForSingleSeries: true,
+      },
 
       stroke: {
         width: 1,
       },
       title: {
-        text: props.sensorName,
+        text: props.sensorNames.map(e => e.toString()),
         align: "center",
       },
 
@@ -152,7 +156,9 @@ export default {
           enabled: true,
         },
       },
-      /* colors: ["#008FFB"], */
+      legend: {
+      show: false,
+      },
       fill: {
         type: "gradient",
         gradient: {
@@ -167,23 +173,12 @@ export default {
         },
       },
       yaxis: {
-        /* show: false, */
-        floating: false,
-        axisTicks: {
-          show: false,
-        },
-        axisBorder: {
-          show: true,
-        },
-        labels: {
-          show: false,
-        },
+        show: false,
       },
     });
-    console.log(chartOptionsLine.value.chart.id)
 
     fetchData().then(() => {
-      res.value = getSensorDataById(props.sensorIds);
+      res.value = getSensorDataById([...props.sensorIds]);
       time.value = res.value[0];
 
       // adding all the sensors into the series
