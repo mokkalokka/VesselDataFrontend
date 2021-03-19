@@ -27,7 +27,7 @@
         >
       </div>
       <grid-layout
-        
+        :key="updated"
         v-model:layout="layout"
         :col-num="12"
         :row-height="200"
@@ -92,13 +92,15 @@ export default defineComponent({
           w: 12,
           h: 2,
           i: e.id,
-          sensorIds: e.grahpsToCompare.concat(e.id),
+          sensorIds: [...e.grahpsToCompare].concat(e.id),
           sensorNames:
-            selectedSensors.value.map((s) => {
-              if (e.grahpsToCompare.concat(e.id).includes(s.id)) {
+            /* selectedSensors.value.map((s) => {
+              if (e.grahpsToCompare.concat(e.id).includes(s.id)) {                
                 return s.sensorName;
               }
-            })
+            }) */
+            selectedSensors.value.filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
+            .map(f => { return f.sensorName}) 
         });
     });
 
