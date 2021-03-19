@@ -120,7 +120,7 @@ import {
   resetSelectedSensors,
   useSelectedSensors,
 } from "@/composables/useSelectedSensors";
-import { useGroups, useTempGroups, resetGroups } from "@/composables/useGroups";
+import { resetGroups, useGroups, useTempGroups} from "@/composables/useGroups";
 /* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";

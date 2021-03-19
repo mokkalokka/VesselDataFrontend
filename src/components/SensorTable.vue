@@ -113,6 +113,7 @@
 import { defineComponent, ref, watch, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import { Sensor } from "@/Interfaces/sensorInterface";
+import { useTempGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "SensorTable",
@@ -135,6 +136,9 @@ export default defineComponent({
 
     // number for which page in paginator is active
     const activePage = ref(0 as number);
+
+    // temporary groups for settings
+    const tempGroups = useTempGroups()
 
     //filter-method
     const searchFilter = (sensor: Sensor) => {
@@ -177,9 +181,12 @@ export default defineComponent({
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
         selectedSensors.value.splice(selectedSensors.value.indexOf(sensor), 1);
+        tempGroups.value[sensor.group - 1].sensors.splice(tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),1);
+        sensor.group = 1
       } else {
         activeRows.value.push(sensor.id);
         selectedSensors.value.push(sensor);
+        tempGroups.value[0].sensors.push(sensor)
       }
     };
 

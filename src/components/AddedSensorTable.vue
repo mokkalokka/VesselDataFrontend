@@ -1,12 +1,9 @@
 <template>
   <div class="card mt-4">
-    <div class="accordion accordion-flush">
-      <div
-        v-for="group in tempGroups"
+    <div class="accordion p-0 accordion-flush">
+        <div class="accordion-item" v-for="group in tempGroups"
         :key="group.id"
-        v-show="group.sensors.length != 0"
-      >
-        <div class="accordion-item">
+        v-show="group.sensors.length != 0">
           <h2 class="accordion-header" :id="'heading' + group.id">
             <button
               class="accordion-button"
@@ -25,10 +22,8 @@
             :aria-labelledby="'heading' + group.id"
           >
             <div class="accordion-body p-0">
-              <div class="card my-2">
-                <div class="card-body p-2">
-                  <h5 class="card-title">Instillinger for gruppen</h5>
-                  <table class="table table-bordered">
+                  <h5>Instillinger for gruppen</h5>
+                  <table class="table m-0 table-bordered">
                     <thead>
                       <tr>
                         <th>Datovisning</th>
@@ -92,12 +87,8 @@
                       </tr>
                     </tbody>
                   </table>
-                </div>
-              </div>
-              <div class="card my-2">
-                <div class="card-body p-2">
                   <h5 class="card-title">Instillinger for sensorene</h5>
-                  <table class="table table-bordered">
+                  <table class="table m-0 table-bordered">
                     <thead>
                       <tr>
                         <th>Sensor</th>
@@ -168,7 +159,10 @@
                             :createTag="false"
                             mode="tags"
                             v-model="sensor.grahpsToCompare"
-                            :options="filterSensors(sensor)"
+                            :options="filterSensors(sensor, group)"
+                            @change="updateCurrentGroup(group)"
+                            @select="removeSelectedSensorToGroup"
+                            @deselect="addDeselectedSensorToGroup"
                           />
                         </td>
                         <td>
@@ -187,28 +181,27 @@
                       </tr>
                     </tbody>
                   </table>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from "vue";
-import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { defineComponent, ref } from "vue";
 import { useTempGroups } from "@/composables/useGroups";
 import { Sensor } from "@/Interfaces/sensorInterface";
 import { Group } from "@/Interfaces/groupInterface";
+import { useSelectedSensors } from "@/composables/useSelectedSensors";
 
 export default defineComponent({
   name: "AddedSensorTable",
 
   setup: () => {
     const selectedSensors = useSelectedSensors();
+    const currentGroup = ref(null as Group);
+
     const graphTypes = [
       { type: "Linje", value: "Linje" },
       { type: "Bar", value: "Bar" },
@@ -216,21 +209,6 @@ export default defineComponent({
     ];
 
     const tempGroups = useTempGroups();
-
-    if (tempGroups.value.length === 0) {
-      const currentDate = new Date();
-      tempGroups.value.push({
-        id: 1,
-        sensors: [],
-        groupDate: true,
-        fromDate: currentDate.toISOString().slice(0, 10),
-        fromTime: currentDate.toLocaleTimeString("en-GB"),
-        toDate: currentDate.toISOString().slice(0, 10),
-        toTime: currentDate.toLocaleTimeString("en-GB"),
-        fromDateTime: currentDate,
-        toDateTime: currentDate,
-      });
-    }
 
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);
@@ -243,6 +221,9 @@ export default defineComponent({
 
       // Change the sensor object to contain right id
       sensor.group = newGroupNumber;
+
+      // Change the group number for the sensor to compare with
+      sensor.grahpsToCompare.map(s => selectedSensors.value.find(e => e.id == s).group = newGroupNumber)
 
       // Check if group exits. If it exits add sensor to the group, if not create the group and add sensor
       if (tempGroups.value[newGroupNumber - 1] === undefined) {
@@ -262,16 +243,6 @@ export default defineComponent({
       }
     };
 
-    watch(
-      selectedSensors,
-      (selectedSensors: Sensor[], prevSelectedSensors: Sensor[]) => {
-        tempGroups.value[0].sensors = selectedSensors.filter(
-          (sensor) => sensor.group == 1
-        );
-      },
-      { deep: true }
-    );
-
     const updateSensorsInGroup = (group: Group) => {
       group.sensors.map((sensor) => {
         sensor.fromDate = group.fromDate;
@@ -281,19 +252,36 @@ export default defineComponent({
       });
     };
 
-    const filterSensors = (sensor: Sensor) => {
+    const filterSensors = (sensor: Sensor, group: Group) => {
       return selectedSensors.value
-        .filter((s) => s.id != sensor.id)
+        .filter((s) => s.id != sensor.id && group.id == s.group)
         .map((s) => ({ value: s.id, label: s.sensorName }));
+    };
+
+    const updateCurrentGroup = (group) => {
+      currentGroup.value = group;
+    };
+
+    const removeSelectedSensorToGroup = (value) => {
+      currentGroup.value.sensors = currentGroup.value.sensors.filter(
+        (s) => s.id != value
+      );
+    };
+    const addDeselectedSensorToGroup = (value) => {
+      currentGroup.value.sensors.push(
+        selectedSensors.value.filter((s) => s.id == value)[0]
+      );
     };
 
     return {
       graphTypes,
-      selectedSensors,
       filterSensors,
       tempGroups,
       addSensorToGroup,
       updateSensorsInGroup,
+      removeSelectedSensorToGroup,
+      addDeselectedSensorToGroup,
+      updateCurrentGroup,
     };
   },
 });
