@@ -1,33 +1,32 @@
 <template>
-<div style="height: 80vh; width: 100%">
-  <div style="height: 70vh; width: 100%">
-    <l-map
-      v-model="zoom"
-      v-model:zoom="zoom"
-      :center="[60.390075, 1.94950166666667]"
-    >
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      ></l-tile-layer>
-      <l-control-layers />
+  <div style="height: 100%; width: 100%">
+    <div v-if="max > 1" style="height: 80%; width: 100%">
+      <l-map
+        v-model="zoom"
+        v-model:zoom="zoom"
+        :center="[60.390075, 1.94950166666667]"
+      >
+        <l-tile-layer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ></l-tile-layer>
+        <l-control-layers />
 
-      <l-polyline
-        v-if="!fetching"
-        v-model:lat-lngs="position"
-        color="green"
-      ></l-polyline>
+        <l-polyline
+          v-if="!fetching"
+          v-model:lat-lngs="position"
+          color="green"
+        ></l-polyline>
 
-      <l-marker :lat-lng="position[sliderValue]" >
-      </l-marker>
-
-    </l-map>
+        <l-marker :lat-lng="position[sliderValue]"> </l-marker>
+      </l-map>
     </div>
-    <div class="p-d-flex p-jc-center m-1">
-      <p>{{new Date (position[sliderValue][2]).toLocaleString()}}</p>
+    <div class="text-center"  style="height: 20%; width: 100%">
+      <div >
+        <p>{{ new Date(position[sliderValue][2]).toLocaleString() }}</p>
+      </div>
+
+      <Slider class="mx-4" v-model="sliderValue" :step="1" :min="min" :max="max" />
     </div>
-    
-    <Slider class="m-2" v-model="sliderValue" :step="1" :min="min" :max="max" />
-  
   </div>
 </template>
 <script>
@@ -36,7 +35,7 @@ import {
   LTileLayer,
   LControlLayers,
   LPolyline,
-  LMarker
+  LMarker,
 } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ref } from "vue";
@@ -47,7 +46,7 @@ export default {
     LTileLayer,
     LControlLayers,
     LPolyline,
-    LMarker
+    LMarker,
   },
   setup() {
     const zoom = ref(7);
