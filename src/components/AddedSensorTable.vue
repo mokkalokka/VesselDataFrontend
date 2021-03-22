@@ -267,10 +267,21 @@ export default defineComponent({
         (s) => s.id != value
       );
     };
+    
     const addDeselectedSensorToGroup = (value) => {
-      currentGroup.value.sensors.push(
-        selectedSensors.value.filter((s) => s.id == value)[0]
-      );
+      let contains = false as boolean;
+
+      for(let i = 0; i < currentGroup.value.sensors.length; i++){
+        if(currentGroup.value.sensors[i].id == value){
+          contains = true;
+          break;
+        }
+      }
+      if(!contains){
+        currentGroup.value.sensors.push(
+            selectedSensors.value.filter((s) => s.id == value)[0]
+          );
+      }
     };
 
     return {
