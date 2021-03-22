@@ -164,7 +164,7 @@
                         v-model="sensor.grahpsToCompare"
                         :options="filterSensors(sensor, group)"
                         @change="updateCurrentGroup(group)"
-                        @select="removeSelectedSensorToGroup"
+                        @select="removeSelectedSensorFromGroup"
                         @deselect="addDeselectedSensorToGroup"
                       />
                     </td>
@@ -200,17 +200,24 @@ export default defineComponent({
   name: "AddedSensorTable",
 
   setup: () => {
+    // selected sensors from SensorTable.
     const selectedSensors = useSelectedSensors();
-    const currentGroup = ref(null as Group);
 
+    // Different graph rendering options.
     const graphTypes = [
       { type: "Linje", value: "Linje" },
       { type: "Bar", value: "Bar" },
       { type: "Pai", value: "Pai" },
     ];
 
+    // temp groups for changing things and not effetcing the rendering at once.
     const tempGroups = useTempGroups();
 
+    /**
+     * Add selected sensor to seletced group.
+     * @param {Sensor} sensor - The selected sensor.
+     * @param {any} author - The event which is the new group number.
+     */
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);
 
@@ -247,6 +254,10 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Update the the sensor time and date when the group date and time changes
+     * @param {Group} group - The group the date and time changed in
+     */
     const updateSensorsInGroup = (group: Group) => {
       group.sensors.map((sensor) => {
         sensor.fromDate = group.fromDate;
@@ -256,35 +267,60 @@ export default defineComponent({
       });
     };
 
-    const filterSensors = (sensor: Sensor, group: Group) => {
+    /**
+     * Filters the sensors a current sensor can be compared with
+     * @param {Sensor} sensor - The currenct sensor
+     * @param {Group} group - The group used for only comparing sensors in the same group
+     * @return {{}[]} Array of objects in a format that works with vueform multiselect
+     */
+    const filterSensors = (sensor: Sensor, group: Group): {}[] => {
       return selectedSensors.value
-        .filter((s) => s.id != sensor.id && group.id == s.group)
+        .filter((s) => s.id != sensor.id && group.id == s.group) // array of sensors that is not the currenct sensor and in the same group
         .map((s) => ({ value: s.id, label: s.sensorName }));
     };
 
+    // Used for saving the current group because vueform multiselect would not let take it in as a parameter.
+    const currentGroup = ref(null as Group);
+
+    /**
+     * Update the current group with the group that is being worked on
+     * Needed because of reason mentioned above
+     * @param {Group} group - The group used for setting the new current group
+     */
     const updateCurrentGroup = (group) => {
       currentGroup.value = group;
     };
 
-    const removeSelectedSensorToGroup = (value) => {
+    /**
+     * Removes the sensor selected for comparison from the group so that it dosent get rendered twice
+     * @param {any} value - the sensor id
+     */
+    const removeSelectedSensorFromGroup = (value) => {
       currentGroup.value.sensors = currentGroup.value.sensors.filter(
         (s) => s.id != value
       );
     };
-    
+
+    /**
+     * Add the sensor removed from comparison so that it gets rendered again
+     * @param {any} value - the sensor id
+     */
     const addDeselectedSensorToGroup = (value) => {
       let contains = false as boolean;
 
-      for(let i = 0; i < currentGroup.value.sensors.length; i++){
-        if(currentGroup.value.sensors[i].id == value){
+      // check if the sensor already is in the group array.
+      //So that we dont get duplicates if the same sensor is compared with multiple other sensors.
+      for (let i = 0; i < currentGroup.value.sensors.length; i++) {
+        if (currentGroup.value.sensors[i].id == value) {
           contains = true;
           break;
         }
       }
-      if(!contains){
+      // if not already in the array of sensors in the group, add it.
+      if (!contains) {
         currentGroup.value.sensors.push(
-            selectedSensors.value.filter((s) => s.id == value)[0]
-          );
+          selectedSensors.value.filter((s) => s.id == value)[0]
+        );
       }
     };
 
@@ -294,7 +330,7 @@ export default defineComponent({
       tempGroups,
       addSensorToGroup,
       updateSensorsInGroup,
-      removeSelectedSensorToGroup,
+      removeSelectedSensorFromGroup,
       addDeselectedSensorToGroup,
       updateCurrentGroup,
     };
