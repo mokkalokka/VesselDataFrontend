@@ -1,88 +1,175 @@
 <template>
-<div class="container">
-  <div class="card my-4">
-    <div class="p-d-flex p-jc-center"></div>
-    <Accordion :activeIndex="active" :multiple="true">
-      <AccordionTab header="Sensor table">
-        <!-- SENSOR TABLE HERE -->
-        <SensorTable
-          :sensorNames="sensorNames"
-          :selectedSensors="selectedSensors"
-        />
-        <div class="p-d-flex p-jc-center" v-if="selectedSensors.length != 0">
-          <Button
-            label="view selected data"
-            icon="pi pi-table"
-            class="p-button-rounded p-button-info p-m-4"
-            @click="setSensorsToRender"
-          />
-        </div>
-      </AccordionTab>
-
-      <AccordionTab :disabled="!showSensorData" header="Sensor Data">
-        <!-- GRAPHS HERE -->
-        <div class="p-d-flex p-jc-end graphSearch p-3">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="graphFilter" placeholder="Keyword Search" />
-          </span>
-        </div>
-
-        <div v-if="showSensorData">
-          <Accordion
-            v-for="s in sensorsToRender"
-            :key="s.id"
-            :activeIndex="graphActive"
-            :multiple="true"
-            v-show="filter(s.sensorName)"
+  <div class="container">
+    <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
+    <div class="card my-4">
+      <div class="accordion accordion-flush" id="sensorAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingOne">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#sensorTableCollapse"
+              aria-expanded="false"
+              aria-controls="sensorTableCollapse"
+            >
+              Sensorer for "Båtnavn"
+            </button>
+          </h2>
+          <div
+            id="sensorTableCollapse"
+            class="accordion-collapse collapse multi-collapse show"
+            aria-labelledby="flush-headingOne"
+            data-bs-parent="#sensorAccordion"
           >
-            <AccordionTab :header="s.sensorName">
-              <line-graph :sensorName="s.sensorName" :sensorId="s.id" />
-            </AccordionTab>
-          </Accordion>
+            <div class="accordion-body">
+              <div class="table table-responsive">
+                <SensorTable
+                  :sensorNames="sensorNames"
+                  :selectedSensors="selectedSensors"
+                />
+                <!-- <div  v-if="selectedSensors.length != 0">
+                  <button
+                    class="btn btn-danger"
+                    @click="clearSelectedSensors"
+                  >
+                    Fjern valgte sensorer
+                  </button>
+                </div> -->
+                <div v-show="selectedSensors.length != 0">
+                  <div class="d-flex justify-content-center">
+                    <h2>Valgte sensorer</h2>
+                  </div>
+                  <AddedSensorTable />
+                  <div class="d-flex justify-content-center mt-4">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      data-bs-target=".multi-collapse"
+                      data-bs-toggle="collapse"
+                      aria-controls="sensorTableCollapse graphCollapse"
+                      @click="setSensorsToRender"
+                    >
+                      Vis grafer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </AccordionTab>
-      <AccordionTab header="Map">
-        <Map />
-      </AccordionTab>
-    </Accordion>
-  </div>
+        <div class="accordion-item" disabled="!showSensorData">
+          <h2 class="accordion-header" id="flush-headingThree">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              :disabled="!showGraphs"
+              data-bs-toggle="collapse" 
+              data-bs-target="#graphCollapse"
+              aria-expanded="false"
+              aria-controls="graphCollapse"
+              v-bind:class='!showGraphs ? "bg-light" : "bg-default"'
+            >
+              Grafer
+            </button>
+          </h2>
+          <div
+            id="graphCollapse"
+            aria-labelledby="flush-headingThree"
+            v-bind:class="graphToggleClass"
+          >
+            <div class="accordion-body">
+              <div v-if="showGraphs" :key="sensorListUpdated">
+                <div v-for="group in groups" :key="group.id">
+                  <vue-grid v-show="group.sensors.length != 0" :group="group" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingFour">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#mapCollapse"
+              aria-expanded="true"
+              aria-controls="mapCollapse"
+            >
+              Map
+            </button>
+          </h2>
+          <div
+            id="mapCollapse"
+            class="accordion-collapse collapse show"
+            aria-labelledby="flush-headingFour"
+          >
+            <div class="accordion-body">
+              <Map />
+            </div>
+          </div>
+        </div> -->
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
-import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import LineGraph from "@/components/LineGraph.vue";
+import {
+  resetSelectedSensors,
+  useSelectedSensors,
+} from "@/composables/useSelectedSensors";
+import { resetGroups, useGroups, useTempGroups} from "@/composables/useGroups";
+/* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
+import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import Map from "@/components/Map.vue";
-
+/* import Map from "@/components/Map.vue"; */
+import VueGrid from "@/components/VueGrid.vue";
 
 interface SensorName {
-    id: number;
-    filterkey: string;
-    sensorName: string;
-    description: string;
-    startTime: Date;
-    endTime: Date;
+  id: number;
+  filterkey: string;
+  sensorName: string;
+  description: string;
+  startTime: Date;
+  endTime: Date;
 }
 
 export default defineComponent({
-  components: { LineGraph, SensorTable, Map },
+  components: {
+    /* LineGraph, */ SensorTable,
+    /* Map */ VueGrid,
+    AddedSensorTable,
+  },
   name: "VesselData",
   setup() {
     const selectedSensors = useSelectedSensors();
-    const showSensorData = ref(false);
-    const active = ref([0, 2] as number[]);
-    const graphFilter = ref("");
+    const showSensorData = ref(false as boolean);
+    const showGraphs = ref(false as boolean);
+    const graphFilter = ref("" as string);
     const graphActive = ref([0] as number[]);
-    const sensorsToRender = ref([] as SensorName[])
+    const sensorListUpdated = ref(1 as number);
+    const groups = useGroups();
+    const tempGroups = useTempGroups();
+    const graphToggleClass = ref("accordion-collapse collapse multi-collapse")
 
+    resetGroups();
+    resetSelectedSensors();
+
+    onMounted(() => {
+      document.getElementById("graphCollapse").addEventListener('show.bs.collapse', function () {
+        graphToggleClass.value = "accordion-collapse collapse"
+      })
+    })
+      
     const setSensorsToRender = () => {
-      showSensorData.value = true;
-      sensorsToRender.value = [...selectedSensors.value]
-      active.value = [1];
+      sensorListUpdated.value++;
+      groups.value = tempGroups.value;
+      showGraphs.value = true;
     };
 
     const filter = (sensorName: string) => {
@@ -92,18 +179,22 @@ export default defineComponent({
     // From server
     const { sensorNames, initialize } = useSensorData();
 
+    
+
     initialize();
 
     return {
-      active,
       showSensorData,
+      showGraphs,
       sensorNames,
       selectedSensors,
       setSensorsToRender,
       graphFilter,
       graphActive,
       filter,
-      sensorsToRender
+      sensorListUpdated,
+      groups,
+      graphToggleClass
     };
   },
 });

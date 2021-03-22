@@ -1,138 +1,222 @@
 <template>
-  <DataTable
-    :value="sensorNames"
-    v-model:selection="selectedSensors"
-    v-model:filters="sensorFilters"
-    dataKey="id"
-    editMode="cell"
-    class="editable-cells-table p-p-0"
-    :scrollable="true"
-    scrollHeight="400px"
-  >
-    <template #header>
-      <div class="p-d-flex p-jc-between">
-        <Button
-          type="button"
-          icon="pi pi-filter-slash"
-          label="Clear"
-          class="p-button-outlined"
-          @click="clearFilter()"
+  <div class="card my-4">
+    <div class="card-header bg-transparent">
+      <div class="input-group searchgroup mb-3">
+        <input
+          type="text"
+          class="form-control border-end-0"
+          placeholder="Søk etter sensorer..."
+          aria-label="Sensor Name"
+          aria-describedby="sensorsearch-addon"
+          v-model="input"
         />
-        <span class="p-input-icon-left">
-          
-          <i class="pi pi-search" />
-          <InputText
-            v-model="sensorFilters['sensorName']"
-            placeholder="Keyword Search"
-          />
+        <span class="input-group-text bg-transparent" id="sensorsearch-addon">
+          <BIconSearch />
         </span>
       </div>
-    </template>
-    <template #empty> No Sensors found. </template>
-    <template #loading> Loading sensors. Please wait. </template>
-
-    <Column
-      field="sensorName"
-      header="Sensors Name"
-      sortable
-      filterMatchMode="contains"
-    ></Column>
-    <Column
-      field="description"
-      header="Description"
-      headerStyle="text-align:center"
-      bodyStyle="text-align:center"
-    ></Column>
-    <Column
-      field="startTime"
-      header="Start time"
-      headerStyle="text-align:center"
-      bodyStyle="text-align:center"
-    >
-
-      <template #body="slotProps">
-        <p>
-          <i class="pi pi-calendar"></i>
-          {{ slotProps.data["startTime"].toLocaleDateString("en-GB") }}
-        </p>
-      </template>
-
-      <template #editor="slotProps">
-            <Calendar
-              id="min"
-              v-model="slotProps.data['startTime']"
-              showOnFocus="false"
-              :minDate="sensorNames[0].startTime"
-              :maxDate="sensorNames[0].endTime"
-              :manualInput="false"
-            />
-      </template>
-    </Column>
-    <Column
-      field="endTme"
-      header="End time"
-      headerStyle="text-align:center"
-      bodyStyle="text-align:center"
-    >
-      <template #body="slotProps">
-        <p>
-          <i class="pi pi-calendar"></i>
-          {{ slotProps.data["endTime"].toLocaleDateString("en-GB") }}
-        </p>
-      </template>
-
-      <template #editor="slotProps">
-            <Calendar
-              id="max"
-              v-model="slotProps.data['endTime']"
-              showOnFocus="false"
-              :minDate="sensorNames[0].startTime"
-              :maxDate="sensorNames[0].endTime"
-              :manualInput="false"
-            />
-      </template>
-    </Column>
-    <Column
-      selectionMode="multiple"
-      headerStyle="width: 3em"
-      bodyStyle="width: 3em"
-    ></Column>
-  </DataTable>
+    </div>
+    <div class="table-responsive">
+      <table id="sensorTable" class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th scope="col">
+              <button
+                type="button"
+                class="active sort-btn-hover btn bg-transparent shadow-0 border-0"
+                @click="sort"
+              >
+                Sensornavn <BIconArrowDownUp />
+              </button>
+            </th>
+            <th scope="col">Beskrivelse</th>
+            <!-- <th scope="col">Fra-tid</th>
+            <th scope="col">Til-tid</th> -->
+          </tr>
+        </thead>
+        <tbody
+          data-link="row"
+          class="rowlink"
+          v-for="sensor in sensorPages[activePage]"
+          :key="sensor.id"
+        >
+          <tr
+            v-bind:id="sensor.id"
+            @click="toggleSelectedSensor(sensor)"
+            v-bind:class="{ 'table-active': activeRows.includes(sensor.id) }"
+          >
+            <td>{{ sensor.sensorName }}</td>
+            <td>{{ sensor.description }}</td>
+            <!-- <td>{{ sensor.startTime }}</td>
+            <td>{{ sensor.endTime }}</td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <li
+          v-bind:class="activePage === 0 ? 'page-item disabled' : 'page-item'"
+        >
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Previous"
+            @click.prevent="
+              activePage > 0 ? activePage-- : (activePage = activePage)
+            "
+          >
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <div v-for="page in sensorPages" :key="sensorPages.indexOf(page)">
+          <li
+            v-bind:class="
+              sensorPages.indexOf(page) === activePage
+                ? 'page-item active'
+                : 'page-item'
+            "
+          >
+            <a
+              class="page-link"
+              href="#"
+              @click.prevent="activePage = sensorPages.indexOf(page)"
+              >{{ sensorPages.indexOf(page) + 1 }}</a
+            >
+          </li>
+        </div>
+        <li
+          v-bind:class="
+            activePage === sensorPages.length - 1
+              ? 'page-item disabled'
+              : 'page-item'
+          "
+        >
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Next"
+            @click.prevent="
+              activePage < sensorPages.length - 1
+                ? activePage++
+                : (activePage = activePage)
+            "
+          >
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { useSensorData } from "@/composables/useSensorData";
+import { defineComponent, ref, watch, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { Sensor } from "@/Interfaces/sensorInterface";
+import { useTempGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "SensorTable",
   props: ["sensorNames"],
-  setup: () => {
-    //component specific
-    const sensorFilters = ref({ 
-      sensorName: ""});
-  
+  setup: (props) => {
+    // array for selected sensors
     const selectedSensors = useSelectedSensors();
-    
 
-    const clearFilter = () => {
-      sensorFilters.value["sensorName"] = "";
-      
+    //mutable sensor array
+    const sensors = ref([] as Sensor[]);
+
+    // search string input
+    const input = ref("" as string);
+
+    // array for active (selected) rows in table
+    const activeRows = ref([] as number[]);
+
+    //2D-array containing pages of sensors for paginator
+    const sensorPages = ref([] as Sensor[][]);
+
+    // number for which page in paginator is active
+    const activePage = ref(0 as number);
+
+    // temporary groups for settings
+    const tempGroups = useTempGroups()
+
+    //filter-method
+    const searchFilter = (sensor: Sensor) => {
+      const nameContains = sensor.sensorName
+        .toLowerCase()
+        .includes(input.value.toLowerCase());
+      const descriptionContains = sensor.description
+        .toLowerCase()
+        .includes(input.value.toLowerCase());
+
+      return nameContains || descriptionContains;
+    };
+
+    // method for dividing sensor array into pages array
+    const fillPagesArray = () => {
+      //console.log("Kjører fillpages");
+
+      sensorPages.value.length = 0;
+      sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
+
+      const size = 10;
+      const subArrSize: number = Math.ceil(sensors.value.length / size);
+      //console.log(subArrSize);
+      for (let i = 0; i < subArrSize; i++) {
+        const from: number = size * i;
+        const to: number = size * (1 + i);
+        const sliced: Sensor[] = sensors.value.slice(from, to);
+        sensorPages.value.push(sliced);
+      }
+
+      activePage.value = 0;
+    };
+
+    watchEffect(() => {
+      fillPagesArray();
+    });
+
+    // method for adding/removing sensor from active sensor array depending if clicked or unclicked
+    const toggleSelectedSensor = (sensor: Sensor) => {
+      if (activeRows.value.includes(sensor.id)) {
+        activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
+        selectedSensors.value.splice(selectedSensors.value.indexOf(sensor), 1);
+        tempGroups.value[sensor.group - 1].sensors.splice(tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),1);
+        sensor.group = 1
+      } else {
+        activeRows.value.push(sensor.id);
+        selectedSensors.value.push(sensor);
+        tempGroups.value[0].sensors.push(sensor)
+      }
     };
 
     return {
       selectedSensors,
-      sensorFilters,
-      clearFilter,
-      
+      toggleSelectedSensor,
+      activeRows,
+      sensorPages,
+      activePage,
+      input,
+      searchFilter,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
-p:hover {
+td:hover {
   cursor: pointer;
+}
+
+a:focus.page-link {
+  border-color: dotted black;
+}
+
+a:hover.page-link {
+  cursor: pointer;
+}
+
+th button {
+  font-weight: bold;
 }
 </style>

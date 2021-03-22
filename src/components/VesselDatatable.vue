@@ -1,7 +1,7 @@
 <template>
   <div class="card mt-4">
     
-    <table class="table table-bordered table-hover">
+    <table class="table m-0 table-bordered table-hover">
       <thead>
         <tr>
           <th>
