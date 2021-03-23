@@ -56,6 +56,9 @@ export default {
     const min = ref(0);
     const max = ref(1);
 
+    /**
+     * Fetches data and sets the position array, max and min position
+     */
     fetchData().then(() => {
       position.value = getPosition().value;
       min.value = 0;

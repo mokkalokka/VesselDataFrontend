@@ -101,13 +101,14 @@ export default {
     let avarage = 0;
     let stdDeviation = 0;
 
+    // Setting up the chart options
     const chartOptions = ref({
       chart: {
         id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
         type: "line",
         toolbar: {
           autoSelected: "pan",
-          show: false,
+          show: true,
         },
         animations: {
           enabled: false,
@@ -144,6 +145,7 @@ export default {
         decimalsInFloat: 2,
       },
     });
+    // Setting up the time line charts
     const chartOptionsLine = ref({
       chart: {
         id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#2",
@@ -177,6 +179,7 @@ export default {
       },
     });
 
+    // Fetching data and setting up the chart
     fetchData().then(() => {
       res.value = getSensorDataById([...props.sensorIds]);
       time.value = res.value[0];
@@ -203,6 +206,10 @@ export default {
       stdDeviation = std(res.value[1]);
     });
 
+    /**
+     * Toggles the graph statistics. 
+     * Note: this is only enabled when there is one sensor to show in the graph
+     */
     const toggleStatistics = () => {
       showStatistics.value = !showStatistics.value;
 
@@ -307,6 +314,9 @@ export default {
       }
     };
 
+    /**
+     * Toggles the timeline graph
+     */
     const toggleTimeLine = () => {
       showTimeLine.value = !showTimeLine.value;
     };
