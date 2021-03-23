@@ -87,29 +87,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingFour">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#mapCollapse"
-              aria-expanded="true"
-              aria-controls="mapCollapse"
-            >
-              Map
-            </button>
-          </h2>
-          <div
-            id="mapCollapse"
-            class="accordion-collapse collapse show"
-            aria-labelledby="flush-headingFour"
-          >
-            <div class="accordion-body">
-              <Map />
-            </div>
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -123,12 +100,11 @@ import {
   useSelectedSensors,
 } from "@/composables/useSelectedSensors";
 import { resetGroups, useGroups, useTempGroups} from "@/composables/useGroups";
-/* import LineGraph from "@/components/LineGraph.vue"; */
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
-import Map from "@/components/Map.vue";
-/* import Map from "@/components/Map.vue"; */
 import VueGrid from "@/components/VueGrid.vue";
+import lodash from 'lodash';
+
 
 export default defineComponent({
   components: {
@@ -181,7 +157,8 @@ export default defineComponent({
      */
     const setSensorsToRender = () => {
       sensorListUpdated.value++;
-      groups.value = [...tempGroups.value];
+      /* groups.value = [...tempGroups.value]; */
+      groups.value = lodash.cloneDeep(tempGroups.value);
       showGraphs.value = true;
     };
 
