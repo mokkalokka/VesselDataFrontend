@@ -128,7 +128,7 @@ export default defineComponent({
     // search string input
     const input = ref("" as string);
 
-    // array for active (selected) rows in table
+    // array for active (selected) rows in sensor table
     const activeRows = ref([] as number[]);
 
     //2D-array containing pages of sensors for paginator
@@ -140,43 +140,51 @@ export default defineComponent({
     // temporary groups for settings
     const tempGroups = useTempGroups()
 
-    //filter-method
-    const searchFilter = (sensor: Sensor) => {
-      const nameContains = sensor.sensorName
+    /**
+     * Method for filtering sensors
+     * @param {Sensor} sensor - sensor to match filter string on (match on either name or description).
+     * @returns {boolean} true if name, description or both match query
+    */
+    const searchFilter = (sensor: Sensor): boolean => {
+      const nameContains: boolean = sensor.sensorName
         .toLowerCase()
         .includes(input.value.toLowerCase());
-      const descriptionContains = sensor.description
+      const descriptionContains: boolean = sensor.description
         .toLowerCase()
         .includes(input.value.toLowerCase());
 
       return nameContains || descriptionContains;
     };
 
-    // method for dividing sensor array into pages array
+    /**
+     * method for dividing sensor array into pages array for pagination
+    */
     const fillPagesArray = () => {
-      //console.log("Kjører fillpages");
 
       sensorPages.value.length = 0;
       sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
 
       const size = 10;
       const subArrSize: number = Math.ceil(sensors.value.length / size);
-      //console.log(subArrSize);
+
       for (let i = 0; i < subArrSize; i++) {
         const from: number = size * i;
         const to: number = size * (1 + i);
         const sliced: Sensor[] = sensors.value.slice(from, to);
         sensorPages.value.push(sliced);
       }
-
       activePage.value = 0;
     };
 
+    // to fill sensors in pagination-array when props have been loaded
     watchEffect(() => {
       fillPagesArray();
     });
 
-    // method for adding/removing sensor from active sensor array depending if clicked or unclicked
+    /**
+     * method for adding/removing sensor from activeSensor-array, selectedSensors-array and tempGroups-array depending on if clicked or unclicked in GUI
+     * @param {Sensor} sensor - sensor that is clicked in sensor table
+    */
     const toggleSelectedSensor = (sensor: Sensor) => {
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);

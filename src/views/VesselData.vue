@@ -130,15 +130,6 @@ import Map from "@/components/Map.vue";
 /* import Map from "@/components/Map.vue"; */
 import VueGrid from "@/components/VueGrid.vue";
 
-interface SensorName {
-  id: number;
-  filterkey: string;
-  sensorName: string;
-  description: string;
-  startTime: Date;
-  endTime: Date;
-}
-
 export default defineComponent({
   components: {
     /* LineGraph, */ SensorTable,
@@ -147,32 +138,59 @@ export default defineComponent({
   },
   name: "VesselData",
   setup() {
+
+    // array of selected sensors
     const selectedSensors = useSelectedSensors();
+
+    // boolean variable to determine if sensor layout selection should be shown
     const showSensorData = ref(false as boolean);
+
+    // boolean variable to determine if graph grid should be shown
     const showGraphs = ref(false as boolean);
+
+    // search query for graphs
     const graphFilter = ref("" as string);
+
+    // ??
     const graphActive = ref([0] as number[]);
+
+    // ??
     const sensorListUpdated = ref(1 as number);
+
+    // array of groups to render graphs in
     const groups = useGroups();
+
+    //array of temporary groups i selection phase, before rendering graphs
     const tempGroups = useTempGroups();
+
+    // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
     const graphToggleClass = ref("accordion-collapse collapse multi-collapse")
 
     resetGroups();
     resetSelectedSensors();
 
+    // when component is mounted, sett accordion tab to collapse, without multi-collapse property
     onMounted(() => {
       document.getElementById("graphCollapse").addEventListener('show.bs.collapse', function () {
         graphToggleClass.value = "accordion-collapse collapse"
       })
     })
       
+    /**
+     * Method to evoke when sensors are selected and grapsh should be shown. Sets chosen group configuration.
+     */
     const setSensorsToRender = () => {
       sensorListUpdated.value++;
-      groups.value = tempGroups.value;
+      groups.value = [...tempGroups.value];
       showGraphs.value = true;
     };
 
-    const filter = (sensorName: string) => {
+    /**
+     * Method for filtering graphs on sensorName
+     * @param {string} sensorName - sensor name to match search query on
+     * @returns {boolean} result of string match
+     */
+    const filter = (sensorName: string): boolean => {
       return sensorName.toLowerCase().includes(graphFilter.value.toLowerCase());
     };
 
