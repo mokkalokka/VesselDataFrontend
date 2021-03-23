@@ -1,6 +1,5 @@
 <template>
   <div class="h-100 w-100">
-    <!-- style="width: 100% height: 100%" -->
     <div class="content">
       <h1 class="text-center">Group {{group.id}}</h1>
 
@@ -45,8 +44,7 @@
           :h="item.h"
           :i="item.i"
         >
-          <line-graph
-            
+          <line-graph     
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
@@ -62,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from "vue";
+import { defineComponent, ref } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
@@ -71,20 +69,13 @@ import {Group} from '@/Interfaces/groupInterface'
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
-  props: ['group'],
-  
- /*  props: {
-    group: {
-      type: Number,
-      default: 1,
-    },
-  }, */
- 
+  props: ['group'], 
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
 
+    // Mapping trough the group sensors and adds them to the grid
     props.group.sensors.map((e) => {
         layout.value.push({
           x: 0,
@@ -93,13 +84,7 @@ export default defineComponent({
           h: 2,
           i: e.id,
           sensorIds: [...e.grahpsToCompare].concat(e.id),
-          sensorNames:
-            /* selectedSensors.value.map((s) => {
-              if (e.grahpsToCompare.concat(e.id).includes(s.id)) {                
-                return s.sensorName;
-              }
-            }) */
-            selectedSensors.value.filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
+          sensorNames: selectedSensors.value.filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
             .map(f => { return f.sensorName}) 
         });
     });
@@ -110,25 +95,20 @@ export default defineComponent({
     const updated = ref(1);
     const showMap = ref(false);
 
+    /**
+     * Toggles the ability to reorder and resize grids.
+     */
     const toggleReorder = () => {
       draggable.value = !draggable.value;
       resizable.value = !resizable.value;
     };
 
-    const increaseWidth = () => {
-      let width = document.getElementById("content").offsetWidth;
-      width += 20;
-      document.getElementById("content").style.width = width + "px";
-    };
-
-    const decreaseWidth = () => {
-      let width = document.getElementById("content").offsetWidth;
-      width -= 20;
-      document.getElementById("content").style.width = width + "px";
-    };
-
+    /**
+     * Toggles map and adds it to the bottom of the grid if it should render.
+     */
     const toggleMap = () => {
       if (!showMap.value) {
+        //Calculates the bottom of the grid and adds the map
         layout.value.push({
           x: 0,
           y:
@@ -140,6 +120,7 @@ export default defineComponent({
           sensorName: "map",
         });
       } else {
+        // Removes the map from grid
         layout.value.splice(layout.value.indexOf({ sensorName: "map" }), 1);
       }
       showMap.value = !showMap.value;
@@ -147,8 +128,6 @@ export default defineComponent({
     };
 
     return {
-      increaseWidth,
-      decreaseWidth,
       layout,
       draggable,
       resizable,
