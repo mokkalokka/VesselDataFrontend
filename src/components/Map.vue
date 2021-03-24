@@ -73,3 +73,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.leaflet-container {
+    background: white;
+}
+</style>
