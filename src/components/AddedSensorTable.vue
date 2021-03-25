@@ -1,9 +1,18 @@
 <template>
-  <Accordion :contentArray="tempGroups" :tabHeader="'Gruppe'">
-    <template v-slot:default="slotTempGroups">
-      <h5>Instillinger for gruppen</h5>
-      <div class="table-responsive">
-        <table class="table m-0 table-bordered">
+  <Accordion>
+    <AccordionItem
+      v-for="group in tempGroups"
+      :key="group.id"
+      v-show="group.sensors.length != 0"
+    >
+      <AccordionHeader
+        :item="group"
+        :headerId="group.id"
+        :tabHeader="'Gruppe'"
+      />
+      <AccordionBody :item="group">
+        <h5 class="card-title">Instillinger for gruppen</h5>
+        <DataTable :id="'groupSettingsTable'" :hoverable="false">
           <thead>
             <tr>
               <th>Datovisning</th>
@@ -19,10 +28,7 @@
                     class="form-check-input"
                     type="checkbox"
                     checked
-                    @click="
-                      slotTempGroups.item.groupDate = !slotTempGroups.item
-                        .groupDate
-                    "
+                    @click="group.groupDate = !group.groupDate"
                   />
                   <label class="form-check-label"> Datovisning </label>
                 </div>
@@ -31,47 +37,45 @@
                 <input
                   type="date"
                   class="form-control"
-                  v-model="slotTempGroups.item.fromDate"
-                  :disabled="!slotTempGroups.item.groupDate"
-                  :max="slotTempGroups.item.toDate"
-                  @change="updateSensorsInGroup(slotTempGroups.item)"
+                  v-model="group.fromDate"
+                  :disabled="!group.groupDate"
+                  :max="group.toDate"
+                  @change="updateSensorsInGroup(group)"
                 />
                 <input
                   type="time"
                   class="form-control"
-                  v-model="slotTempGroups.item.fromTime"
+                  v-model="group.fromTime"
                   step="1"
-                  :disabled="!slotTempGroups.item.groupDate"
-                  :max="slotTempGroups.item.toTime"
-                  @change="updateSensorsInGroup(slotTempGroups.item)"
+                  :disabled="!group.groupDate"
+                  :max="group.toTime"
+                  @change="updateSensorsInGroup(group)"
                 />
               </td>
               <td>
                 <input
                   type="date"
                   class="form-control"
-                  v-model="slotTempGroups.item.toDate"
-                  :disabled="!slotTempGroups.item.groupDate"
-                  :min="slotTempGroups.item.fromDate"
-                  @change="updateSensorsInGroup(slotTempGroups.item)"
+                  v-model="group.toDate"
+                  :disabled="!group.groupDate"
+                  :min="group.fromDate"
+                  @change="updateSensorsInGroup(group)"
                 />
                 <input
                   type="time"
                   class="form-control"
-                  v-model="slotTempGroups.item.toTime"
+                  v-model="group.toTime"
                   step="1"
-                  :disabled="!slotTempGroups.item.groupDate"
-                  :min="slotTempGroups.item.fromTime"
-                  @change="updateSensorsInGroup(slotTempGroups.item)"
+                  :disabled="!group.groupDate"
+                  :min="group.fromTime"
+                  @change="updateSensorsInGroup(group)"
                 />
               </td>
             </tr>
           </tbody>
-        </table>
-      </div>
-      <h5 class="card-title">Instillinger for sensorene</h5>
-      <div class="table-responsive">
-        <table class="table m-0 table-bordered">
+        </DataTable>
+        <h5 class="card-title">Instillinger for sensorene</h5>
+        <DataTable :id="'sensorSettingsTable'" :hoverable="false">
           <thead>
             <tr>
               <th>Sensor</th>
@@ -83,14 +87,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sensor in slotTempGroups.item.sensors" :key="sensor.id">
+            <tr v-for="sensor in group.sensors" :key="sensor.id">
               <td>{{ sensor.sensorName }}</td>
               <td>
                 <input
                   type="date"
                   class="form-control"
                   v-model="sensor.fromDate"
-                  :disabled="slotTempGroups.item.groupDate"
+                  :disabled="group.groupDate"
                   :max="sensor.toDate"
                 />
                 <input
@@ -98,7 +102,7 @@
                   class="form-control"
                   v-model="sensor.fromTime"
                   step="1"
-                  :disabled="slotTempGroups.item.groupDate"
+                  :disabled="group.groupDate"
                   :max="sensor.fromTime"
                 />
               </td>
@@ -107,7 +111,7 @@
                   type="date"
                   class="form-control"
                   v-model="sensor.toDate"
-                  :disabled="slotTempGroups.item.groupDate"
+                  :disabled="group.groupDate"
                   :min="sensor.toDate"
                 />
                 <input
@@ -115,7 +119,7 @@
                   class="form-control"
                   v-model="sensor.toTime"
                   step="1"
-                  :disabled="slotTempGroups.item.groupDate"
+                  :disabled="group.groupDate"
                   :min="sensor.toTime"
                 />
               </td>
@@ -140,8 +144,8 @@
                   :createTag="false"
                   mode="tags"
                   v-model="sensor.grahpsToCompare"
-                  :options="filterSensors(sensor, slotTempGroups.item)"
-                  @change="updateCurrentGroup(slotTempGroups.item)"
+                  :options="filterSensors(sensor, group)"
+                  @change="updateCurrentGroup(group)"
                   @select="removeSelectedSensorFromGroup"
                   @deselect="addDeselectedSensorToGroup"
                 />
@@ -158,11 +162,12 @@
               </td>
             </tr>
           </tbody>
-        </table>
-      </div>
-    </template>
+        </DataTable>
+      </AccordionBody>
+    </AccordionItem>
   </Accordion>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
@@ -170,11 +175,21 @@ import { useTempGroups } from "@/composables/useGroups";
 import { Sensor } from "@/Interfaces/sensorInterface";
 import { Group } from "@/Interfaces/groupInterface";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import Accordion from "@/components/reusable/Accordion.vue";
+import Accordion from "@/components/reusable/accordion/Accordion.vue";
+import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
+import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
+import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
+import DataTable from "@/components/reusable/DataTable.vue";
 
 export default defineComponent({
   name: "AddedSensorTable",
-  components: { Accordion },
+  components: {
+    Accordion,
+    AccordionItem,
+    AccordionHeader,
+    AccordionBody,
+    DataTable,
+  },
 
   setup: () => {
     // selected sensors from SensorTable.
