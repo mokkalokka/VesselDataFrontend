@@ -48,7 +48,9 @@ export default {
     LPolyline,
     LMarker,
   },
-  setup() {
+  props: ['group'],
+
+  setup(props) {
     const zoom = ref(7);
     const { getPosition, fetching, fetchData } = useSensorData();
     const position = ref([[60], [2]]);
@@ -60,7 +62,8 @@ export default {
      * Fetches data and sets the position array, max and min position
      */
     fetchData().then(() => {
-      position.value = getPosition().value;
+      console.log(props.group.fromDateTime);
+      position.value = getPosition(props.group.fromDateTime, props.group.toDateTime).value;
       min.value = 0;
       max.value = position.value.length - 1;
     });

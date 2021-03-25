@@ -2,8 +2,8 @@
   <div class="h-100 w-100">
     <div class="content">
       <h1 class="text-center">Group {{group.id}}</h1>
-
-      <div class="form-check form-switch d-flex justify-content-center">
+      <div class="row">
+        <div class="form-check form-switch col m-auto d-flex justify-content-center">
         <input
           @click="toggleReorder"
           class="form-check-input"
@@ -14,7 +14,7 @@
           Manual reordering</label
         >
       </div>
-      <div class="form-check form-switch d-flex justify-content-center">
+      <div class="form-check form-switch col m-auto d-flex justify-content-center">
         <input
           @click="toggleMap"
           class="form-check-input"
@@ -25,6 +25,21 @@
           Toggle map</label
         >
       </div>
+      <div class="form-check form-switch col m-auto d-flex justify-content-center">
+        <input
+          :checked="group.groupDate"
+          @click="currentGroup.groupDate = !currentGroup.groupDate"
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault"
+        />
+        <label class="form-check-label" for="flexSwitchCheckDefault">
+          Syncronize charts</label
+        >  
+      </div>
+      </div>
+
+      
       <grid-layout
         :key="updated"
         v-model:layout="layout"
@@ -48,10 +63,10 @@
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
-            :groupId="group.id"
+            :group="group"
           />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
-            <Map />
+            <Map :group="group" />
           </div>
         </grid-item>
       </grid-layout>
@@ -65,6 +80,7 @@ import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
 import {Group} from '@/Interfaces/groupInterface'
+import { useGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "VueGrid",
@@ -74,6 +90,8 @@ export default defineComponent({
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
+    const groups = useGroups();
+    const currentGroup = groups.value.find(e => e.id == props.group.id)
 
     // Mapping trough the group sensors and adds them to the grid
     props.group.sensors.map((e) => {
@@ -135,6 +153,7 @@ export default defineComponent({
       toggleReorder,
       toggleMap,
       updated,
+      currentGroup
     };
   },
 });
