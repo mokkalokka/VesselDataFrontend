@@ -55,7 +55,7 @@
                         v-model="group.fromDate"
                         :disabled="!group.groupDate"
                         :max="group.toDate"
-                        @change="updateSensorsInGroup(group)"
+                        @change="updateDate(group)"
                       />
                       <input
                         type="time"
@@ -64,7 +64,7 @@
                         step="1"
                         :disabled="!group.groupDate"
                         :max="group.toTime"
-                        @change="updateSensorsInGroup(group)"
+                        @change="updateDate(group)"
                       />
                     </td>
                     <td>
@@ -74,7 +74,7 @@
                         v-model="group.toDate"
                         :disabled="!group.groupDate"
                         :min="group.fromDate"
-                        @change="updateSensorsInGroup(group)"
+                        @change="updateDate(group)"
                       />
                       <input
                         type="time"
@@ -83,7 +83,7 @@
                         step="1"
                         :disabled="!group.groupDate"
                         :min="group.fromTime"
-                        @change="updateSensorsInGroup(group)"
+                        @change="updateDate(group)"
                       />
                     </td>
                   </tr>
@@ -163,7 +163,7 @@
                         mode="tags"
                         v-model="sensor.grahpsToCompare"
                         :options="filterSensors(sensor, group)"
-                        @change="updateCurrentGroup(group)"
+                        @change="updateCurrent(group, sensor)"
                         @select="removeSelectedSensorFromGroup"
                         @deselect="addDeselectedSensorToGroup"
                       />
@@ -216,7 +216,7 @@ export default defineComponent({
     /**
      * Add selected sensor to seletced group.
      * @param {Sensor} sensor - The selected sensor.
-     * @param {any} author - The event which is the new group number.
+     * @param {any} event - The event which is the new group number.
      */
     const addSensorToGroup = (sensor: Sensor, event: any) => {
       const newGroupNumber = parseInt(event.target.value);
@@ -255,16 +255,49 @@ export default defineComponent({
     };
 
     /**
-     * Update the the sensor time and date when the group date and time changes
+     * Update the date for the group and the sensor when it changes in the group
      * @param {Group} group - The group the date and time changed in
      */
-    const updateSensorsInGroup = (group: Group) => {
+    const updateDate = (group: Group) => {
       group.sensors.map((sensor) => {
         sensor.fromDate = group.fromDate;
         sensor.fromTime = group.fromTime;
         sensor.toDate = group.toDate;
         sensor.toTime = group.toTime;
       });
+
+      const fromYear = parseInt(group.fromDate.substring(0, 4));
+      const fromMonth = parseInt(group.fromDate.substring(5, 7)) - 1;
+      const fromDay = parseInt(group.fromDate.substring(8, 10));
+
+      const fromHours = parseInt(group.fromTime.substring(0, 2));
+      const fromMinutes = parseInt(group.fromTime.substring(3, 5));
+      const fromSeconds = parseInt(group.fromTime.substring(6, 8));
+
+      const toYear = parseInt(group.toDate.substring(0, 4));
+      const toMonth = parseInt(group.toDate.substring(5, 7)) - 1;
+      const toDay = parseInt(group.toDate.substring(8, 10));
+
+      const toHours = parseInt(group.toTime.substring(0, 2));
+      const toMinutes = parseInt(group.toTime.substring(3, 5));
+      const toSeconds = parseInt(group.toTime.substring(6, 8));
+
+      group.fromDateTime = new Date(
+        fromYear,
+        fromMonth,
+        fromDay,
+        fromHours,
+        fromMinutes,
+        fromSeconds
+      );
+      group.toDateTime = new Date(
+        toYear,
+        toMonth,
+        toDay,
+        toHours,
+        toMinutes,
+        toSeconds
+      );
     };
 
     /**
@@ -279,30 +312,48 @@ export default defineComponent({
         .map((s) => ({ value: s.id, label: s.sensorName }));
     };
 
-    // Used for saving the current group because vueform multiselect would not let take it in as a parameter.
+    // Used for saving the current group and sesnor because vueform multiselect would not let take it in as a parameter.
     const currentGroup = ref(null as Group);
+    const currentSensor = ref(null as Sensor);
 
     /**
      * Update the current group with the group that is being worked on
      * Needed because of reason mentioned above
      * @param {Group} group - The group used for setting the new current group
+     * @param {Sensor} senor - The group used for setting the new current group
      */
-    const updateCurrentGroup = (group) => {
+    const updateCurrent = (group: Group, sensor: Sensor) => {
       currentGroup.value = group;
+      currentSensor.value = sensor;
     };
 
     /**
-     * Removes the sensor selected for comparison from the group so that it dosent get rendered twice
+     * Removes the sensor selected for comparison from the group so that it dosent get rendered twice.
+     * Also merges the two arrays of graphToCompare into the current sensor.
+     * Runs on select in vueform multiselect.
      * @param {any} value - the sensor id
      */
     const removeSelectedSensorFromGroup = (value) => {
+      const selectedSensor = selectedSensors.value.find((s) => s.id == value);
+
+      // Creates a new array that contains all the sensors for comparison with set, so that duplicates get removed.
+      currentSensor.value.grahpsToCompare = [
+        ...new Set(
+          selectedSensor.grahpsToCompare.concat(
+            currentSensor.value.grahpsToCompare
+          )
+        ),
+      ];
+      selectedSensor.grahpsToCompare = [];
+
       currentGroup.value.sensors = currentGroup.value.sensors.filter(
         (s) => s.id != value
       );
     };
 
     /**
-     * Add the sensor removed from comparison so that it gets rendered again
+     * Add the sensor removed from comparison so that it gets rendered again.
+     * Runs on deselect in vueform multiselect
      * @param {any} value - the sensor id
      */
     const addDeselectedSensorToGroup = (value) => {
@@ -329,10 +380,10 @@ export default defineComponent({
       filterSensors,
       tempGroups,
       addSensorToGroup,
-      updateSensorsInGroup,
+      updateDate,
       removeSelectedSensorFromGroup,
       addDeselectedSensorToGroup,
-      updateCurrentGroup,
+      updateCurrent,
     };
   },
 });
