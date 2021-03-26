@@ -28,14 +28,6 @@
                   :sensorNames="sensorNames"
                   :selectedSensors="selectedSensors"
                 />
-                <!-- <div  v-if="selectedSensors.length != 0">
-                  <button
-                    class="btn btn-danger"
-                    @click="clearSelectedSensors"
-                  >
-                    Fjern valgte sensorer
-                  </button>
-                </div> -->
                 <div v-show="selectedSensors.length != 0">
                   <div class="d-flex justify-content-center">
                     <h2>Valgte sensorer</h2>
@@ -99,7 +91,12 @@ import {
   resetSelectedSensors,
   useSelectedSensors,
 } from "@/composables/useSelectedSensors";
-import { resetGroups, useGroups, useTempGroups } from "@/composables/useGroups";
+import {
+  resetGroups,
+  resetTempGroups,
+  useGroups,
+  useTempGroups,
+} from "@/composables/useGroups";
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
@@ -140,6 +137,7 @@ export default defineComponent({
     // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
     const graphToggleClass = ref("accordion-collapse collapse multi-collapse");
 
+    resetTempGroups();
     resetGroups();
     resetSelectedSensors();
 
