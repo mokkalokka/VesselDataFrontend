@@ -163,7 +163,8 @@
                         mode="tags"
                         v-model="sensor.grahpsToCompare"
                         :options="filterSensors(sensor, group)"
-                        @change="updateCurrent(group, sensor)"
+                        @change="updateCurrent(sensor, group)"
+                        @input="addAllDeselectedSensorsToGroup"
                         @select="removeSelectedSensorFromGroup"
                         @deselect="addDeselectedSensorToGroup"
                       />
@@ -319,10 +320,10 @@ export default defineComponent({
     /**
      * Update the current group with the group that is being worked on
      * Needed because of reason mentioned above
-     * @param {Group} group - The group used for setting the new current group
      * @param {Sensor} senor - The group used for setting the new current group
+     * @param {Group} group - The group used for setting the new current group
      */
-    const updateCurrent = (group: Group, sensor: Sensor) => {
+    const updateCurrent = (sensor: Sensor, group: Group) => {
       currentGroup.value = group;
       currentSensor.value = sensor;
     };
@@ -331,9 +332,9 @@ export default defineComponent({
      * Removes the sensor selected for comparison from the group so that it dosent get rendered twice.
      * Also merges the two arrays of graphToCompare into the current sensor.
      * Runs on select in vueform multiselect.
-     * @param {any} value - the sensor id
+     * @param {number} value - the sensor id deselected for comparison
      */
-    const removeSelectedSensorFromGroup = (value) => {
+    const removeSelectedSensorFromGroup = (value: number) => {
       const selectedSensor = selectedSensors.value.find((s) => s.id == value);
 
       // Creates a new array that contains all the sensors for comparison with set, so that duplicates get removed.
@@ -352,26 +353,46 @@ export default defineComponent({
     };
 
     /**
-     * Add the sensor removed from comparison so that it gets rendered again.
+     * Add the sensor removed from comparison back to the group.
      * Runs on deselect in vueform multiselect
-     * @param {any} value - the sensor id
+     * @param {number} value - the sensor id selected for comparison
      */
-    const addDeselectedSensorToGroup = (value) => {
+    const addDeselectedSensorToGroup = (value: number) => {
       let contains = false as boolean;
 
       // check if the sensor already is in the group array.
       //So that we dont get duplicates if the same sensor is compared with multiple other sensors.
-      for (let i = 0; i < currentGroup.value.sensors.length; i++) {
-        if (currentGroup.value.sensors[i].id == value) {
-          contains = true;
-          break;
-        }
+      if (
+        currentGroup.value.sensors.some(
+          (s) =>
+            s.id == value ||
+            (s.grahpsToCompare.includes(value) &&
+              s.id != currentSensor.value.id)
+        )
+      ) {
+        contains = true;
       }
       // if not already in the array of sensors in the group, add it.
       if (!contains) {
         currentGroup.value.sensors.push(
           selectedSensors.value.filter((s) => s.id == value)[0]
         );
+      }
+    };
+
+    /**
+     * Adds the all the deselected sensors from comparsion back to the group.
+     * Runs on input on multiselect, but runs only when every sensor is removed at once
+     * @param {[]} value - array of sensors ids selected or deselected for comparsion
+     */
+    const addAllDeselectedSensorsToGroup = (value: number[]) => {
+      if (
+        currentSensor.value.grahpsToCompare.length != 1 &&
+        value.length == 0
+      ) {
+        currentSensor.value.grahpsToCompare.map((id) => {
+          addDeselectedSensorToGroup(id);
+        });
       }
     };
 
@@ -384,6 +405,7 @@ export default defineComponent({
       removeSelectedSensorFromGroup,
       addDeselectedSensorToGroup,
       updateCurrent,
+      addAllDeselectedSensorsToGroup,
     };
   },
 });
