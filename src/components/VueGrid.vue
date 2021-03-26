@@ -1,7 +1,7 @@
 <template>
   <div class="h-100 w-100">
     <div class="content">
-      <h1 class="text-center">Group {{group.id}}</h1>
+      <h1 class="text-center">Gruppe {{group.id}}</h1>
       <div class="row">
         <div class="form-check form-switch col m-auto d-flex justify-content-center">
         <input
