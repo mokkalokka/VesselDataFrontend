@@ -1,14 +1,16 @@
 import { Sensor } from "./sensorInterface";
 
 export interface Group {
-
     id: number;
     sensors: Sensor[];
     groupDate: boolean;
-    fromDate: String;
-    fromTime: String;
-    toDate: String;
-    toTime: String;
-    fromDateTime: Date,
-    toDateTime: Date,
+    fromDate: string;
+    fromTime: string;
+    toDate: string;
+    toTime: string;
+    fromDateTime: Date;
+    toDateTime: Date;
+    zoomedFromDateTime?: Date;
+    zoomedToDateTime?: Date;
+    hoverIndex?: number;
 }
