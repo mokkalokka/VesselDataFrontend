@@ -1,18 +1,45 @@
 <template>
   <div class="card my-4">
     <div class="card-header bg-transparent">
-      <div class="input-group searchgroup mb-3">
-        <input
-          type="text"
-          class="form-control border-end-0"
-          placeholder="Søk etter sensorer..."
-          aria-label="Sensor Name"
-          aria-describedby="sensorsearch-addon"
-          v-model="input"
-        />
-        <span class="input-group-text bg-transparent" id="sensorsearch-addon">
-          <BIconSearch />
-        </span>
+      <div class="row">
+        <div class="col-12 col-xxl-8 col-lg-6 my-lg-3">
+          <div class="input-group searchgroup">
+            <input
+              type="text"
+              class="form-control border-end-0"
+              placeholder="Søk etter sensorer..."
+              aria-label="Sensor Name"
+              aria-describedby="sensorsearch-addon"
+              v-model="input"
+            />
+            <span
+              class="input-group-text bg-transparent"
+              id="sensorsearch-addon"
+            >
+              <BIconSearch />
+            </span>
+          </div>
+        </div>
+        <div class="col-6 col-xxl-2 col-lg-3 col-md-4 my-3 px-2 d-grid">
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="selectAllSensors"
+            :disabled="selectedSensors.length === sensorNames.length"
+          >
+            Velg alle sensorer
+          </button>
+        </div>
+        <div class="col-6 col-xxl-2 col-lg-3 col-md-4 my-3 px-2 d-grid">
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="clearSelectedSensors"
+            :disabled="selectedSensors.length === 0"
+          >
+            Fjern valgte sensorer
+          </button>
+        </div>
       </div>
     </div>
     <div class="table-responsive">
@@ -29,6 +56,7 @@
               </button>
             </th>
             <th scope="col">Beskrivelse</th>
+
             <!-- <th scope="col">Fra-tid</th>
             <th scope="col">Til-tid</th> -->
           </tr>
@@ -110,10 +138,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, watchEffect } from "vue";
-import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import { defineComponent, ref, watchEffect } from "vue";
+import {
+  useSelectedSensors,
+  resetSelectedSensors,
+} from "@/composables/useSelectedSensors";
 import { Sensor } from "@/Interfaces/sensorInterface";
-import { useTempGroups } from "@/composables/useGroups";
+import { useTempGroups, resetTempGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "SensorTable",
@@ -138,13 +169,13 @@ export default defineComponent({
     const activePage = ref(0 as number);
 
     // temporary groups for settings
-    const tempGroups = useTempGroups()
+    const tempGroups = useTempGroups();
 
     /**
      * Method for filtering sensors
      * @param {Sensor} sensor - sensor to match filter string on (match on either name or description).
      * @returns {boolean} true if name, description or both match query
-    */
+     */
     const searchFilter = (sensor: Sensor): boolean => {
       const nameContains: boolean = sensor.sensorName
         .toLowerCase()
@@ -158,9 +189,8 @@ export default defineComponent({
 
     /**
      * method for dividing sensor array into pages array for pagination
-    */
+     */
     const fillPagesArray = () => {
-
       sensorPages.value.length = 0;
       sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
 
@@ -184,18 +214,42 @@ export default defineComponent({
     /**
      * method for adding/removing sensor from activeSensor-array, selectedSensors-array and tempGroups-array depending on if clicked or unclicked in GUI
      * @param {Sensor} sensor - sensor that is clicked in sensor table
-    */
+     */
     const toggleSelectedSensor = (sensor: Sensor) => {
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
         selectedSensors.value.splice(selectedSensors.value.indexOf(sensor), 1);
-        tempGroups.value[sensor.group - 1].sensors.splice(tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),1);
-        sensor.group = 1
+        tempGroups.value[sensor.group - 1].sensors.splice(
+          tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
+          1
+        );
+        sensor.group = 1;
       } else {
         activeRows.value.push(sensor.id);
         selectedSensors.value.push(sensor);
-        tempGroups.value[0].sensors.push(sensor)
+        tempGroups.value[0].sensors.push(sensor);
       }
+    };
+
+    /**
+     * Method for clearing all selected sensors
+     */
+    const clearSelectedSensors = () => {
+      resetSelectedSensors();
+      resetTempGroups();
+      activeRows.value.length = 0;
+    };
+
+    /**
+     * Method for selecting all sensors. If sensors are filtered, only matching sensors will be selected
+     */
+    const selectAllSensors = () => {
+      clearSelectedSensors();
+      sensorPages.value.map((p: Sensor[]) => {
+        p.map((s: Sensor) => {
+          toggleSelectedSensor(s);
+        });
+      });
     };
 
     return {
@@ -206,6 +260,8 @@ export default defineComponent({
       activePage,
       input,
       searchFilter,
+      clearSelectedSensors,
+      selectAllSensors,
     };
   },
 });

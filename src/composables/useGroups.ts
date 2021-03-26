@@ -23,7 +23,7 @@ export function useTempGroups() {
     return tempGroups;
 }
 
-export function resetGroups() {
+export function resetTempGroups() {
     tempGroups.value = [{
         id: 1,
         sensors: [],
@@ -35,5 +35,8 @@ export function resetGroups() {
         fromDateTime: currentDate,
         toDateTime: currentDate,
     }];
+}
+
+export function resetGroups() {
     groups.value = [];
 }
