@@ -2,30 +2,21 @@
   <div class="h-100 w-100">
     <!-- style="width: 100% height: 100%" -->
     <div class="content">
-      <h1 class="text-center">Group {{group.id}}</h1>
-
-      <div class="form-check form-switch d-flex justify-content-center">
-        <input
-          @click="toggleReorder"
-          class="form-check-input"
-          type="checkbox"
-          id="flexSwitchCheckDefault"
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefault">
-          Manual reordering</label
-        >
-      </div>
-      <div class="form-check form-switch d-flex justify-content-center">
-        <input
-          @click="toggleMap"
-          class="form-check-input"
-          type="checkbox"
-          id="flexSwitchCheckDefault"
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefault">
-          Toggle map</label
-        >
-      </div>
+      <h1 class="text-center">Gruppe {{ group.id }}</h1>
+      <ToggleButton
+        :id="'flexSwitchCheckReorderGrid'"
+        :checkedValue="false"
+        :click="toggleReorder"
+      >
+        Manuell Omstrukturering
+      </ToggleButton>
+      <ToggleButton
+        :id="'flexSwitchCheckMap'"
+        :checkedValue="false"
+        :click="toggleMap"
+      >
+        Vis Kart
+      </ToggleButton>
       <grid-layout
         :key="updated"
         v-model:layout="layout"
@@ -46,7 +37,6 @@
           :i="item.i"
         >
           <line-graph
-            
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
@@ -62,46 +52,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from "vue";
+import { defineComponent, ref } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
-import {Group} from '@/Interfaces/groupInterface'
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default defineComponent({
   name: "VueGrid",
-  components: { LineGraph, Map },
-  props: ['group'],
-  
- /*  props: {
+  components: { LineGraph, Map, ToggleButton },
+  props: ["group"],
+
+  /*  props: {
     group: {
       type: Number,
       default: 1,
     },
   }, */
- 
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
 
     props.group.sensors.map((e) => {
-        layout.value.push({
-          x: 0,
-          y: 0,
-          w: 12,
-          h: 2,
-          i: e.id,
-          sensorIds: [...e.grahpsToCompare].concat(e.id),
-          sensorNames:
-            /* selectedSensors.value.map((s) => {
+      layout.value.push({
+        x: 0,
+        y: 0,
+        w: 12,
+        h: 2,
+        i: e.id,
+        sensorIds: [...e.grahpsToCompare].concat(e.id),
+        sensorNames:
+          /* selectedSensors.value.map((s) => {
               if (e.grahpsToCompare.concat(e.id).includes(s.id)) {                
                 return s.sensorName;
               }
             }) */
-            selectedSensors.value.filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
-            .map(f => { return f.sensorName}) 
-        });
+          selectedSensors.value
+            .filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
+            .map((f) => {
+              return f.sensorName;
+            }),
+      });
     });
 
     const draggable = ref(false);

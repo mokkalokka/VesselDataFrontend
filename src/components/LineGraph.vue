@@ -15,50 +15,53 @@
       </div>
       <div v-if="showTimeLine" id="chart-line" class="h-25 container">
         <div class="row">
-        <div class="col m-auto">
-          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time tilbake"><BIconPlus /></button>
+          <div class="col m-auto">
+            <button
+              class="btn btn-outline-primary"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Hent 1 time tilbake"
+            >
+              <BIconPlus />
+            </button>
+          </div>
+          <div class="col-10">
+            <apexchart
+              type="area"
+              height="60%"
+              :options="chartOptionsLine"
+              :series="series"
+            ></apexchart>
+          </div>
+          <div class="col m-auto">
+            <button
+              class="btn btn-outline-primary"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Hent 1 time frem"
+            >
+              <BIconPlus />
+            </button>
+          </div>
         </div>
-        <div class="col-10">
-          <apexchart
-            type="area"
-            height="60%"
-            :options="chartOptionsLine"
-            :series="series"
-          ></apexchart>
-        </div>
-        <div class="col m-auto">
-          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time frem"><BIconPlus /></button>
-        </div>
-      </div>
       </div>
       <div class="container">
         <div class="row">
-          <div
+          <ToggleButton
+            :id="'flexSwitchCheckStatistics'"
+            :checkedValue="false"
+            :click="toggleStatistics"
             v-if="numberOfSensors == 1"
-            class="form-check form-switch col d-flex justify-content-center"
           >
-            <input
-              @click="toggleStatistics"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Statistics</label
-            >
-          </div>
-          <div class="form-check form-switch col d-flex justify-content-center">
-            <input
-              checked
-              @click="toggleTimeLine"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Timeline</label
-            >
-          </div>
+            Vis statistikk
+          </ToggleButton>
+          <ToggleButton
+            :id="'flexSwitchCheckTimeline'"
+            :checkedValue="true"
+            :click="toggleTimeLine"
+          >
+            Vis tidslinje
+          </ToggleButton>
         </div>
       </div>
     </div>
@@ -69,6 +72,7 @@
 import { useSensorData } from "@/composables/useSensorData";
 import { ref } from "vue";
 import { std, mean, max, min } from "mathjs";
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default {
   name: "LineGraph",
@@ -83,9 +87,10 @@ export default {
     },
     groupId: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
+  components: { ToggleButton },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
@@ -103,7 +108,12 @@ export default {
 
     const chartOptions = ref({
       chart: {
-        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
+        id:
+          "chart-group=" +
+          props.groupId +
+          "-sensors=[" +
+          props.sensorIds.toString() +
+          "]-#1",
         type: "line",
         toolbar: {
           autoSelected: "pan",
@@ -113,16 +123,16 @@ export default {
           enabled: false,
         },
       },
-       legend: {
-      show: true,
-      showForSingleSeries: true,
+      legend: {
+        show: true,
+        showForSingleSeries: true,
       },
 
       stroke: {
         width: 1,
       },
       title: {
-        text: props.sensorNames.map(e => e.toString()),
+        text: props.sensorNames.map((e) => e.toString()),
         align: "center",
       },
 
@@ -146,10 +156,20 @@ export default {
     });
     const chartOptionsLine = ref({
       chart: {
-        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#2",
+        id:
+          "chart-group=" +
+          props.groupId +
+          "-sensors=[" +
+          props.sensorIds.toString() +
+          "]-#2",
         type: "area",
         brush: {
-          target: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
+          target:
+            "chart-group=" +
+            props.groupId +
+            "-sensors=[" +
+            props.sensorIds.toString() +
+            "]-#1",
           enabled: true,
         },
         selection: {
@@ -157,7 +177,7 @@ export default {
         },
       },
       legend: {
-      show: false,
+        show: false,
       },
       fill: {
         type: "gradient",
