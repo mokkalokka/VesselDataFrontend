@@ -64,11 +64,11 @@
               class="accordion-button collapsed"
               type="button"
               :disabled="!showGraphs"
-              data-bs-toggle="collapse" 
+              data-bs-toggle="collapse"
               data-bs-target="#graphCollapse"
               aria-expanded="false"
               aria-controls="graphCollapse"
-              v-bind:class='!showGraphs ? "bg-light" : "bg-default"'
+              v-bind:class="!showGraphs ? 'bg-light' : 'bg-default'"
             >
               Grafer
             </button>
@@ -79,7 +79,7 @@
             v-bind:class="graphToggleClass"
           >
             <div class="accordion-body">
-              <div v-if="showGraphs" :key="sensorListUpdated">
+              <div v-if="showGraphs">
                 <div v-for="group in groups" :key="group.id">
                   <vue-grid v-show="group.sensors.length != 0" :group="group" />
                 </div>
@@ -99,12 +99,11 @@ import {
   resetSelectedSensors,
   useSelectedSensors,
 } from "@/composables/useSelectedSensors";
-import { resetGroups, useGroups, useTempGroups} from "@/composables/useGroups";
+import { resetGroups, useGroups, useTempGroups } from "@/composables/useGroups";
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
-import lodash from 'lodash';
-
+import lodash from "lodash";
 
 export default defineComponent({
   components: {
@@ -114,7 +113,6 @@ export default defineComponent({
   },
   name: "VesselData",
   setup() {
-
     // array of selected sensors
     const selectedSensors = useSelectedSensors();
 
@@ -140,18 +138,20 @@ export default defineComponent({
     const tempGroups = useTempGroups();
 
     // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
-    const graphToggleClass = ref("accordion-collapse collapse multi-collapse")
+    const graphToggleClass = ref("accordion-collapse collapse multi-collapse");
 
     resetGroups();
     resetSelectedSensors();
 
     // when component is mounted, sett accordion tab to collapse, without multi-collapse property
     onMounted(() => {
-      document.getElementById("graphCollapse").addEventListener('show.bs.collapse', function () {
-        graphToggleClass.value = "accordion-collapse collapse"
-      })
-    })
-      
+      document
+        .getElementById("graphCollapse")
+        .addEventListener("show.bs.collapse", function () {
+          graphToggleClass.value = "accordion-collapse collapse";
+        });
+    });
+
     /**
      * Method to evoke when sensors are selected and grapsh should be shown. Sets chosen group configuration.
      */
@@ -174,8 +174,6 @@ export default defineComponent({
     // From server
     const { sensorNames, initialize } = useSensorData();
 
-    
-
     initialize();
 
     return {
@@ -189,7 +187,7 @@ export default defineComponent({
       filter,
       sensorListUpdated,
       groups,
-      graphToggleClass
+      graphToggleClass,
     };
   },
 });
