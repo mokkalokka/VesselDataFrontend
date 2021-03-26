@@ -5,8 +5,10 @@
         :key="updated"
         id="chart-line2"
         v-bind:class="{
-          'h-100': !showTimeLine || group.groupDate,
-          'h-75': showTimeLine && !group.groupDate,
+          'h-100':
+            !showTimeLine || (group.groupDate && group.sensors.length != 1),
+          'h-75':
+            showTimeLine && (!group.groupDate || group.sensors.length == 1),
         }"
       >
         <apexchart
@@ -17,7 +19,7 @@
         ></apexchart>
       </div>
       <div
-        v-if="showTimeLine && !group.groupDate"
+        v-if="showTimeLine && (!group.groupDate || group.sensors.length == 1)"
         id="chart-line"
         class="h-25 container"
       >
@@ -69,7 +71,7 @@
             >
           </div>
           <div
-            v-if="!group.groupDate"
+            v-if="!group.groupDate || group.sensors.length == 1"
             class="form-check form-switch col d-flex justify-content-center"
           >
             <input
@@ -93,6 +95,7 @@
 import { useSensorData } from "@/composables/useSensorData";
 import { ref, watchEffect } from "vue";
 import { std, mean, max, min } from "mathjs";
+import { useGroups } from "@/composables/useGroups";
 
 export default {
   name: "LineGraph",
@@ -131,6 +134,8 @@ export default {
     let minVal = 0;
     let avarage = 0;
     let stdDeviation = 0;
+    const groups = useGroups();
+    const currentGroup = groups.value.find((e) => e.id == props.group.id);
 
     /* const forceZoom = (xaxis) => {
       console.log("zooming!");
@@ -144,8 +149,33 @@ export default {
       chart: {
         events: {
           zoomed: function (chartContext, { xaxis, yaxis }) {
-            console.log(xaxis);
+            currentGroup.zoomedFromDateTime = new Date(xaxis.min);
+            currentGroup.zoomedToDateTime = new Date(xaxis.max);
           },
+          beforeZoom: function (chartContext, { xaxis, yaxis }) { 
+            if (
+              new Date(xaxis.min) < new Date(time.value[0]) ||
+              new Date(xaxis.max) > new Date(time.value[-1])
+            ) {
+              return {
+                // dont zoom out any further
+                xaxis: {
+                  min: time.value[0],
+                  max: time.value[-1],
+                },
+              };
+            } else {
+              return {
+                xaxis: {
+                  min: xaxis.min,
+                  max: xaxis.max
+                },
+              };
+            }
+          },
+          mouseMove: function (event, chartContext, config){ 
+            currentGroup.hoverIndex = config.dataPointIndex
+          }
         },
         id: chartId + "1",
         /* group: "group-" + props.group.id, */
@@ -210,11 +240,14 @@ export default {
     // Setting up the time line charts
     const chartOptionsLine = ref({
       chart: {
-        /* events: {
-      selection: function(chartContext, { xaxis, yaxis }) {
-        forceZoom(xaxis);
-          }
-        }, */
+        events: {
+          brushScrolled: function (chartContext, { xaxis, yaxis }) {
+            if (currentGroup.sensors.length == 1) {
+              currentGroup.zoomedFromDateTime = new Date(xaxis.min);
+              currentGroup.zoomedToDateTime = new Date(xaxis.max);
+            }
+          },
+        },
         id: chartId + "2",
         /* id: "timeline", */
         type: "area",
@@ -265,7 +298,7 @@ export default {
     });
 
     watchEffect(() => {
-      console.log(props.group.groupDate);
+      /* console.log(props.group.groupDate); */
       if (props.group.groupDate) {
         chartOptions.value.chart = {
           ...chartOptions.value.chart,

@@ -25,8 +25,8 @@
           Toggle map</label
         >
       </div>
-      <div class="form-check form-switch col m-auto d-flex justify-content-center">
-        <input
+      <div v-if="group.sensors.length > 1" class="form-check form-switch col m-auto d-flex justify-content-center">
+        <input  
           :checked="group.groupDate"
           @click="currentGroup.groupDate = !currentGroup.groupDate"
           class="form-check-input"
@@ -126,6 +126,7 @@ export default defineComponent({
      */
     const toggleMap = () => {
       if (!showMap.value) {
+        currentGroup.hoverIndex = 0
         //Calculates the bottom of the grid and adds the map
         layout.value.push({
           x: 0,

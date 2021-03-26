@@ -4,7 +4,7 @@ import { useFetch } from "@/composables/useFetch"
 import { Sensor } from "@/Interfaces/sensorInterface"
 
 const sensorNames = ref([] as Sensor[])
-const position = ref([[],[]] as number[][])
+const position = ref([])
 
 
 export function useSensorData() {
@@ -54,17 +54,22 @@ export function useSensorData() {
         const lat = response.value[81]['Nav_Pos.lat'] as number[]
         const lon = response.value[82]['Nav_Pos.lon'] as number[]
         const time = response.value[0]['time'] as number[]
-        const fromIndex = time.indexOf(fromDateTime)
-        const toIndex = time.indexOf(toDateTime)
+        const timeIndexes = [] 
+        const pos = ref([])
+        time.map((e, index) =>{
+            const date = new Date(e).toString()
+            if ((date == fromDateTime.toString()) || (date == toDateTime.toString())){
+                timeIndexes.push(index)               
+            }
+        } )
         
-        console.log("from index:" +  fromIndex);
-        console.log("to index:" +  toIndex);
-        
-
-        position.value = lat.map((_ , index) =>{
-            return [lat[index], lon[index], time[index]]
+        lat.map((_ , index) =>{
+            if(index >= timeIndexes[0] && index <= timeIndexes[1]){
+                pos.value.push([lat[index], lon[index], time[index]]) 
+            }
         })
-        return position
+        /* console.log(position.value.length) */
+        return pos
         
     }
 
