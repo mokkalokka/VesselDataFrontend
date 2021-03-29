@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <div v-if="max > 1" style="height: 80%; width: 100%">
+    <div :key="zoomedPositionUpdated" v-if="max > 1" style="height: 80%; width: 100%">
       <l-map
         v-model="zoom"
         v-model:zoom="zoom"
@@ -15,6 +15,11 @@
           v-if="!fetching"
           v-model:lat-lngs="position"
           color="green"
+        ></l-polyline>
+        <l-polyline
+          v-if="zoomedPositionUpdated"
+          v-model:lat-lngs="zoomedPosition"
+          color="red"
         ></l-polyline>
 
         <l-marker :lat-lng="position[sliderValue]"> </l-marker>
@@ -38,7 +43,7 @@ import {
   LMarker,
 } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 export default {
   components: {
@@ -48,19 +53,47 @@ export default {
     LPolyline,
     LMarker,
   },
-  setup() {
+  props: ['group'],
+
+  setup(props) {
     const zoom = ref(7);
     const { getPosition, fetching, fetchData } = useSensorData();
     const position = ref([[60], [2]]);
     const sliderValue = ref(0);
     const min = ref(0);
     const max = ref(1);
+    const zoomedPosition = ref([60], [2])
+    const zoomedPositionUpdated = ref(0)
 
-    fetchData().then(() => {
-      position.value = getPosition().value;
+    /**
+     * Fetches data and sets the position array, max and min position
+     */
+    fetchData().then(() => { 
+      position.value = getPosition(props.group.fromDateTime, props.group.toDateTime).value;
       min.value = 0;
       max.value = position.value.length - 1;
     });
+
+    /**
+     * Watches for changes in zoomedDateTime to make a line of the zoomed position
+     */
+    watchEffect(() => {
+      if(props.group.zoomedFromDateTime){
+        zoomedPositionUpdated.value ++
+        zoomedPosition.value = getPosition(props.group.zoomedFromDateTime, props.group.zoomedToDateTime).value;
+      }
+    })
+
+    /**
+     * Watches the current hover position from graphs and drop marker at that point
+     */
+    watchEffect(() => {
+      if(props.group.hoverIndex && ( min.value < props.group.hoverIndex < max.value) && props.group.hoverIndex != -1 ){
+        sliderValue.value = props.group.hoverIndex
+      }
+    })
+
+
 
     return {
       zoom,
@@ -69,6 +102,8 @@ export default {
       sliderValue,
       min,
       max,
+      zoomedPosition,
+      zoomedPositionUpdated
     };
   },
 };

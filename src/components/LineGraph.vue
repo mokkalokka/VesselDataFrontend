@@ -2,9 +2,14 @@
   <div class="card p-2 pb-4 shadow-sm h-100">
     <div id="wrapper" class="h-100" v-if="showGraphs">
       <div
-        :key="showStatistics"
+        :key="updated"
         id="chart-line2"
-        v-bind:class="{ 'h-100': !showTimeLine, 'h-75': showTimeLine }"
+        v-bind:class="{
+          'h-100':
+            !showTimeLine || (group.groupDate && group.sensors.length != 1),
+          'h-75':
+            showTimeLine && (!group.groupDate || group.sensors.length == 1),
+        }"
       >
         <apexchart
           type="line"
@@ -13,23 +18,41 @@
           :series="series"
         ></apexchart>
       </div>
-      <div v-if="showTimeLine" id="chart-line" class="h-25 container">
+      <div
+        v-if="showTimeLine && (!group.groupDate || group.sensors.length == 1)"
+        id="chart-line"
+        class="h-25 container"
+      >
         <div class="row">
-        <div class="col m-auto">
-          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time tilbake"><BIconPlus /></button>
+          <div class="col m-auto">
+            <button
+              class="btn btn-outline-primary"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Hent 1 time tilbake"
+            >
+              <BIconPlus />
+            </button>
+          </div>
+          <div class="col-10">
+            <apexchart
+              type="area"
+              height="60%"
+              :options="chartOptionsLine"
+              :series="series"
+            ></apexchart>
+          </div>
+          <div class="col m-auto">
+            <button
+              class="btn btn-outline-primary"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Hent 1 time frem"
+            >
+              <BIconPlus />
+            </button>
+          </div>
         </div>
-        <div class="col-10">
-          <apexchart
-            type="area"
-            height="60%"
-            :options="chartOptionsLine"
-            :series="series"
-          ></apexchart>
-        </div>
-        <div class="col m-auto">
-          <button class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Hent 1 time frem"><BIconPlus /></button>
-        </div>
-      </div>
       </div>
       <div class="container">
         <div class="row">
@@ -47,9 +70,12 @@
               Show Statistics</label
             >
           </div>
-          <div class="form-check form-switch col d-flex justify-content-center">
+          <div
+            v-if="!group.groupDate || group.sensors.length == 1"
+            class="form-check form-switch col d-flex justify-content-center"
+          >
             <input
-              checked
+              :checked="showTimeLine"
               @click="toggleTimeLine"
               class="form-check-input"
               type="checkbox"
@@ -67,8 +93,9 @@
 
 <script>
 import { useSensorData } from "@/composables/useSensorData";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { std, mean, max, min } from "mathjs";
+import { useGroups } from "@/composables/useGroups";
 
 export default {
   name: "LineGraph",
@@ -81,48 +108,96 @@ export default {
       type: Array[Number],
       required: true,
     },
-    groupId: {
-      type: Number,
-      required: true
-    }
+    group: {
+      type: Object,
+      required: true,
+    },
   },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
     const res = ref([[], []]);
     const series = ref([]);
-    const showTimeLine = ref(true);
+    const showTimeLine = ref(!props.group.groupDate);
     const showStatistics = ref(false);
     const showGraphs = ref(false);
     const time = ref([]);
     const numberOfSensors = ref(0);
+    const updated = ref(0);
+    const chartId =
+      "chart-group=" +
+      props.group.id +
+      "-sensors=[" +
+      props.sensorIds.toString() +
+      "]-#";
     let maxVal = 0;
     let minVal = 0;
     let avarage = 0;
     let stdDeviation = 0;
+    const groups = useGroups();
+    const currentGroup = groups.value.find((e) => e.id == props.group.id);
 
+    /* const forceZoom = (xaxis) => {
+      console.log("zooming!");
+      console.log("From: " + new Date(xaxis.min));
+      console.log("To: " + new Date(xaxis.max));
+      window.ApexCharts.exec(chartId + "1", "zoomX", (xaxis.min, xaxis.max));
+    } */
+
+    // Setting up the chart options
     const chartOptions = ref({
       chart: {
-        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
+        events: {
+          zoomed: function (chartContext, { xaxis, yaxis }) {
+            currentGroup.zoomedFromDateTime = new Date(xaxis.min);
+            currentGroup.zoomedToDateTime = new Date(xaxis.max);
+          },
+          beforeZoom: function (chartContext, { xaxis, yaxis }) { 
+            if (
+              new Date(xaxis.min) < new Date(time.value[0]) ||
+              new Date(xaxis.max) > new Date(time.value[-1])
+            ) {
+              return {
+                // dont zoom out any further
+                xaxis: {
+                  min: time.value[0],
+                  max: time.value[-1],
+                },
+              };
+            } else {
+              return {
+                xaxis: {
+                  min: xaxis.min,
+                  max: xaxis.max
+                },
+              };
+            }
+          },
+          mouseMove: function (event, chartContext, config){ 
+            currentGroup.hoverIndex = config.dataPointIndex
+          }
+        },
+        id: chartId + "1",
+        /* group: "group-" + props.group.id, */
         type: "line",
         toolbar: {
-          autoSelected: "pan",
-          show: false,
+          autoSelected: "zoom",
+          show: true,
         },
         animations: {
           enabled: false,
         },
       },
-       legend: {
-      show: true,
-      showForSingleSeries: true,
+      legend: {
+        show: false,
+        showForSingleSeries: true,
       },
 
       stroke: {
         width: 1,
       },
       title: {
-        text: props.sensorNames.map(e => e.toString()),
+        text: props.sensorNames.map((e) => e.toString()),
         align: "center",
       },
 
@@ -137,27 +212,60 @@ export default {
       },
       xaxis: {
         type: "datetime",
-        tickAmount: 15,
       },
       yaxis: {
         tickAmount: 4,
         decimalsInFloat: 2,
+        labels: {
+          minWidth: "100%",
+        },
       },
+      tooltip: {
+        enabled: true,
+        x: {
+          show: false,
+          format: "dd MMM - HH:mm:ss",
+        },
+        y: {
+          show: false,
+        },
+        /* marker: {
+            show: false,
+        }, */
+      },
+      /* theme: {
+        mode: "dark"
+      } */
     });
+    // Setting up the time line charts
     const chartOptionsLine = ref({
       chart: {
-        id: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#2",
+        events: {
+          brushScrolled: function (chartContext, { xaxis, yaxis }) {
+            if (currentGroup.sensors.length == 1) {
+              currentGroup.zoomedFromDateTime = new Date(xaxis.min);
+              currentGroup.zoomedToDateTime = new Date(xaxis.max);
+            }
+          },
+        },
+        id: chartId + "2",
+        /* id: "timeline", */
         type: "area",
         brush: {
-          target: "chart-group=" + props.groupId +"-sensors=["+ props.sensorIds.toString() + "]-#1",
+          target: chartId + "1",
+
           enabled: true,
         },
         selection: {
           enabled: true,
         },
+        /* toolbar: {
+          autoSelected: "selection",
+          show: false,
+        }, */
       },
       legend: {
-      show: false,
+        show: false,
       },
       fill: {
         type: "gradient",
@@ -174,9 +282,42 @@ export default {
       },
       yaxis: {
         show: false,
+        tooltip: {
+          enabled: false,
+        },
+        labels: {
+          minWidth: "100%",
+        },
+      },
+      tooltip: {
+        enabled: false,
+      },
+      dataLabels: {
+        enabled: false,
       },
     });
 
+    watchEffect(() => {
+      /* console.log(props.group.groupDate); */
+      if (props.group.groupDate) {
+        chartOptions.value.chart = {
+          ...chartOptions.value.chart,
+          ...{ group: "group-" + props.group.id + "-1" },
+        };
+        chartOptions.value = {
+          ...chartOptions.value,
+        };
+      } else {
+        delete chartOptions.value.chart.group;
+        chartOptions.value = {
+          ...chartOptions.value,
+        };
+        //group: "group-" + props.group.id + "-1",
+      }
+      updated.value++;
+    });
+
+    // Fetching data and setting up the chart
     fetchData().then(() => {
       res.value = getSensorDataById([...props.sensorIds]);
       time.value = res.value[0];
@@ -203,6 +344,10 @@ export default {
       stdDeviation = std(res.value[1]);
     });
 
+    /**
+     * Toggles the graph statistics.
+     * Note: this is only enabled when there is one sensor to show in the graph
+     */
     const toggleStatistics = () => {
       showStatistics.value = !showStatistics.value;
 
@@ -307,6 +452,9 @@ export default {
       }
     };
 
+    /**
+     * Toggles the timeline graph
+     */
     const toggleTimeLine = () => {
       showTimeLine.value = !showTimeLine.value;
     };
@@ -321,6 +469,7 @@ export default {
       showStatistics,
       showGraphs,
       numberOfSensors,
+      updated,
     };
   },
 };

@@ -1,31 +1,51 @@
 <template>
   <div class="h-100 w-100">
-    <!-- style="width: 100% height: 100%" -->
     <div class="content">
-      <h1 class="text-center">Group {{group.id}}</h1>
+      <h1 class="text-center">Gruppe {{ group.id }}</h1>
+      <div class="row">
+        <div
+          class="form-check form-switch col m-auto d-flex justify-content-center"
+        >
+          <input
+            @click="toggleReorder"
+            class="form-check-input"
+            type="checkbox"
+            id="flexSwitchCheckDefault"
+          />
+          <label class="form-check-label" for="flexSwitchCheckDefault">
+            Manual reordering</label
+          >
+        </div>
+        <div
+          class="form-check form-switch col m-auto d-flex justify-content-center"
+        >
+          <input
+            @click="toggleMap"
+            class="form-check-input"
+            type="checkbox"
+            id="flexSwitchCheckDefault"
+          />
+          <label class="form-check-label" for="flexSwitchCheckDefault">
+            Toggle map</label
+          >
+        </div>
+        <div
+          v-if="group.sensors.length > 1"
+          class="form-check form-switch col m-auto d-flex justify-content-center"
+        >
+          <input
+            :checked="group.groupDate"
+            @click="currentGroup.groupDate = !currentGroup.groupDate"
+            class="form-check-input"
+            type="checkbox"
+            id="flexSwitchCheckDefault"
+          />
+          <label class="form-check-label" for="flexSwitchCheckDefault">
+            Syncronize charts</label
+          >
+        </div>
+      </div>
 
-      <div class="form-check form-switch d-flex justify-content-center">
-        <input
-          @click="toggleReorder"
-          class="form-check-input"
-          type="checkbox"
-          id="flexSwitchCheckDefault"
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefault">
-          Manual reordering</label
-        >
-      </div>
-      <div class="form-check form-switch d-flex justify-content-center">
-        <input
-          @click="toggleMap"
-          class="form-check-input"
-          type="checkbox"
-          id="flexSwitchCheckDefault"
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefault">
-          Toggle map</label
-        >
-      </div>
       <grid-layout
         :key="updated"
         v-model:layout="layout"
@@ -46,14 +66,13 @@
           :i="item.i"
         >
           <line-graph
-            
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
-            :groupId="group.id"
+            :group="group"
           />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
-            <Map />
+            <Map :group="group" />
           </div>
         </grid-item>
       </grid-layout>
@@ -62,73 +81,44 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from "vue";
+import { defineComponent, ref, watch, watchEffect } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
-import {Group} from '@/Interfaces/groupInterface'
+import { Group } from "@/Interfaces/groupInterface";
+import { useGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
-  props: ['group'],
-  
- /*  props: {
-    group: {
-      type: Number,
-      default: 1,
-    },
-  }, */
- 
+  props: ["group"],
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
-
-    props.group.sensors.map((e) => {
-        layout.value.push({
-          x: 0,
-          y: 0,
-          w: 12,
-          h: 2,
-          i: e.id,
-          sensorIds: [...e.grahpsToCompare].concat(e.id),
-          sensorNames:
-            /* selectedSensors.value.map((s) => {
-              if (e.grahpsToCompare.concat(e.id).includes(s.id)) {                
-                return s.sensorName;
-              }
-            }) */
-            selectedSensors.value.filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
-            .map(f => { return f.sensorName}) 
-        });
-    });
-
+    const groups = useGroups();
+    const currentGroup = groups.value.find((e) => e.id == props.group.id);
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
     const updated = ref(1);
     const showMap = ref(false);
 
+    /**
+     * Toggles the ability to reorder and resize grids.
+     */
     const toggleReorder = () => {
       draggable.value = !draggable.value;
       resizable.value = !resizable.value;
     };
 
-    const increaseWidth = () => {
-      let width = document.getElementById("content").offsetWidth;
-      width += 20;
-      document.getElementById("content").style.width = width + "px";
-    };
-
-    const decreaseWidth = () => {
-      let width = document.getElementById("content").offsetWidth;
-      width -= 20;
-      document.getElementById("content").style.width = width + "px";
-    };
-
+    /**
+     * Toggles map and adds it to the bottom of the grid if it should render.
+     */
     const toggleMap = () => {
       if (!showMap.value) {
+        currentGroup.hoverIndex = 0;
+        //Calculates the bottom of the grid and adds the map
         layout.value.push({
           x: 0,
           y:
@@ -140,15 +130,44 @@ export default defineComponent({
           sensorName: "map",
         });
       } else {
+        // Removes the map from grid
         layout.value.splice(layout.value.indexOf({ sensorName: "map" }), 1);
       }
       showMap.value = !showMap.value;
       updated.value++;
     };
 
+    const setLayout = () => {
+      // Mapping trough the group sensors and adds them to the grid
+      console.log(props.group.sensors);
+
+      layout.value = props.group.sensors.map((e) => {
+        return {
+          x: 0,
+          y: 0,
+          w: 12,
+          h: 2,
+          i: e.id,
+          sensorIds: [...e.grahpsToCompare].concat(e.id),
+          sensorNames: selectedSensors.value
+            .filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
+            .map((f) => {
+              return f.sensorName;
+            }),
+        };
+      });
+    };
+    setLayout();
+
+    watch(
+      () => props.group.sensors,
+      () => {
+        setLayout();
+        updated.value++;
+      }
+    );
+
     return {
-      increaseWidth,
-      decreaseWidth,
       layout,
       draggable,
       resizable,
@@ -156,6 +175,7 @@ export default defineComponent({
       toggleReorder,
       toggleMap,
       updated,
+      currentGroup,
     };
   },
 });
