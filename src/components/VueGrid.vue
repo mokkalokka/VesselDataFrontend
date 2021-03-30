@@ -139,7 +139,6 @@ export default defineComponent({
 
     const setLayout = () => {
       // Mapping trough the group sensors and adds them to the grid
-      console.log(props.group.sensors);
 
       layout.value = props.group.sensors.map((e) => {
         return {

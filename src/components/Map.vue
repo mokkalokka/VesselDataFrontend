@@ -1,6 +1,11 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <div :key="zoomedPositionUpdated" v-if="max > 1" style="height: 80%; width: 100%">
+    <div
+      :key="zoomedPositionUpdated"
+      :style="
+        showPosition ? 'height: 80%; width: 100%' : 'height: 90%; width: 100%'
+      "
+    >
       <l-map
         v-model="zoom"
         v-model:zoom="zoom"
@@ -11,26 +16,40 @@
         ></l-tile-layer>
         <l-control-layers />
 
-        <l-polyline
-          v-if="!fetching"
-          v-model:lat-lngs="position"
-          color="green"
-        ></l-polyline>
-        <l-polyline
-          v-if="zoomedPositionUpdated"
-          v-model:lat-lngs="zoomedPosition"
-          color="red"
-        ></l-polyline>
-
-        <l-marker :lat-lng="position[sliderValue]"> </l-marker>
+        <div v-if="showPosition">
+          <l-polyline
+            v-if="!fetching"
+            v-model:lat-lngs="position"
+            color="green"
+          ></l-polyline>
+          <l-polyline
+            v-if="zoomedPositionUpdated"
+            v-model:lat-lngs="zoomedPosition"
+            color="red"
+          ></l-polyline>
+          <l-marker :lat-lng="position[sliderValue]"> </l-marker>
+        </div>
       </l-map>
     </div>
-    <div class="text-center"  style="height: 20%; width: 100%">
-      <div >
+    <div
+      v-if="showPosition"
+      class="text-center"
+      style="height: 20%; width: 100%"
+    >
+      <div>
         <p>{{ new Date(position[sliderValue][2]).toLocaleString() }}</p>
       </div>
 
-      <Slider class="mx-4" v-model="sliderValue" :step="1" :min="min" :max="max" />
+      <Slider
+        class="mx-4"
+        v-model="sliderValue"
+        :step="1"
+        :min="min"
+        :max="max"
+      />
+    </div>
+    <div v-else>
+      <p class="text-center">Ingen posisjon for dette tidsintervallet</p>
     </div>
   </div>
 </template>
@@ -53,7 +72,7 @@ export default {
     LPolyline,
     LMarker,
   },
-  props: ['group'],
+  props: ["group"],
 
   setup(props) {
     const zoom = ref(7);
@@ -62,38 +81,50 @@ export default {
     const sliderValue = ref(0);
     const min = ref(0);
     const max = ref(1);
-    const zoomedPosition = ref([60], [2])
-    const zoomedPositionUpdated = ref(0)
+    const zoomedPosition = ref([60], [2]);
+    const zoomedPositionUpdated = ref(0);
+    const showPosition = ref(false);
 
     /**
      * Fetches data and sets the position array, max and min position
      */
-    fetchData().then(() => { 
-      position.value = getPosition(props.group.fromDateTime, props.group.toDateTime).value;
+    fetchData().then(() => {
+      position.value = getPosition(
+        props.group.fromDateTime,
+        props.group.toDateTime
+      ).value;
       min.value = 0;
       max.value = position.value.length - 1;
+      if (position.value.length > 1) {
+        showPosition.value = true;
+      }
     });
 
     /**
      * Watches for changes in zoomedDateTime to make a line of the zoomed position
      */
     watchEffect(() => {
-      if(props.group.zoomedFromDateTime){
-        zoomedPositionUpdated.value ++
-        zoomedPosition.value = getPosition(props.group.zoomedFromDateTime, props.group.zoomedToDateTime).value;
+      if (props.group.zoomedFromDateTime) {
+        zoomedPositionUpdated.value++;
+        zoomedPosition.value = getPosition(
+          props.group.zoomedFromDateTime,
+          props.group.zoomedToDateTime
+        ).value;
       }
-    })
+    });
 
     /**
      * Watches the current hover position from graphs and drop marker at that point
      */
     watchEffect(() => {
-      if(props.group.hoverIndex && ( min.value < props.group.hoverIndex < max.value) && props.group.hoverIndex != -1 ){
-        sliderValue.value = props.group.hoverIndex
+      if (
+        props.group.hoverIndex &&
+        min.value < props.group.hoverIndex < max.value &&
+        props.group.hoverIndex != -1
+      ) {
+        sliderValue.value = props.group.hoverIndex;
       }
-    })
-
-
+    });
 
     return {
       zoom,
@@ -103,7 +134,8 @@ export default {
       min,
       max,
       zoomedPosition,
-      zoomedPositionUpdated
+      zoomedPositionUpdated,
+      showPosition,
     };
   },
 };
@@ -111,6 +143,6 @@ export default {
 
 <style scoped>
 .leaflet-container {
-    background: white;
+  background: white;
 }
 </style>
