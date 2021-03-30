@@ -1,4 +1,18 @@
 <template>
+  <div class="input-group searchgroup mb-3">
+    <input
+      type="text"
+      class="form-control border-end-0"
+      placeholder="Søk etter sensorer..."
+      aria-label="Sensor Name"
+      aria-describedby="sensorsearch-addon"
+      v-model="input"
+    />
+    <span class="input-group-text bg-transparent" id="sensorsearch-addon">
+      <BIconSearch />
+    </span>
+  </div>
+
   <DataTable :id="'sensorTable'" :hoverable="true" :clickRows="true">
     <thead>
       <tr>

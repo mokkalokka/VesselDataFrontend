@@ -1,8 +1,6 @@
 <template>
-  <div class="card mt-4">
-    <div class="accordion p-0 accordion-flush">
-      <slot /><!-- accordion content slot -->
-    </div>
+  <div class="accordion p-0 accordion-flush">
+    <slot />
   </div>
 </template>
 

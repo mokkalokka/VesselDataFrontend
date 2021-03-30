@@ -11,7 +11,7 @@
         :tabHeader="'Gruppe'"
       />
       <AccordionBody :item="group">
-        <h5 class="card-title">Instillinger for gruppen</h5>
+        <h5>Instillinger for gruppen</h5>
         <DataTable :id="'groupSettingsTable'" :hoverable="false">
           <thead>
             <tr>
@@ -74,7 +74,7 @@
             </tr>
           </tbody>
         </DataTable>
-        <h5 class="card-title">Instillinger for sensorene</h5>
+        <h5>Instillinger for sensorene</h5>
         <DataTable :id="'sensorSettingsTable'" :hoverable="false">
           <thead>
             <tr>
