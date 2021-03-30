@@ -48,6 +48,7 @@
                             type="checkbox"
                             checked
                             @click="group.groupDate = !group.groupDate"
+                            :disabled="group.sensors.length == 1"
                           />
                           <label class="form-check-label"> Datovisning </label>
                         </div>
@@ -60,7 +61,7 @@
                           :disabled="!group.groupDate"
                           :max="group.toDate"
                           @change="
-                            updateDate(group);
+                            updateGroupSensorsDateTime(group);
                             validateGroupTime(group);
                             checkIfValidInput();
                           "
@@ -68,7 +69,7 @@
                         />
                         <input
                           type="time"
-                          id="groupFromTime"
+                          :id="'groupFromTime' + group.id"
                           class="form-control"
                           v-model="group.fromTime"
                           step="1"
@@ -77,7 +78,7 @@
                             group.fromDate == group.toDate ? group.toTime : ''
                           "
                           @blur="
-                            updateDate(group);
+                            updateGroupSensorsDateTime(group);
                             validateGroupTime(group);
                             checkIfValidInput();
                           "
@@ -92,7 +93,7 @@
                           :disabled="!group.groupDate"
                           :min="group.fromDate"
                           @change="
-                            updateDate(group);
+                            updateGroupSensorsDateTime(group);
                             validateGroupTime(group);
                             checkIfValidInput();
                           "
@@ -100,7 +101,7 @@
                         />
                         <input
                           type="time"
-                          id="groupToTime"
+                          :id="'groupToTime' + group.id"
                           class="form-control"
                           v-model="group.toTime"
                           step="1"
@@ -109,7 +110,7 @@
                             group.fromDate == group.toDate ? group.fromTime : ''
                           "
                           @blur="
-                            updateDate(group);
+                            updateGroupSensorsDateTime(group);
                             validateGroupTime(group);
                             checkIfValidInput();
                           "
@@ -146,13 +147,14 @@
                           :max="sensor.toDate"
                           :required="!group.groupDate"
                           @change="
+                            updateDateTime(sensor);
                             checkIfValidInput();
                             validateSensorTime(sensor);
                           "
                         />
                         <input
                           type="time"
-                          id="sensorFromTime"
+                          :id="'sensorFromTime' + sensor.id"
                           class="form-control"
                           v-model="sensor.fromTime"
                           step="1"
@@ -164,6 +166,7 @@
                           "
                           :required="!group.groupDate"
                           @blur="
+                            updateDateTime(sensor);
                             checkIfValidInput();
                             validateSensorTime(sensor);
                           "
@@ -175,16 +178,17 @@
                           class="form-control"
                           v-model="sensor.toDate"
                           :disabled="group.groupDate"
-                          :min="sensor.toDate"
+                          :min="sensor.fromDate"
                           :required="!group.groupDate"
                           @change="
+                            updateDateTime(sensor);
                             checkIfValidInput();
                             validateSensorTime(sensor);
                           "
                         />
                         <input
                           type="time"
-                          id="sensortoTime"
+                          :id="'sensorToTime' + sensor.id"
                           class="form-control"
                           v-model="sensor.toTime"
                           step="1"
@@ -196,6 +200,7 @@
                           "
                           :required="!group.groupDate"
                           @blur="
+                            updateDateTime(sensor);
                             checkIfValidInput();
                             validateSensorTime(sensor);
                           "
@@ -221,7 +226,7 @@
                           :searchable="true"
                           :createTag="false"
                           mode="tags"
-                          v-model="sensor.grahpsToCompare"
+                          v-model="sensor.sensorsToCompare"
                           :options="filterSensors(sensor, group)"
                           @change="updateCurrent(sensor, group)"
                           @input="addAllDeselectedSensorsToGroup"
@@ -310,7 +315,7 @@ export default defineComponent({
       sensor.group = newGroupNumber;
 
       // Change the group number for the sensor to compare with
-      sensor.grahpsToCompare.map(
+      sensor.sensorsToCompare.map(
         (s) =>
           (selectedSensors.value.find((e) => e.id == s).group = newGroupNumber)
       );
@@ -321,47 +326,38 @@ export default defineComponent({
           id: tempGroups.value.length + 1,
           sensors: [sensor],
           groupDate: true,
-          fromDate: sensor.startTime.toISOString().slice(0, 10),
-          fromTime: sensor.startTime.toLocaleTimeString("en-GB"),
-          toDate: sensor.endTime.toISOString().slice(0, 10),
-          toTime: sensor.endTime.toLocaleTimeString("en-GB"),
-          fromDateTime: sensor.startTime,
-          toDateTime: sensor.endTime,
+          fromDate: sensor.fromDateTime.toISOString().slice(0, 10),
+          fromTime: sensor.fromDateTime.toLocaleTimeString("en-GB"),
+          toDate: sensor.toDateTime.toISOString().slice(0, 10),
+          toTime: sensor.toDateTime.toLocaleTimeString("en-GB"),
+          fromDateTime: sensor.fromDateTime,
+          toDateTime: sensor.toDateTime,
         });
       } else {
         tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
       }
     };
 
-    /**
-     * Update the date for the group and the sensor when it changes in the group
-     * @param {Group} group - The group the date and time changed in
-     */
-    const updateDate = (group: Group) => {
-      group.sensors.map((sensor) => {
-        sensor.fromDate = group.fromDate;
-        sensor.fromTime = group.fromTime;
-        sensor.toDate = group.toDate;
-        sensor.toTime = group.toTime;
-      });
 
-      const fromYear = parseInt(group.fromDate.substring(0, 4));
-      const fromMonth = parseInt(group.fromDate.substring(5, 7)) - 1;
-      const fromDay = parseInt(group.fromDate.substring(8, 10));
+    const updateDateTime = (object: Sensor | Group) => {
 
-      const fromHours = parseInt(group.fromTime.substring(0, 2));
-      const fromMinutes = parseInt(group.fromTime.substring(3, 5));
-      const fromSeconds = parseInt(group.fromTime.substring(6, 8));
+      const fromYear = parseInt(object.fromDate.substring(0, 4));
+      const fromMonth = parseInt(object.fromDate.substring(5, 7)) - 1;
+      const fromDay = parseInt(object.fromDate.substring(8, 10));
 
-      const toYear = parseInt(group.toDate.substring(0, 4));
-      const toMonth = parseInt(group.toDate.substring(5, 7)) - 1;
-      const toDay = parseInt(group.toDate.substring(8, 10));
+      const fromHours = parseInt(object.fromTime.substring(0, 2));
+      const fromMinutes = parseInt(object.fromTime.substring(3, 5));
+      const fromSeconds = parseInt(object.fromTime.substring(6, 8));
 
-      const toHours = parseInt(group.toTime.substring(0, 2));
-      const toMinutes = parseInt(group.toTime.substring(3, 5));
-      const toSeconds = parseInt(group.toTime.substring(6, 8));
+      const toYear = parseInt(object.toDate.substring(0, 4));
+      const toMonth = parseInt(object.toDate.substring(5, 7)) - 1;
+      const toDay = parseInt(object.toDate.substring(8, 10));
 
-      group.fromDateTime = new Date(
+      const toHours = parseInt(object.toTime.substring(0, 2));
+      const toMinutes = parseInt(object.toTime.substring(3, 5));
+      const toSeconds = parseInt(object.toTime.substring(6, 8));
+
+      object.fromDateTime = new Date(
         fromYear,
         fromMonth,
         fromDay,
@@ -369,7 +365,7 @@ export default defineComponent({
         fromMinutes,
         fromSeconds
       );
-      group.toDateTime = new Date(
+      object.toDateTime = new Date(
         toYear,
         toMonth,
         toDay,
@@ -377,43 +373,22 @@ export default defineComponent({
         toMinutes,
         toSeconds
       );
+    }
+
+    /**
+     * Update the date for the group and the sensor when it changes in the group
+     * @param {Group} group - The group the date and time changed in
+     */
+    const updateGroupSensorsDateTime = (group: Group) => {
+      group.sensors.map((sensor) => {
+        sensor.fromDate = group.fromDate;
+        sensor.fromTime = group.fromTime;
+        sensor.toDate = group.toDate;
+        sensor.toTime = group.toTime;
+        updateDateTime(sensor);
+      });
+      updateDateTime(group)
     };
-
-    // const updateSensorDateTime = (object: Sensor | Group) => {
-
-    //   const fromYear = parseInt(sensor.fromDate.substring(0, 4));
-    //   const fromMonth = parseInt(sensor.fromDate.substring(5, 7)) - 1;
-    //   const fromDay = parseInt(sensor.fromDate.substring(8, 10));
-
-    //   const fromHours = parseInt(sensor.fromTime.substring(0, 2));
-    //   const fromMinutes = parseInt(sensor.fromTime.substring(3, 5));
-    //   const fromSeconds = parseInt(sensor.fromTime.substring(6, 8));
-
-    //   const toYear = parseInt(sensor.toDate.substring(0, 4));
-    //   const toMonth = parseInt(sensor.toDate.substring(5, 7)) - 1;
-    //   const toDay = parseInt(sensor.toDate.substring(8, 10));
-
-    //   const toHours = parseInt(sensor.toTime.substring(0, 2));
-    //   const toMinutes = parseInt(sensor.toTime.substring(3, 5));
-    //   const toSeconds = parseInt(sensor.toTime.substring(6, 8));
-
-    //   sensor.startTime = new Date(
-    //     fromYear,
-    //     fromMonth,
-    //     fromDay,
-    //     fromHours,
-    //     fromMinutes,
-    //     fromSeconds
-    //   );
-    //   object.endTime = new Date(
-    //     toYear,
-    //     toMonth,
-    //     toDay,
-    //     toHours,
-    //     toMinutes,
-    //     toSeconds
-    //   );
-    // }
 
     /**
      * Filters the sensors a current sensor can be compared with
@@ -452,14 +427,14 @@ export default defineComponent({
       const selectedSensor = selectedSensors.value.find((s) => s.id == value);
 
       // Creates a new array that contains all the sensors for comparison with set, so that duplicates get removed.
-      currentSensor.value.grahpsToCompare = [
+      currentSensor.value.sensorsToCompare = [
         ...new Set(
-          selectedSensor.grahpsToCompare.concat(
-            currentSensor.value.grahpsToCompare
+          selectedSensor.sensorsToCompare.concat(
+            currentSensor.value.sensorsToCompare
           )
         ),
       ];
-      selectedSensor.grahpsToCompare = [];
+      selectedSensor.sensorsToCompare = [];
 
       currentGroup.value.sensors = currentGroup.value.sensors.filter(
         (s) => s.id != value
@@ -480,7 +455,7 @@ export default defineComponent({
         currentGroup.value.sensors.some(
           (s) =>
             s.id == value ||
-            (s.grahpsToCompare.includes(value) &&
+            (s.sensorsToCompare.includes(value) &&
               s.id != currentSensor.value.id)
         )
       ) {
@@ -500,11 +475,8 @@ export default defineComponent({
      * @param {[]} value - array of sensors ids selected or deselected for comparsion
      */
     const addAllDeselectedSensorsToGroup = (value: number[]) => {
-      if (
-        currentSensor.value.grahpsToCompare.length != 1 &&
-        value.length == 0
-      ) {
-        currentSensor.value.grahpsToCompare.map((id) => {
+      if (value.length == 0) {
+        currentSensor.value.sensorsToCompare.map((id) => {
           addDeselectedSensorToGroup(id);
         });
       }
@@ -514,10 +486,10 @@ export default defineComponent({
 
     const validateGroupTime = (group: Group) => {
       const groupFromTime = document.getElementById(
-        "groupFromTime"
+        "groupFromTime" + group.id
       ) as HTMLFormElement;
       const groupToTime = document.getElementById(
-        "groupToTime"
+        "groupToTime" + group.id
       ) as HTMLFormElement;
 
       if (group.toTime == group.fromTime && group.toDate == group.fromDate) {
@@ -535,18 +507,16 @@ export default defineComponent({
 
     const validateSensorTime = (sensor: Sensor) => {
       const sensorFromTime = document.getElementById(
-        "sensorFromTime"
+        "sensorFromTime" + sensor.id
       ) as HTMLFormElement;
       const sensorToTime = document.getElementById(
-        "sensorToTime"
+        "sensorToTime" + sensor.id
       ) as HTMLFormElement;
 
       if (
         sensor.toTime == sensor.fromTime &&
         sensor.toDate == sensor.fromDate
       ) {
-        console.log("setter");
-
         sensorFromTime.setCustomValidity(
           "Tiden kan ikke være den samme i begge felt når det er samme dato"
         );
@@ -580,7 +550,8 @@ export default defineComponent({
       filterSensors,
       tempGroups,
       addSensorToGroup,
-      updateDate,
+      updateGroupSensorsDateTime,
+      updateDateTime,
       removeSelectedSensorFromGroup,
       addDeselectedSensorToGroup,
       updateCurrent,

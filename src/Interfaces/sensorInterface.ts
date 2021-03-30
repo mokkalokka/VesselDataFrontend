@@ -3,10 +3,10 @@ export interface Sensor {
     filterkey: string;
     sensorName: string;
     description: string;
-    startTime: Date;
-    endTime: Date;
+    fromDateTime: Date;
+    toDateTime: Date;
     group: number;
-    grahpsToCompare: number[];
+    sensorsToCompare: number[];
     graphType: string;
     fromDate: String;
     fromTime: String;

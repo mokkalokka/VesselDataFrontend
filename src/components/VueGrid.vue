@@ -148,9 +148,9 @@ export default defineComponent({
           w: 12,
           h: 2,
           i: e.id,
-          sensorIds: [...e.grahpsToCompare].concat(e.id),
+          sensorIds: [...e.sensorsToCompare].concat(e.id),
           sensorNames: selectedSensors.value
-            .filter((s) => [...e.grahpsToCompare].concat(e.id).includes(s.id))
+            .filter((s) => [...e.sensorsToCompare].concat(e.id).includes(s.id))
             .map((f) => {
               return f.sensorName;
             }),

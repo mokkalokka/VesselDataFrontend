@@ -13,8 +13,8 @@ export function useSensorData() {
 
     function setSensorNames() {
         /* TODO: filter null values */
-        const startTime = new Date(response.value[0]["time"][0])
-        const endTime = new Date(response.value[0]["time"][3599])
+        const fromDateTime = new Date(response.value[0].time[0])
+        const toDateTime = new Date(response.value[0].time[3599])
         
 
         sensorNames.value = response.value.map((e: Sensor, index: number) => {
@@ -24,15 +24,15 @@ export function useSensorData() {
                 filterkey: Object.keys(e)[0],
                 sensorName:  (namefields.length > 1 ? namefields[namefields.length - 2] + " " + namefields[namefields.length - 1] : namefields[0]),
                 description: namefields[0], 
-                startTime: startTime, 
-                endTime: endTime,
+                fromDateTime: fromDateTime, 
+                toDateTime: toDateTime,
                 group: 1,
-                grahpsToCompare: [],
+                sensorsToCompare: [],
                 graphType: "Linje",
-                fromDate: startTime.toISOString().slice(0, 10),
-                fromTime: startTime.toLocaleTimeString("en-GB"),
-                toDate: endTime.toISOString().slice(0, 10),
-                toTime: endTime.toLocaleTimeString("en-GB"),
+                fromDate: fromDateTime.toISOString().slice(0, 10),
+                fromTime: fromDateTime.toLocaleTimeString("en-GB"),
+                toDate: toDateTime.toISOString().slice(0, 10),
+                toTime: toDateTime.toLocaleTimeString("en-GB"),
                 } 
         } ) as Sensor[]
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))
