@@ -2,12 +2,16 @@ import { ref } from 'vue'
 import { Group } from '@/Interfaces/groupInterface';
 const currentDate = new Date();
 const groups = ref([] as Group[])
+
+const tempDate = new Date()
+tempDate.setHours(tempDate.getHours() - 1);
+
 const tempGroups = ref([{
     id: 1,
     sensors: [],
     groupDate: true,
-    fromDate: currentDate.toISOString().slice(0, 10),
-    fromTime: currentDate.toLocaleTimeString("en-GB"),
+    fromDate: tempDate.toISOString().slice(0, 10),
+    fromTime: tempDate.toLocaleTimeString("en-GB"),
     toDate: currentDate.toISOString().slice(0, 10),
     toTime: currentDate.toLocaleTimeString("en-GB"),
     fromDateTime: currentDate,
@@ -28,8 +32,8 @@ export function resetTempGroups() {
         id: 1,
         sensors: [],
         groupDate: true,
-        fromDate: currentDate.toISOString().slice(0, 10),
-        fromTime: currentDate.toLocaleTimeString("en-GB"),
+        fromDate: tempDate.toISOString().slice(0, 10),
+        fromTime: tempDate.toLocaleTimeString("en-GB"),
         toDate: currentDate.toISOString().slice(0, 10),
         toTime: currentDate.toLocaleTimeString("en-GB"),
         fromDateTime: currentDate,

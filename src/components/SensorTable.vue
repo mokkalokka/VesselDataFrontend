@@ -56,9 +56,6 @@
               </button>
             </th>
             <th scope="col">Beskrivelse</th>
-
-            <!-- <th scope="col">Fra-tid</th>
-            <th scope="col">Til-tid</th> -->
           </tr>
         </thead>
         <tbody
@@ -74,8 +71,6 @@
           >
             <td>{{ sensor.sensorName }}</td>
             <td>{{ sensor.description }}</td>
-            <!-- <td>{{ sensor.startTime }}</td>
-            <td>{{ sensor.endTime }}</td> -->
           </tr>
         </tbody>
       </table>
