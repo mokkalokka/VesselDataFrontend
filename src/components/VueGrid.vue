@@ -24,6 +24,7 @@
             class="form-check-input"
             type="checkbox"
             id="flexSwitchCheckDefault"
+            :checked="showMap"
           />
           <label class="form-check-label" for="flexSwitchCheckDefault">
             Toggle map</label
@@ -162,6 +163,7 @@ export default defineComponent({
       () => props.group.sensors,
       () => {
         setLayout();
+        showMap.value = false
         updated.value++;
       }
     );
@@ -175,6 +177,7 @@ export default defineComponent({
       toggleMap,
       updated,
       currentGroup,
+      showMap
     };
   },
 });
