@@ -6,9 +6,11 @@
         id="chart-line2"
         v-bind:class="{
           'h-100':
-            !showTimeLine || (currentGroup.groupDate && currentGroup.sensors.length != 1),
+            !showTimeLine ||
+            (currentGroup.groupDate && currentGroup.sensors.length != 1),
           'h-75':
-            showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1),
+            showTimeLine &&
+            (!currentGroup.groupDate || currentGroup.sensors.length == 1),
         }"
       >
         <apexchart
@@ -19,7 +21,10 @@
         ></apexchart>
       </div>
       <div
-        v-if="showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1)"
+        v-if="
+          showTimeLine &&
+          (!currentGroup.groupDate || currentGroup.sensors.length == 1)
+        "
         id="chart-line"
         class="h-25 container"
       >
@@ -56,35 +61,22 @@
       </div>
       <div class="container">
         <div class="row">
-          <div
+          <ToggleButton
+            :id="'flexSwitchCheckStats'"
+            :checkedValue="false"
+            :click="toggleStatistics"
             v-if="numberOfSensors == 1"
-            class="form-check form-switch col d-flex justify-content-center"
           >
-            <input
-              @click="toggleStatistics"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Statistics</label
-            >
-          </div>
-          <div
+            Vis statistikk
+          </ToggleButton>
+          <ToggleButton
+            :id="'flexSwitchCheckTimeline'"
+            :checkedValue="showTimeLine"
+            :click="toggleTimeLine"
             v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
-            class="form-check form-switch col d-flex justify-content-center"
           >
-            <input
-              :checked="showTimeLine"
-              @click="toggleTimeLine"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Timeline</label
-            >
-          </div>
+            Vis tidslinje
+          </ToggleButton>
         </div>
       </div>
     </div>
@@ -96,6 +88,7 @@ import { useSensorData } from "@/composables/useSensorData";
 import { ref, watchEffect } from "vue";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default {
   name: "LineGraph",
@@ -113,6 +106,7 @@ export default {
       required: true,
     },
   },
+  components: { ToggleButton },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
@@ -152,7 +146,7 @@ export default {
             currentGroup.zoomedFromDateTime = new Date(xaxis.min);
             currentGroup.zoomedToDateTime = new Date(xaxis.max);
           },
-          beforeZoom: function (chartContext, { xaxis, yaxis }) { 
+          beforeZoom: function (chartContext, { xaxis, yaxis }) {
             if (
               new Date(xaxis.min) < new Date(time.value[0]) ||
               new Date(xaxis.max) > new Date(time.value[-1])
@@ -168,14 +162,14 @@ export default {
               return {
                 xaxis: {
                   min: xaxis.min,
-                  max: xaxis.max
+                  max: xaxis.max,
                 },
               };
             }
           },
-          mouseMove: function (event, chartContext, config){ 
-            currentGroup.hoverIndex = config.dataPointIndex
-          }
+          mouseMove: function (event, chartContext, config) {
+            currentGroup.hoverIndex = config.dataPointIndex;
+          },
         },
         id: chartId + "1",
         /* group: "group-" + currentGroup.id, */
@@ -470,7 +464,7 @@ export default {
       showGraphs,
       numberOfSensors,
       updated,
-      currentGroup
+      currentGroup,
     };
   },
 };

@@ -3,35 +3,21 @@
     <div class="content">
       <h1 class="text-center">Gruppe {{ currentGroup.id }}</h1>
       <div class="row">
-        <div
-          class="form-check form-switch col m-auto d-flex justify-content-center"
+        <ToggleButton
+          :checkedValue="false"
+          :click="toggleReorder"
+          :id="'flexSwitchCheckReorder'"
         >
-          <input
-            @click="toggleReorder"
-            class="form-check-input"
-            type="checkbox"
-            id="flexSwitchCheckDefault"
-          />
-          <label class="form-check-label" for="flexSwitchCheckDefault">
-            Manual reordering</label
-          >
-        </div>
-        <div
-          class="form-check form-switch col m-auto d-flex justify-content-center"
+          Manuell omorganisering
+        </ToggleButton>
+        <ToggleButton
+          :checkedValue="showMap"
+          :click="toggleMap"
+          :id="'flexSwitchCheckMap'"
         >
-          <input
-            @click="toggleMap"
-            class="form-check-input"
-            type="checkbox"
-            id="flexSwitchCheckDefault"
-            :checked="showMap"
-          />
-          <label class="form-check-label" for="flexSwitchCheckDefault">
-            Toggle map</label
-          >
-        </div>
+          Vis kart
+        </ToggleButton>
         <div
-          v-if="currentGroup.sensors.length > 1"
           class="form-check form-switch col m-auto d-flex justify-content-center"
         >
           <input
@@ -45,6 +31,14 @@
             Syncronize charts</label
           >
         </div>
+        <!-- <ToggleButton
+        v-if="currentGroup.sensors.length > 1"
+        :checkedValue="currentGroup.groupDate"
+        :click="currentGroup.groupDate = !currentGroup.groupDate"
+        :id="'flexSwitchCheckSynchronize'"
+        >
+        Synkroniser grafer
+        </ToggleButton> -->
       </div>
 
       <grid-layout
@@ -88,29 +82,29 @@ import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
 import { Group } from "@/Interfaces/groupInterface";
 import { useGroups } from "@/composables/useGroups";
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default defineComponent({
   name: "VueGrid",
-  components: { LineGraph, Map },
-  
+  components: { LineGraph, Map, ToggleButton },
+
   props: {
     groupId: {
       type: Number,
       required: true,
-    }
+    },
   },
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
     const groups = useGroups();
-    const currentGroup = ref(groups.value[props.groupId -1])
+    const currentGroup = ref(groups.value[props.groupId - 1]);
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
     const updated = ref(1);
     const showMap = ref(false);
-    
 
     /**
      * Toggles the ability to reorder and resize grids.
@@ -167,17 +161,16 @@ export default defineComponent({
     setLayout();
 
     watch(
-      () => groups.value[props.groupId -1].sensors,
+      () => groups.value[props.groupId - 1].sensors,
       () => {
-        currentGroup.value = groups.value[props.groupId -1] 
-        
+        currentGroup.value = groups.value[props.groupId - 1];
+
         setLayout();
-        showMap.value = false
+        showMap.value = false;
         updated.value++;
       },
 
-      {deep: true}
-
+      { deep: true }
     );
 
     return {
@@ -189,7 +182,7 @@ export default defineComponent({
       toggleMap,
       updated,
       currentGroup,
-      showMap
+      showMap,
     };
   },
 });

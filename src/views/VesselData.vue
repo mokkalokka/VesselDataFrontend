@@ -1,65 +1,73 @@
 <template>
   <div class="container">
     <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
-    <div class="card my-4">
-      <div class="accordion accordion-flush" id="sensorAccordion">
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingOne">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#sensorTableCollapse"
-              aria-expanded="false"
-              aria-controls="sensorTableCollapse"
-            >
-              Sensorer for "Båtnavn"
-            </button>
-          </h2>
-          <div
-            id="sensorTableCollapse"
-            class="accordion-collapse collapse multi-collapse show"
-            aria-labelledby="flush-headingOne"
-            data-bs-parent="#sensorAccordion"
+    <div class="accordion" id="sensorAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingOne">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sensorTableCollapse"
+            aria-expanded="false"
+            aria-controls="sensorTableCollapse"
           >
-            <div class="accordion-body">
-              <div class="table table-responsive">
-                <SensorTable
-                  :sensorNames="sensorNames"
-                  :selectedSensors="selectedSensors"
-                />
-                <div v-show="selectedSensors.length != 0">
-                  <AddedSensorTable />
-                </div>
-              </div>
+            Sensorer for "Båtnavn"
+          </button>
+        </h2>
+        <div
+          id="sensorTableCollapse"
+          class="accordion-collapse collapse multi-collapse show"
+          aria-labelledby="flush-headingOne"
+          data-bs-parent="#sensorAccordion"
+        >
+          <div class="accordion-body">
+            <SensorTable
+              :sensorNames="sensorNames"
+              :selectedSensors="selectedSensors"
+            />
+            <div v-show="selectedSensors.length != 0">
+              <AddedSensorTable />
             </div>
           </div>
         </div>
-        <div class="accordion-item" disabled="!showSensorData">
-          <h2 class="accordion-header" id="flush-headingThree">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              :disabled="groups.length == 0"
-              data-bs-toggle="collapse"
-              data-bs-target="#graphCollapse"
-              aria-expanded="false"
-              aria-controls="graphCollapse"
-              v-bind:class="groups.length == 0 ? 'bg-light' : 'bg-default'"
-            >
-              Grafer
-            </button>
-          </h2>
-          <div
-            id="graphCollapse"
-            aria-labelledby="flush-headingThree"
-            v-bind:class="graphToggleClass"
+      </div>
+      <div class="accordion-item" disabled="!showSensorData">
+        <h2 class="accordion-header" id="flush-headingThree">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            :disabled="groups.length == 0"
+            data-bs-toggle="collapse"
+            data-bs-target="#graphCollapse"
+            aria-expanded="false"
+            aria-controls="graphCollapse"
+            v-bind:class="groups.length == 0 ? 'bg-light' : 'bg-default'"
           >
-            <div class="accordion-body">
-              <div v-for="group in groups" :key="group.id">
-                <vue-grid v-show="group.sensors.length != 0" :groupId="group.id" />
-              </div>
-            </div>
+            Grafer
+          </button>
+        </h2>
+        <div
+          id="graphCollapse"
+          aria-labelledby="flush-headingThree"
+          v-bind:class="graphToggleClass"
+        >
+          <div class="accordion-body">
+            <Accordion>
+              <AccordionItem v-for="group in groups" :key="group.id">
+                <AccordionHeader
+                  :item="group"
+                  :headerId="group.id"
+                  :tabHeader="'Gruppe'"
+                />
+                <AccordionBody :item="group" :multiCollapse="false">
+                  <vue-grid
+                    v-show="group.sensors.length != 0"
+                    :groupId="group.id"
+                  />
+                </AccordionBody>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
@@ -84,12 +92,20 @@ import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
 import lodash from "lodash";
+import Accordion from "@/components/reusable/accordion/Accordion.vue";
+import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
+import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
+import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
 
 export default defineComponent({
   components: {
     /* LineGraph, */ SensorTable,
     /* Map */ VueGrid,
     AddedSensorTable,
+    Accordion,
+    AccordionItem,
+    AccordionHeader,
+    AccordionBody,
   },
   name: "VesselData",
   setup() {

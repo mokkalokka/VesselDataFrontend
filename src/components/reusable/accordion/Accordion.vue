@@ -1,5 +1,5 @@
 <template>
-  <div class="accordion p-0 accordion-flush">
+  <div class="accordion p-0">
     <slot />
   </div>
 </template>

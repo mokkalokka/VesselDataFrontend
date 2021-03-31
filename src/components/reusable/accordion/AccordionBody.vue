@@ -1,7 +1,11 @@
 <template>
   <div
     :id="'collapse' + item.id"
-    class="accordion-collapse collapse show"
+    v-bind:class="
+      multiCollapse
+        ? 'accordion-collapse collapse multi-collapse show'
+        : 'accordion-collapse collapse show'
+    "
     :aria-labelledby="'heading' + item.id"
   >
     <div class="accordion-body p-0">
@@ -15,6 +19,6 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "AccordionBody",
-  props: ["item"],
+  props: ["item", "multiCollapse"],
 });
 </script>
