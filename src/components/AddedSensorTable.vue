@@ -29,7 +29,10 @@
             :aria-labelledby="'heading' + group.id"
           >
             <div class="accordion-body p-0">
-              <h5>Instillinger for gruppen</h5>
+              <div class="d-flex justify-content-center">
+                <h5 class="my-3" text-center>Instillinger for gruppen</h5>
+              </div>
+
               <div class="table-responsive">
                 <table class="table m-0 table-bordered">
                   <thead>
@@ -121,8 +124,9 @@
                   </tbody>
                 </table>
               </div>
-
-              <h5 class="card-title">Instillinger for sensorene</h5>
+              <div class="d-flex justify-content-center">
+                <h5 class="my-3" text-center>Instillinger for sensorene</h5>
+              </div>
               <div class="table-responsive">
                 <table class="table m-0 table-bordered">
                   <thead>
@@ -337,10 +341,10 @@ export default defineComponent({
         tempGroups.value[newGroupNumber - 1].sensors.push(sensor);
       }
     };
-
-
+    /**
+     * Updates the datetime attribute for either the sensor or the group
+     */
     const updateDateTime = (object: Sensor | Group) => {
-
       const fromYear = parseInt(object.fromDate.substring(0, 4));
       const fromMonth = parseInt(object.fromDate.substring(5, 7)) - 1;
       const fromDay = parseInt(object.fromDate.substring(8, 10));
@@ -373,7 +377,7 @@ export default defineComponent({
         toMinutes,
         toSeconds
       );
-    }
+    };
 
     /**
      * Update the date for the group and the sensor when it changes in the group
@@ -387,7 +391,7 @@ export default defineComponent({
         sensor.toTime = group.toTime;
         updateDateTime(sensor);
       });
-      updateDateTime(group)
+      updateDateTime(group);
     };
 
     /**
@@ -482,8 +486,12 @@ export default defineComponent({
       }
     };
 
+    // Used for storing if the inputs are valid or not
     const isInputsValid = ref(true);
 
+    /**
+     * Checks if the time is equal for the group
+     */
     const validateGroupTime = (group: Group) => {
       const groupFromTime = document.getElementById(
         "groupFromTime" + group.id
@@ -505,6 +513,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Checks if the time is equal for the sensor.
+     */
     const validateSensorTime = (sensor: Sensor) => {
       const sensorFromTime = document.getElementById(
         "sensorFromTime" + sensor.id
@@ -529,6 +540,9 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Checks if all the form inputs are valid.
+     */
     const checkIfValidInput = () => {
       const form = document.getElementById("form") as HTMLFormElement;
       if (form.checkValidity()) {
@@ -539,7 +553,7 @@ export default defineComponent({
     };
 
     /**
-     * Method to evoke when sensors are selected and grapsh should be shown. Sets chosen group configuration.
+     * Takes the sensors and group settings from tempGroups and set it equal to groups.
      */
     const setSensorsToRender = () => {
       groups.value = lodash.cloneDeep(tempGroups.value);
