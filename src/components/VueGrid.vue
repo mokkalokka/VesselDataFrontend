@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 w-100">
-    <div class="content mt-3">
+    <div class="content pt-3">
       <div class="row">
         <ToggleButton
           :checkedValue="false"
