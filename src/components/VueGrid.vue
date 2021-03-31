@@ -1,7 +1,6 @@
 <template>
   <div class="h-100 w-100">
-    <div class="content">
-      <h1 class="text-center">Gruppe {{ currentGroup.id }}</h1>
+    <div class="content mt-3">
       <div class="row">
         <ToggleButton
           :checkedValue="false"
@@ -27,7 +26,7 @@
             type="checkbox"
             id="flexSwitchCheckDefault"
           />
-          <label class="form-check-label" for="flexSwitchCheckDefault">
+          <label class="form-check-label ms-2" for="flexSwitchCheckDefault">
             Syncronize charts</label
           >
         </div>

@@ -7,7 +7,7 @@
       :id="id"
       @click="click"
     />
-    <label class="form-check-label" for="flexSwitchCheckDefault">
+    <label class="form-check-label ms-2" for="flexSwitchCheckDefault">
       <slot />
     </label>
   </div>

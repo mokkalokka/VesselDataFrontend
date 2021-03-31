@@ -54,17 +54,18 @@
         >
           <div class="accordion-body">
             <Accordion>
-              <AccordionItem v-for="group in groups" :key="group.id">
+              <AccordionItem
+                v-for="group in groups"
+                :key="group.id"
+                v-show="group.sensors.length != 0"
+              >
                 <AccordionHeader
                   :item="group"
                   :headerId="group.id"
                   :tabHeader="'Gruppe'"
                 />
                 <AccordionBody :item="group" :multiCollapse="false">
-                  <vue-grid
-                    v-show="group.sensors.length != 0"
-                    :groupId="group.id"
-                  />
+                  <vue-grid :groupId="group.id" />
                 </AccordionBody>
               </AccordionItem>
             </Accordion>
