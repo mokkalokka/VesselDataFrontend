@@ -298,7 +298,6 @@ export default {
     });
 
     watchEffect(() => {
-      console.log(currentGroup.groupDate);
       /* console.log(currentGroup.groupDate); */
       if (currentGroup.groupDate) {
         chartOptions.value.chart = {

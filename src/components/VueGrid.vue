@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, watchEffect } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
@@ -99,17 +99,18 @@ export default defineComponent({
       required: true,
     }
   },
-  
+
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
     const groups = useGroups();
-    const currentGroup = groups.value.find((e) => e.id == props.groupId);
+    const currentGroup = ref(groups.value[props.groupId -1])
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
     const updated = ref(1);
     const showMap = ref(false);
+    
 
     /**
      * Toggles the ability to reorder and resize grids.
@@ -124,7 +125,7 @@ export default defineComponent({
      */
     const toggleMap = () => {
       if (!showMap.value) {
-        currentGroup.hoverIndex = 0;
+        currentGroup.value.hoverIndex = 0;
         //Calculates the bottom of the grid and adds the map
         layout.value.push({
           x: 0,
@@ -147,7 +148,7 @@ export default defineComponent({
     const setLayout = () => {
       // Mapping trough the group sensors and adds them to the grid
 
-      layout.value = currentGroup.sensors.map((e) => {
+      layout.value = currentGroup.value.sensors.map((e) => {
         return {
           x: 0,
           y: 0,
@@ -166,12 +167,17 @@ export default defineComponent({
     setLayout();
 
     watch(
-      () => currentGroup.sensors,
+      () => groups.value[props.groupId -1].sensors,
       () => {
+        currentGroup.value = groups.value[props.groupId -1] 
+        
         setLayout();
         showMap.value = false
         updated.value++;
-      }
+      },
+
+      {deep: true}
+
     );
 
     return {
