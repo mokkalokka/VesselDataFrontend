@@ -1,62 +1,95 @@
 <template>
-  <div class="input-group searchgroup mb-3">
-    <input
-      type="text"
-      class="form-control border-end-0"
-      placeholder="Søk etter sensorer..."
-      aria-label="Sensor Name"
-      aria-describedby="sensorsearch-addon"
-      v-model="input"
-    />
-    <span class="input-group-text bg-transparent" id="sensorsearch-addon">
-      <BIconSearch />
-    </span>
-  </div>
-
-  <DataTable :id="'sensorTable'" :hoverable="true" :clickRows="true">
-    <thead>
-      <tr>
-        <th scope="col">
+  <div class="card my-4">
+    <div class="card-header bg-transparent">
+      <div class="row">
+        <div class="col-12 col-xxl-8 col-lg-6 my-lg-3">
+          <div class="input-group searchgroup">
+            <input
+              type="text"
+              class="form-control border-end-0"
+              placeholder="Søk etter sensorer..."
+              aria-label="Sensor Name"
+              aria-describedby="sensorsearch-addon"
+              v-model="input"
+            />
+            <span
+              class="input-group-text bg-transparent"
+              id="sensorsearch-addon"
+            >
+              <BIconSearch />
+            </span>
+          </div>
+        </div>
+        <div class="col-6 col-xxl-2 col-lg-3 col-md-4 my-3 px-2 d-grid">
           <button
             type="button"
-            class="active sort-btn-hover btn bg-transparent shadow-0 border-0"
-            @click="sort"
+            class="btn btn-primary"
+            @click="selectAllSensors"
+            :disabled="selectedSensors.length === sensorNames.length"
           >
-            Sensornavn <BIconArrowDownUp />
+            Velg alle sensorer
           </button>
-        </th>
-        <th scope="col">Beskrivelse</th>
-      </tr>
-    </thead>
-    <tbody
-      data-link="row"
-      class="rowlink"
-      v-for="sensor in sensorPages[activePage]"
-      :key="sensor.id"
-    >
-      <tr
-        v-bind:id="sensor.id"
-        @click="toggleSelectedSensor(sensor)"
-        v-bind:class="{ 'table-active': activeRows.includes(sensor.id) }"
-      >
-        <td>{{ sensor.sensorName }}</td>
-        <td>{{ sensor.description }}</td>
-      </tr>
-    </tbody>
-  </DataTable>
-  <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-      <li v-bind:class="activePage === 0 ? 'page-item disabled' : 'page-item'">
-        <a
-          class="page-link"
-          href="#"
-          aria-label="Previous"
-          @click.prevent="
-            activePage > 0 ? activePage-- : (activePage = activePage)
-          "
+        </div>
+        <div class="col-6 col-xxl-2 col-lg-3 col-md-4 my-3 px-2 d-grid">
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="clearSelectedSensors"
+            :disabled="selectedSensors.length === 0"
+          >
+            Fjern valgte sensorer
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table id="sensorTable" class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th scope="col">
+              <button
+                type="button"
+                class="active sort-btn-hover btn bg-transparent shadow-0 border-0"
+                @click="sort"
+              >
+                Sensornavn <BIconArrowDownUp />
+              </button>
+            </th>
+            <th scope="col">Beskrivelse</th>
+          </tr>
+        </thead>
+        <tbody
+          data-link="row"
+          class="rowlink"
+          v-for="sensor in sensorPages[activePage]"
+          :key="sensor.id"
         >
-          <span aria-hidden="true">&laquo;</span>
-        </a>
+          <tr
+            v-bind:id="sensor.id"
+            @click="toggleSelectedSensor(sensor)"
+            v-bind:class="{ 'table-active': activeRows.includes(sensor.id) }"
+          >
+            <td>{{ sensor.sensorName }}</td>
+            <td>{{ sensor.description }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <li
+          v-bind:class="activePage === 0 ? 'page-item disabled' : 'page-item'"
+        >
+          <a
+            class="page-link"
+            href="#"
+            aria-label="Previous"
+            @click.prevent="
+              activePage > 0 ? activePage-- : (activePage = activePage)
+            "
+          >
+            <span aria-hidden="true">&laquo;</span>
+          </a>
       </li>
       <div v-for="page in sensorPages" :key="sensorPages.indexOf(page)">
         <li
@@ -96,18 +129,21 @@
       </li>
     </ul>
   </nav>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from "vue";
-import { useSelectedSensors } from "@/composables/useSelectedSensors";
+import {
+  useSelectedSensors,
+  resetSelectedSensors,
+} from "@/composables/useSelectedSensors";
 import { Sensor } from "@/Interfaces/sensorInterface";
-import { useTempGroups } from "@/composables/useGroups";
-import DataTable from "@/components/reusable/DataTable.vue";
+import { useTempGroups, resetTempGroups } from "@/composables/useGroups";
 
 export default defineComponent({
   name: "SensorTable",
-  components: { DataTable },
+  // components: { DataTable },
   props: ["sensorNames"],
 
   setup: (props) => {
@@ -192,6 +228,27 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Method for clearing all selected sensors
+     */
+    const clearSelectedSensors = () => {
+      resetSelectedSensors();
+      resetTempGroups();
+      activeRows.value.length = 0;
+    };
+
+    /**
+     * Method for selecting all sensors. If sensors are filtered, only matching sensors will be selected
+     */
+    const selectAllSensors = () => {
+      clearSelectedSensors();
+      sensorPages.value.map((p: Sensor[]) => {
+        p.map((s: Sensor) => {
+          toggleSelectedSensor(s);
+        });
+      });
+    };
+
     return {
       selectedSensors,
       toggleSelectedSensor,
@@ -200,6 +257,8 @@ export default defineComponent({
       activePage,
       input,
       searchFilter,
+      clearSelectedSensors,
+      selectAllSensors,
     };
   },
 });

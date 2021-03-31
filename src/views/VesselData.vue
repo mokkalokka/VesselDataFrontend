@@ -23,31 +23,13 @@
             data-bs-parent="#sensorAccordion"
           >
             <div class="accordion-body">
-              <SensorTable :sensorNames="sensorNames" />
-              <!-- <div  v-if="selectedSensors.length != 0">
-                  <button
-                    class="btn btn-danger"
-                    @click="clearSelectedSensors"
-                  >
-                    Fjern valgte sensorer
-                  </button>
-                </div> -->
-              <div v-show="selectedSensors.length != 0">
-                <div class="d-flex justify-content-center">
-                  <h2>Valgte sensorer</h2>
-                </div>
-                <AddedSensorTable />
-                <div class="d-flex justify-content-center mt-4">
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    data-bs-target=".multi-collapse"
-                    data-bs-toggle="collapse"
-                    aria-controls="sensorTableCollapse graphCollapse"
-                    @click="setSensorsToRender"
-                  >
-                    Vis grafer
-                  </button>
+              <div class="table table-responsive">
+                <SensorTable
+                  :sensorNames="sensorNames"
+                  :selectedSensors="selectedSensors"
+                />
+                <div v-show="selectedSensors.length != 0">
+                  <AddedSensorTable />
                 </div>
               </div>
             </div>
@@ -58,12 +40,12 @@
             <button
               class="accordion-button collapsed"
               type="button"
-              :disabled="!showGraphs"
+              :disabled="groups.length == 0"
               data-bs-toggle="collapse"
               data-bs-target="#graphCollapse"
               aria-expanded="false"
               aria-controls="graphCollapse"
-              v-bind:class="!showGraphs ? 'bg-light' : 'bg-default'"
+              v-bind:class="groups.length == 0 ? 'bg-light' : 'bg-default'"
             >
               Grafer
             </button>
@@ -74,27 +56,9 @@
             v-bind:class="graphToggleClass"
           >
             <div class="accordion-body">
-              <Accordion>
-                <AccordionItem
-                  v-for="group in groups"
-                  :key="group.id"
-                  v-show="group.sensors.length != 0"
-                >
-                  <AccordionHeader
-                    :item="group"
-                    :headerId="group.id"
-                    :tabHeader="'Gruppe'"
-                  />
-                  <AccordionBody :item="group">
-                    <div v-if="showGraphs" :key="sensorListUpdated">
-                      <vue-grid
-                        v-show="group.sensors.length != 0"
-                        :group="group"
-                      />
-                    </div>
-                  </AccordionBody>
-                </AccordionItem>
-              </Accordion>
+              <div v-for="group in groups" :key="group.id">
+                <vue-grid v-show="group.sensors.length != 0" :groupId="group.id" />
+              </div>
             </div>
           </div>
         </div>
@@ -110,25 +74,22 @@ import {
   resetSelectedSensors,
   useSelectedSensors,
 } from "@/composables/useSelectedSensors";
-import { resetGroups, useGroups, useTempGroups } from "@/composables/useGroups";
+import {
+  resetGroups,
+  resetTempGroups,
+  useGroups,
+  useTempGroups,
+} from "@/composables/useGroups";
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
 import lodash from "lodash";
-import Accordion from "@/components/reusable/accordion/Accordion.vue";
-import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
-import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
-import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
 
 export default defineComponent({
   components: {
     /* LineGraph, */ SensorTable,
     /* Map */ VueGrid,
     AddedSensorTable,
-    Accordion,
-    AccordionItem,
-    AccordionHeader,
-    AccordionBody,
   },
   name: "VesselData",
   setup() {
@@ -137,9 +98,6 @@ export default defineComponent({
 
     // boolean variable to determine if sensor layout selection should be shown
     const showSensorData = ref(false as boolean);
-
-    // boolean variable to determine if graph grid should be shown
-    const showGraphs = ref(false as boolean);
 
     // search query for graphs
     const graphFilter = ref("" as string);
@@ -159,6 +117,7 @@ export default defineComponent({
     // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
     const graphToggleClass = ref("accordion-collapse collapse multi-collapse");
 
+    resetTempGroups();
     resetGroups();
     resetSelectedSensors();
 
@@ -170,16 +129,6 @@ export default defineComponent({
           graphToggleClass.value = "accordion-collapse collapse";
         });
     });
-
-    /**
-     * Method to evoke when sensors are selected and grapsh should be shown. Sets chosen group configuration.
-     */
-    const setSensorsToRender = () => {
-      sensorListUpdated.value++;
-      /* groups.value = [...tempGroups.value]; */
-      groups.value = lodash.cloneDeep(tempGroups.value);
-      showGraphs.value = true;
-    };
 
     /**
      * Method for filtering graphs on sensorName
@@ -197,10 +146,8 @@ export default defineComponent({
 
     return {
       showSensorData,
-      showGraphs,
       sensorNames,
       selectedSensors,
-      setSensorsToRender,
       graphFilter,
       graphActive,
       filter,
