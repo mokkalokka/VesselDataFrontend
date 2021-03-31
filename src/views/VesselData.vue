@@ -57,7 +57,7 @@
           >
             <div class="accordion-body">
               <div v-for="group in groups" :key="group.id">
-                <vue-grid v-show="group.sensors.length != 0" :group="group" />
+                <vue-grid v-show="group.sensors.length != 0" :groupId="group.id" />
               </div>
             </div>
           </div>

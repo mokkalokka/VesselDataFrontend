@@ -72,7 +72,12 @@ export default {
     LPolyline,
     LMarker,
   },
-  props: ["group"],
+   props: {
+    group: {
+      type: Object,
+      required: true,
+    }
+  },
 
   setup(props) {
     const zoom = ref(7);

@@ -1,7 +1,7 @@
 <template>
   <div class="h-100 w-100">
     <div class="content">
-      <h1 class="text-center">Gruppe {{ group.id }}</h1>
+      <h1 class="text-center">Gruppe {{ currentGroup.id }}</h1>
       <div class="row">
         <div
           class="form-check form-switch col m-auto d-flex justify-content-center"
@@ -31,11 +31,11 @@
           >
         </div>
         <div
-          v-if="group.sensors.length > 1"
+          v-if="currentGroup.sensors.length > 1"
           class="form-check form-switch col m-auto d-flex justify-content-center"
         >
           <input
-            :checked="group.groupDate"
+            :checked="currentGroup.groupDate"
             @click="currentGroup.groupDate = !currentGroup.groupDate"
             class="form-check-input"
             type="checkbox"
@@ -70,10 +70,10 @@
             v-if="item.i != 9999999"
             :sensorNames="item.sensorNames"
             :sensorIds="item.sensorIds"
-            :group="group"
+            :groupId="currentGroup.id"
           />
           <div v-if="item.i == 9999999" class="card h-100 v-100">
-            <Map :group="group" />
+            <Map :group="currentGroup" />
           </div>
         </grid-item>
       </grid-layout>
@@ -92,13 +92,19 @@ import { useGroups } from "@/composables/useGroups";
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
-  props: ["group"],
-
+  
+  props: {
+    groupId: {
+      type: Number,
+      required: true,
+    }
+  },
+  
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
     const groups = useGroups();
-    const currentGroup = groups.value.find((e) => e.id == props.group.id);
+    const currentGroup = groups.value.find((e) => e.id == props.groupId);
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
@@ -141,7 +147,7 @@ export default defineComponent({
     const setLayout = () => {
       // Mapping trough the group sensors and adds them to the grid
 
-      layout.value = props.group.sensors.map((e) => {
+      layout.value = currentGroup.sensors.map((e) => {
         return {
           x: 0,
           y: 0,
@@ -160,7 +166,7 @@ export default defineComponent({
     setLayout();
 
     watch(
-      () => props.group.sensors,
+      () => currentGroup.sensors,
       () => {
         setLayout();
         showMap.value = false

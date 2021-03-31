@@ -6,9 +6,9 @@
         id="chart-line2"
         v-bind:class="{
           'h-100':
-            !showTimeLine || (group.groupDate && group.sensors.length != 1),
+            !showTimeLine || (currentGroup.groupDate && currentGroup.sensors.length != 1),
           'h-75':
-            showTimeLine && (!group.groupDate || group.sensors.length == 1),
+            showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1),
         }"
       >
         <apexchart
@@ -19,7 +19,7 @@
         ></apexchart>
       </div>
       <div
-        v-if="showTimeLine && (!group.groupDate || group.sensors.length == 1)"
+        v-if="showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1)"
         id="chart-line"
         class="h-25 container"
       >
@@ -71,7 +71,7 @@
             >
           </div>
           <div
-            v-if="!group.groupDate || group.sensors.length == 1"
+            v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
             class="form-check form-switch col d-flex justify-content-center"
           >
             <input
@@ -108,17 +108,19 @@ export default {
       type: Array[Number],
       required: true,
     },
-    group: {
-      type: Object,
+    groupId: {
+      type: Number,
       required: true,
     },
   },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
+    const groups = useGroups();
+    const currentGroup = groups.value.find((e) => e.id == props.groupId);
     const res = ref([[], []]);
     const series = ref([]);
-    const showTimeLine = ref(!props.group.groupDate);
+    const showTimeLine = ref(!currentGroup.groupDate);
     const showStatistics = ref(false);
     const showGraphs = ref(false);
     const time = ref([]);
@@ -126,7 +128,7 @@ export default {
     const updated = ref(0);
     const chartId =
       "chart-group=" +
-      props.group.id +
+      currentGroup.id +
       "-sensors=[" +
       props.sensorIds.toString() +
       "]-#";
@@ -134,8 +136,6 @@ export default {
     let minVal = 0;
     let avarage = 0;
     let stdDeviation = 0;
-    const groups = useGroups();
-    const currentGroup = groups.value.find((e) => e.id == props.group.id);
 
     /* const forceZoom = (xaxis) => {
       console.log("zooming!");
@@ -178,7 +178,7 @@ export default {
           }
         },
         id: chartId + "1",
-        /* group: "group-" + props.group.id, */
+        /* group: "group-" + currentGroup.id, */
         type: "line",
         toolbar: {
           autoSelected: "zoom",
@@ -298,11 +298,12 @@ export default {
     });
 
     watchEffect(() => {
-      /* console.log(props.group.groupDate); */
-      if (props.group.groupDate) {
+      console.log(currentGroup.groupDate);
+      /* console.log(currentGroup.groupDate); */
+      if (currentGroup.groupDate) {
         chartOptions.value.chart = {
           ...chartOptions.value.chart,
-          ...{ group: "group-" + props.group.id + "-1" },
+          ...{ group: "group-" + currentGroup.id + "-1" },
         };
         chartOptions.value = {
           ...chartOptions.value,
@@ -312,7 +313,7 @@ export default {
         chartOptions.value = {
           ...chartOptions.value,
         };
-        //group: "group-" + props.group.id + "-1",
+        //group: "group-" + currentGroup.id + "-1",
       }
       updated.value++;
     });
@@ -470,6 +471,7 @@ export default {
       showGraphs,
       numberOfSensors,
       updated,
+      currentGroup
     };
   },
 };
