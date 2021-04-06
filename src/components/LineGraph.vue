@@ -24,14 +24,15 @@
         class="h-25 container"
       >
         <div class="row">
-          <div class="col m-auto">
+          <div class="col-1 p-0 d-flex justify-content-around">
             <button
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary w-100 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time tilbake"
+              
             >
-              <BIconPlus />
+              +
             </button>
           </div>
           <div class="col-10">
@@ -42,14 +43,14 @@
               :series="series"
             ></apexchart>
           </div>
-          <div class="col m-auto">
+          <div class="col-1 p-0 d-flex justify-content-around">
             <button
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary w-100 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time frem"
             >
-              <BIconPlus />
+              +
             </button>
           </div>
         </div>

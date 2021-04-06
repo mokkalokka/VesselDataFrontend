@@ -50,8 +50,8 @@
       <grid-layout
         :key="updated"
         v-model:layout="layout"
-        :col-num="12"
-        :row-height="200"
+        :col-num="3"
+        :row-height="400"
         :is-draggable="draggable"
         :is-resizable="resizable"
         :vertical-compact="compact"
@@ -142,7 +142,7 @@ export default defineComponent({
           y:
             layout.value[layout.value.length - 1].y +
             layout.value[layout.value.length - 1].h,
-          w: 12,
+          w: 3,
           h: 3,
           i: 9999999,
           sensorName: "map",
@@ -162,8 +162,8 @@ export default defineComponent({
         return {
           x: 0,
           y: 0,
-          w: 12,
-          h: 2,
+          w: 3,
+          h: 1,
           i: e.id,
           sensorIds: [...e.sensorsToCompare].concat(e.id),
           sensorNames: selectedSensors.value
