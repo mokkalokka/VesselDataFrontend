@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="container p-1">
   <div class="about">
     <h1>About Sintef Ocean</h1>
     <h3>SINTEF Ocean conducts research and innovation related to ocean space for national and international industries. Our ambition is to continue Norways leading position in marine technology and biomarine research.</h3>

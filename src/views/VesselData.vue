@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container p-1">
     <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
     <div class="card my-4">
       <div class="accordion accordion-flush" id="sensorAccordion">
@@ -57,7 +57,10 @@
           >
             <div class="accordion-body">
               <div v-for="group in groups" :key="group.id">
-                <vue-grid v-show="group.sensors.length != 0" :groupId="group.id" />
+                <vue-grid
+                  v-show="group.sensors.length != 0"
+                  :groupId="group.id"
+                />
               </div>
             </div>
           </div>
@@ -167,5 +170,18 @@ export default defineComponent({
 .graphSearch {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
+}
+
+@media only screen and (min-width: 720px) {
+  .container {
+    width: 90% !important;
+    max-width: 90% !important;
+  }
+}
+@media only screen and (max-width: 720px) {
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 </style>
