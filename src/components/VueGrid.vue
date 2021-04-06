@@ -66,14 +66,25 @@
           :h="item.h"
           :i="item.i"
         >
-          <line-graph
-            v-if="item.i != 9999999"
-            :sensorNames="item.sensorNames"
-            :sensorIds="item.sensorIds"
-            :groupId="currentGroup.id"
-          />
-          <div v-if="item.i == 9999999" class="card h-100 v-100">
-            <Map :group="currentGroup" />
+          <div class="v-100 h-100" v-if="!draggable">
+            <line-graph
+              v-if="item.i != 9999999"
+              :sensorNames="item.sensorNames"
+              :sensorIds="item.sensorIds"
+              :groupId="currentGroup.id"
+            />
+            <div v-if="item.i == 9999999" class="card h-100 v-100">
+              <Map :group="currentGroup" />
+            </div>
+          </div>
+          <div class="v-100 h-100" v-else>
+            <div
+              class="w-100 h-100 card bg-light d-flex justify-content-center"
+            >
+              <h1 class="text-center">
+                {{ item.i != 9999999 ? item.sensorNames[0] : "Map" }}
+              </h1>
+            </div>
           </div>
         </grid-item>
       </grid-layout>
@@ -92,25 +103,24 @@ import { useGroups } from "@/composables/useGroups";
 export default defineComponent({
   name: "VueGrid",
   components: { LineGraph, Map },
-  
+
   props: {
     groupId: {
       type: Number,
       required: true,
-    }
+    },
   },
 
   setup(props) {
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
     const groups = useGroups();
-    const currentGroup = ref(groups.value[props.groupId -1])
+    const currentGroup = ref(groups.value[props.groupId - 1]);
     const draggable = ref(false);
     const resizable = ref(false);
     const compact = true;
     const updated = ref(1);
     const showMap = ref(false);
-    
 
     /**
      * Toggles the ability to reorder and resize grids.
@@ -167,17 +177,16 @@ export default defineComponent({
     setLayout();
 
     watch(
-      () => groups.value[props.groupId -1].sensors,
+      () => groups.value[props.groupId - 1].sensors,
       () => {
-        currentGroup.value = groups.value[props.groupId -1] 
-        
+        currentGroup.value = groups.value[props.groupId - 1];
+
         setLayout();
-        showMap.value = false
+        showMap.value = false;
         updated.value++;
       },
 
-      {deep: true}
-
+      { deep: true }
     );
 
     return {
@@ -189,7 +198,7 @@ export default defineComponent({
       toggleMap,
       updated,
       currentGroup,
-      showMap
+      showMap,
     };
   },
 });
@@ -212,12 +221,13 @@ export default defineComponent({
   columns: 120px;
 }
 
-.vue-resizable-handle {
+.vue-grid-item > .vue-resizable-handle {
   z-index: 5000;
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 20%;
+  height: 20%;
   bottom: 0;
+  background-size: 20%;
   right: 0;
   box-sizing: border-box;
   cursor: se-resize;
