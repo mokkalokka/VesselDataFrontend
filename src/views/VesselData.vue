@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container p-1">
     <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
     <div class="accordion" id="sensorAccordion">
       <div class="accordion-item">
@@ -181,5 +181,18 @@ export default defineComponent({
 .graphSearch {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
+}
+
+@media only screen and (min-width: 720px) {
+  .container {
+    width: 90% !important;
+    max-width: 90% !important;
+  }
+}
+@media only screen and (max-width: 720px) {
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 </style>

@@ -44,8 +44,8 @@
       <grid-layout
         :key="updated"
         v-model:layout="layout"
-        :col-num="12"
-        :row-height="200"
+        :col-num="3"
+        :row-height="400"
         :is-draggable="draggable"
         :is-resizable="resizable"
         :vertical-compact="compact"
@@ -60,14 +60,25 @@
           :h="item.h"
           :i="item.i"
         >
-          <line-graph
-            v-if="item.i != 9999999"
-            :sensorNames="item.sensorNames"
-            :sensorIds="item.sensorIds"
-            :groupId="currentGroup.id"
-          />
-          <div v-if="item.i == 9999999" class="card h-100 v-100">
-            <Map :group="currentGroup" />
+          <div class="v-100 h-100" v-if="!draggable">
+            <line-graph
+              v-if="item.i != 9999999"
+              :sensorNames="item.sensorNames"
+              :sensorIds="item.sensorIds"
+              :groupId="currentGroup.id"
+            />
+            <div v-if="item.i == 9999999" class="card h-100 v-100">
+              <Map :group="currentGroup" />
+            </div>
+          </div>
+          <div class="v-100 h-100" v-else>
+            <div
+              class="w-100 h-100 card bg-light d-flex justify-content-center"
+            >
+              <h1 class="text-center">
+                {{ item.i != 9999999 ? item.sensorNames[0] : "Map" }}
+              </h1>
+            </div>
           </div>
         </grid-item>
       </grid-layout>
@@ -126,7 +137,7 @@ export default defineComponent({
           y:
             layout.value[layout.value.length - 1].y +
             layout.value[layout.value.length - 1].h,
-          w: 12,
+          w: 3,
           h: 3,
           i: 9999999,
           sensorName: "map",
@@ -146,8 +157,8 @@ export default defineComponent({
         return {
           x: 0,
           y: 0,
-          w: 12,
-          h: 2,
+          w: 3,
+          h: 1,
           i: e.id,
           sensorIds: [...e.sensorsToCompare].concat(e.id),
           sensorNames: selectedSensors.value
@@ -205,12 +216,13 @@ export default defineComponent({
   columns: 120px;
 }
 
-.vue-resizable-handle {
+.vue-grid-item > .vue-resizable-handle {
   z-index: 5000;
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 20%;
+  height: 20%;
   bottom: 0;
+  background-size: 20%;
   right: 0;
   box-sizing: border-box;
   cursor: se-resize;

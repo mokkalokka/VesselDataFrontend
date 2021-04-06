@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container p-1">
     <div class="card mt-4 border-0">
       <div class="card-header bg-transparent">
         <h1 class="justify-content-center">Your settings</h1>

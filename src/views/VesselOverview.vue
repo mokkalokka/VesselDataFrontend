@@ -1,6 +1,6 @@
 
 <template>
-  <div class="container-sm p-1">
+  <div class="container p-1">
     <VesselDatatable/>
   </div>
 </template>
