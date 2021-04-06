@@ -29,7 +29,7 @@
             <tbody>
               <tr>
                 <td>
-                  <div class="form-check form-switch">
+                  <!-- <div class="form-check form-switch">
                     <input
                       class="form-check-input"
                       type="checkbox"
@@ -38,14 +38,14 @@
                       :disabled="group.sensors.length == 1"
                     />
                     <label class="form-check-label"> Datovisning </label>
-                  </div>
-                  <!-- <ToggleButton
-                          :id="'formCheckShowDate' + group.id"
-                          :checkedValue="true"
-                          :click="toggleDate(group)"
-                        >
-                          Datovisning
-                        </ToggleButton> -->
+                  </div> -->
+                  <ToggleButton
+                    :id="'formCheckShowDate' + group.id"
+                    :checkedValue="true"
+                    @toggle="toggleDate(group)"
+                  >
+                    Datovisning
+                  </ToggleButton>
                 </td>
                 <td>
                   <input
@@ -270,7 +270,7 @@ import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
 import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
 import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
 import DataTable from "@/components/reusable/DataTable.vue";
-//import ToggleButton from '@/components/reusable/ToggleButton.vue';
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default defineComponent({
   name: "AddedSensorTable",
@@ -280,6 +280,7 @@ export default defineComponent({
     AccordionHeader,
     AccordionBody,
     DataTable,
+    ToggleButton,
   },
 
   setup: () => {

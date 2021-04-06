@@ -22,10 +22,7 @@
           data-bs-parent="#sensorAccordion"
         >
           <div class="accordion-body">
-            <SensorTable
-              :sensorNames="sensorNames"
-              :selectedSensors="selectedSensors"
-            />
+            <SensorTable :sensorNames="sensorNames" />
             <div v-show="selectedSensors.length != 0">
               <AddedSensorTable />
             </div>

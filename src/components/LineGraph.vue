@@ -62,18 +62,18 @@
       <div class="container">
         <div class="row">
           <ToggleButton
+            v-if="numberOfSensors == 1"
             :id="'flexSwitchCheckStats'"
             :checkedValue="false"
-            :click="toggleStatistics"
-            v-if="numberOfSensors == 1"
+            @toggle="toggleStatistics"
           >
             Vis statistikk
           </ToggleButton>
           <ToggleButton
+            v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
             :id="'flexSwitchCheckTimeline'"
             :checkedValue="showTimeLine"
-            :click="toggleTimeLine"
-            v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
+            @toggle="toggleTimeLine"
           >
             Vis tidslinje
           </ToggleButton>

@@ -3,20 +3,21 @@
     <div class="content pt-3">
       <div class="row">
         <ToggleButton
-          :checkedValue="false"
-          :click="toggleReorder"
           :id="'flexSwitchCheckReorder'"
+          :checkedValue="false"
+          @toggle="toggleReorder"
         >
           Manuell omorganisering
         </ToggleButton>
+
         <ToggleButton
-          :checkedValue="showMap"
-          :click="toggleMap"
           :id="'flexSwitchCheckMap'"
+          :checkedValue="showMap"
+          @toggle="toggleMap"
         >
           Vis kart
         </ToggleButton>
-        <div
+        <!-- <div
           class="form-check form-switch col m-auto d-flex justify-content-center"
         >
           <input
@@ -29,15 +30,15 @@
           <label class="form-check-label ms-2" for="flexSwitchCheckDefault">
             Syncronize charts</label
           >
-        </div>
-        <!-- <ToggleButton
-        v-if="currentGroup.sensors.length > 1"
-        :checkedValue="currentGroup.groupDate"
-        :click="currentGroup.groupDate = !currentGroup.groupDate"
-        :id="'flexSwitchCheckSynchronize'"
+        </div> -->
+        <ToggleButton
+          v-if="currentGroup.sensors.length > 1"
+          :id="'flexSwitchCheckSynchronize'"
+          :checkedValue="currentGroup.groupDate"
+          @toggle="currentGroup.groupDate = !currentGroup.groupDate"
         >
-        Synkroniser grafer
-        </ToggleButton> -->
+          Synkroniser grafer
+        </ToggleButton>
       </div>
 
       <grid-layout
