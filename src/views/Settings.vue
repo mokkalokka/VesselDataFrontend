@@ -1,5 +1,5 @@
 <template>
-  <div class="container p-1">
+  <div class="container-md p-1">
     <div class="card mt-4 border-0">
       <div class="card-header bg-transparent">
         <h1 class="justify-content-center">Your settings</h1>
@@ -22,27 +22,61 @@
           <tbody>
             <tr>
               <td>
-                <p>{{settings[0]["description"]}}</p>
+                <p>{{ settings[0]["description"] }}</p>
               </td>
               <td>
-                <button id="lightbutton" type="button"  v-bind:class='[settings[0]["light"] === true ? "btn btn-secondary" : "btn btn-outline-secondary"]' @click='settings[0]["light"] = true'>Light</button>
-                <button id= "darkbutton" type="button"  v-bind:class='[settings[0]["light"] === false ? "btn btn-dark" : "btn btn-outline-dark"]' @click='settings[0]["light"] = false'>Dark</button>
+                <button
+                  id="lightbutton"
+                  type="button"
+                  v-bind:class="[
+                    settings[0]['light'] === true
+                      ? 'btn btn-secondary'
+                      : 'btn btn-outline-secondary',
+                  ]"
+                  @click="settings[0]['light'] = true"
+                >
+                  Light
+                </button>
+                <button
+                  id="darkbutton"
+                  type="button"
+                  v-bind:class="[
+                    settings[0]['light'] === false
+                      ? 'btn btn-dark'
+                      : 'btn btn-outline-dark',
+                  ]"
+                  @click="settings[0]['light'] = false"
+                >
+                  Dark
+                </button>
               </td>
             </tr>
             <tr>
               <td>
-                <p>{{settings[1]["description"]}}</p>
+                <p>{{ settings[1]["description"] }}</p>
               </td>
               <td>
-                  <input type="text" :value='settings[1]["value"]' class="form-control" aria-label="default vessel input" aria-describedby="vessel-default">
+                <input
+                  type="text"
+                  :value="settings[1]['value']"
+                  class="form-control"
+                  aria-label="default vessel input"
+                  aria-describedby="vessel-default"
+                />
               </td>
             </tr>
             <tr>
               <td>
-                <p>{{settings[2]["description"]}}</p>
+                <p>{{ settings[2]["description"] }}</p>
               </td>
               <td>
-                  <input type="text" :value='settings[2]["value"]' class="form-control" aria-label="def num data points per hour" aria-describedby="points-default">
+                <input
+                  type="text"
+                  :value="settings[2]['value']"
+                  class="form-control"
+                  aria-label="def num data points per hour"
+                  aria-describedby="points-default"
+                />
               </td>
             </tr>
           </tbody>
@@ -63,7 +97,6 @@ export default defineComponent({
   name: "Settings",
 
   setup() {
-
     let settings = reactive([
       { description: "Color theme", light: true },
       { description: "Default vessel", value: "None" },
@@ -75,7 +108,7 @@ export default defineComponent({
       { description: "Default vessel", value: "None" },
       { description: "Default number of datapoints per hour", value: "60" },
     ]);
-    
+
     const saved = ref(false);
     const reverted = ref(false);
 
