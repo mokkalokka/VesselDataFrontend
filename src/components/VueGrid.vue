@@ -138,7 +138,7 @@ export default defineComponent({
             layout.value[layout.value.length - 1].y +
             layout.value[layout.value.length - 1].h,
           w: 3,
-          h: 3,
+          h: 2,
           i: 9999999,
           sensorName: "map",
         });

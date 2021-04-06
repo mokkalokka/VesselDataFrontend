@@ -29,13 +29,14 @@
         class="h-25 container"
       >
         <div class="row">
-          <div class="col-1 p-0 d-flex justify-content-around">
+          <div
+            class="col-1 p-0 d-flex justify-content-around align-items-center"
+          >
             <button
-              class="btn btn-outline-primary w-100 text-center"
+              class="btn btn-outline-primary h-50 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time tilbake"
-              
             >
               +
             </button>
@@ -48,9 +49,11 @@
               :series="series"
             ></apexchart>
           </div>
-          <div class="col-1 p-0 d-flex justify-content-around">
+          <div
+            class="col-1 p-0 d-flex justify-content-around align-items-center"
+          >
             <button
-              class="btn btn-outline-primary w-100 text-center"
+              class="btn btn-outline-primary h-50 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time frem"
