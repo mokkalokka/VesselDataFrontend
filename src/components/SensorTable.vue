@@ -208,10 +208,24 @@ export default defineComponent({
       if (activeRows.value.includes(sensor.id)) {
         activeRows.value.splice(activeRows.value.indexOf(sensor.id), 1);
         selectedSensors.value.splice(selectedSensors.value.indexOf(sensor), 1);
-        tempGroups.value[sensor.group - 1].sensors.splice(
-          tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
-          1
-        );
+
+        // If the sensor is in the group remove it
+        if (tempGroups.value[sensor.group - 1].sensors.includes(sensor)) {
+          tempGroups.value[sensor.group - 1].sensors.splice(
+            tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
+            1
+          );
+        }
+        // If the sensor is not in the group remove it from sensorsToCompare
+        else {
+          tempGroups.value[sensor.group - 1].sensors.map((s) => {
+            const temp = new Set(s.sensorsToCompare);
+            if (temp.has(sensor.id)) {
+              temp.delete(sensor.id);
+              s.sensorsToCompare = [...temp];
+            }
+          });
+        }
         sensor.group = 1;
       } else {
         activeRows.value.push(sensor.id);
