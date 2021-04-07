@@ -6,20 +6,33 @@
         id="chart-line2"
         v-bind:class="{
           'h-100':
-            !showTimeLine || (currentGroup.groupDate && currentGroup.sensors.length != 1),
+            !showTimeLine ||
+            (currentGroup.groupDate && currentGroup.sensors.length != 1),
           'h-75':
-            showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1),
+            showTimeLine &&
+            (!currentGroup.groupDate || currentGroup.sensors.length == 1),
         }"
       >
+        <p
+          class="text-center"
+          data-toggle="tooltip"
+          data-placement="top"
+          :title="sensorNames.toString()"
+        >
+          {{ getGraphTitle }}
+        </p>
         <apexchart
           type="line"
-          height="100%"
+          height="90%"
           :options="chartOptions"
           :series="series"
         ></apexchart>
       </div>
       <div
-        v-if="showTimeLine && (!currentGroup.groupDate || currentGroup.sensors.length == 1)"
+        v-if="
+          showTimeLine &&
+          (!currentGroup.groupDate || currentGroup.sensors.length == 1)
+        "
         id="chart-line"
         class="h-25 container"
       >
@@ -30,7 +43,6 @@
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time tilbake"
-              
             >
               +
             </button>
@@ -94,7 +106,7 @@
 
 <script>
 import { useSensorData } from "@/composables/useSensorData";
-import { ref, watchEffect } from "vue";
+import { ref, watchEffect, computed } from "vue";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
 
@@ -153,7 +165,7 @@ export default {
             currentGroup.zoomedFromDateTime = new Date(xaxis.min);
             currentGroup.zoomedToDateTime = new Date(xaxis.max);
           },
-          beforeZoom: function (chartContext, { xaxis, yaxis }) { 
+          beforeZoom: function (chartContext, { xaxis, yaxis }) {
             if (
               new Date(xaxis.min) < new Date(time.value[0]) ||
               new Date(xaxis.max) > new Date(time.value[-1])
@@ -169,14 +181,14 @@ export default {
               return {
                 xaxis: {
                   min: xaxis.min,
-                  max: xaxis.max
+                  max: xaxis.max,
                 },
               };
             }
           },
-          mouseMove: function (event, chartContext, config){ 
-            currentGroup.hoverIndex = config.dataPointIndex
-          }
+          mouseMove: function (event, chartContext, config) {
+            currentGroup.hoverIndex = config.dataPointIndex;
+          },
         },
         id: chartId + "1",
         /* group: "group-" + currentGroup.id, */
@@ -197,10 +209,10 @@ export default {
       stroke: {
         width: 1,
       },
-      title: {
+      /* title: {
         text: props.sensorNames.map((e) => e.toString()),
         align: "center",
-      },
+      }, */
 
       dataLabels: {
         enabled: false,
@@ -460,6 +472,29 @@ export default {
       showTimeLine.value = !showTimeLine.value;
     };
 
+    /**
+     * Get graph title
+     */
+
+    const getGraphTitle = computed(() => {
+      let title = "";
+      let sensorOverflow = 0;
+      props.sensorNames.map((e, index) => {
+        if (index < 2) {
+          if (index != props.sensorNames.length - 1) {
+            title += e + ", ";
+          } else {
+            title += e;
+          }
+        } else {
+          sensorOverflow++;
+        }
+      });
+      return (
+        title + (sensorOverflow > 0 ? " + " + sensorOverflow + " more" : "")
+      );
+    });
+
     return {
       chartOptions,
       chartOptionsLine,
@@ -471,7 +506,8 @@ export default {
       showGraphs,
       numberOfSensors,
       updated,
-      currentGroup
+      currentGroup,
+      getGraphTitle,
     };
   },
 };
