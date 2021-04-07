@@ -3,59 +3,18 @@ import App from './App.vue'
 import router from './router'
 
 import VueGridLayout from 'vue-grid-layout'
+import Multiselect from "@vueform/multiselect";
+import VueApexCharts from "vue3-apexcharts";
+import { BIconArrowDownUp, BIconSearch } from 'bootstrap-icons-vue';
 
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BIconArrowDownUp, BIconPlus } from 'bootstrap-icons-vue';
-import { BIconSearch } from 'bootstrap-icons-vue';
-
-
-import PrimeVue from 'primevue/config';
-
-import 'primevue/resources/themes/saga-blue/theme.css'       //theme
-import 'primevue/resources/primevue.min.css'                 //core css
-import 'primeicons/primeicons.css'                           //icons
-import "primevue/resources/themes/saga-blue/theme.css"
-import "primevue/resources/primevue.min.css"
-import "primeicons/primeicons.css"
-import 'primeflex/primeflex.css';
-
-import DataTable from "primevue/datatable"
-import Column from 'primevue/column';
-import ColumnGroup from 'primevue/columngroup';
-import InputText from "primevue/inputtext"
-import Card from 'primevue/card';
-import Button from 'primevue/button';
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
-import Chart from 'primevue/chart';
-import Slider from 'primevue/slider'
-import Calendar from 'primevue/calendar';
-import CheckBox from 'primevue/checkbox'
-
-import Multiselect from "@vueform/multiselect";
-import VueApexCharts from "vue3-apexcharts";
-
 
 createApp(App)
     .use(router)
-    .use(PrimeVue)
     .use(VueApexCharts)
     .use(VueGridLayout)
     .component("Multiselect", Multiselect)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("BIconSearch", BIconSearch)
-    .component("BIconPlus", BIconPlus)
-    .component("DataTable", DataTable)
-    .component("Column", Column)
-    .component("Card", Card)
-    .component("Button", Button)
-    .component("ColumnGroup", ColumnGroup)
-    .component("InputText", InputText)
-    .component("Accordion", Accordion)
-    .component("AccordionTab", AccordionTab)
-    .component("Chart", Chart)
-    .component("Slider", Slider)
-    .component("Calendar", Calendar)
-    .component("CheckBox", CheckBox)
     .mount('#app')

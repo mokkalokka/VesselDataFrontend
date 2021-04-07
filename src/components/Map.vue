@@ -1,11 +1,6 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <div
-      :key="zoomedPositionUpdated"
-      :style="
-        showPosition ? 'height: 80%; width: 100%' : 'height: 90%; width: 100%'
-      "
-    >
+    <div :key="zoomedPositionUpdated" :style="'height: 90%; width: 100%'">
       <l-map
         v-model="zoom"
         v-model:zoom="zoom"
@@ -43,7 +38,8 @@
       <Slider
         class="mx-4"
         v-model="sliderValue"
-        :disabled="false"
+        :tooltips="false"
+        :disabled="true"
         :min="min"
         :max="max"
       />
@@ -151,9 +147,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .leaflet-container {
   background: white;
+}
+.slider-handle-lower {
+  cursor: grab;
 }
 </style>
 <style src="@vueform/slider/themes/default.css"></style>
