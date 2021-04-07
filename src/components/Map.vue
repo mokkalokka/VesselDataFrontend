@@ -35,13 +35,12 @@
         <p>{{ new Date(position[sliderValue][2]).toLocaleString() }}</p>
       </div>
 
-      <Slider
+      <VueSlider
         class="mx-4"
         v-model="sliderValue"
-        :tooltips="false"
-        :disabled="true"
         :min="min"
         :max="max"
+        :tooltip="'none'"
       />
     </div>
     <div v-else>
@@ -60,7 +59,8 @@ import {
 import "leaflet/dist/leaflet.css";
 import { ref, watchEffect } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
-import Slider from "@vueform/slider";
+import VueSlider from "vue-slider-component";
+import "vue-slider-component/theme/antd.css";
 
 export default {
   components: {
@@ -69,7 +69,7 @@ export default {
     LControlLayers,
     LPolyline,
     LMarker,
-    Slider,
+    VueSlider,
   },
   props: {
     group: {
@@ -151,8 +151,4 @@ export default {
 .leaflet-container {
   background: white;
 }
-.slider-handle-lower {
-  cursor: grab;
-}
 </style>
-<style src="@vueform/slider/themes/default.css"></style>
