@@ -17,16 +17,16 @@
         </div>
       </div>
     </div>
-    <div class="card-body pt-0">
+    <div class="card-body p-0">
       <div
-        class="row py-2 boatrow border-top"
+        class="row py-2 px-0 boatrow border-top"
         v-for="vessel in vessels"
         :vessel="vessel"
         :key="vessel.name"
         v-show="filter(vessel)"
         @click="routeToVessel(vessel)"
       >
-        <div class="col">
+        <div class="col ps-2">
           {{ vessel.name }}
         </div>
       </div>
@@ -101,13 +101,13 @@ a {
   font-weight: 400;
 }
 
-.boatrow {
+/* .boatrow {
   font-size: 20px;
-}
+} */
 
 .boatrow:hover {
   cursor: pointer;
-  background-color: rgb(224, 224, 224);
-  border-radius: 5px;
+  background-color: rgb(236, 236, 236);
+  /* border-radius: 5px; */
 }
 </style>
