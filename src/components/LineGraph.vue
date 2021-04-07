@@ -97,7 +97,7 @@
 
 <script>
 import { useSensorData } from "@/composables/useSensorData";
-import { ref, watchEffect, computed } from "vue";
+import { ref, watchEffect, computed, watch } from "vue";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
 import ToggleButton from "@/components/reusable/ToggleButton.vue";
@@ -324,32 +324,39 @@ export default {
       updated.value++;
     });
 
-    // Fetching data and setting up the chart
-    fetchData().then(() => {
-      res.value = getSensorDataById([...props.sensorIds]);
-      time.value = res.value[0];
+    const fetchSensorData = () => {
+      series.value = [];
+      // Fetching data and setting up the chart
+      fetchData().then(() => {
+        res.value = getSensorDataById([...props.sensorIds]);
+        time.value = res.value[0];
 
-      // adding all the sensors into the series
-      res.value.map((s, index) => {
-        if (index != 0) {
-          numberOfSensors.value++;
-          series.value.push({
-            name: props.sensorNames[index - 1],
-            data: time.value.map((e, i) => {
-              return [time.value[i], s[i]];
-            }),
-          });
-        }
+        // adding all the sensors into the series
+        res.value.map((s, index) => {
+          if (index != 0) {
+            numberOfSensors.value++;
+            series.value.push({
+              name: props.sensorNames[index - 1],
+              data: time.value.map((e, i) => {
+                return [time.value[i], s[i]];
+              }),
+            });
+          }
+        });
+
+        showGraphs.value = true;
+
+        /* Analyse data */
+        maxVal = max(res.value[1]);
+        minVal = min(res.value[1]);
+        avarage = mean(res.value[1]);
+        stdDeviation = std(res.value[1]);
+
+        updated.value++;
       });
+    };
 
-      showGraphs.value = true;
-
-      /* Analyse data */
-      maxVal = max(res.value[1]);
-      minVal = min(res.value[1]);
-      avarage = mean(res.value[1]);
-      stdDeviation = std(res.value[1]);
-    });
+    fetchSensorData();
 
     /**
      * Toggles the graph statistics.
@@ -484,10 +491,19 @@ export default {
           sensorOverflow++;
         }
       });
-      return (
-        title + (sensorOverflow > 0 ? " + " + sensorOverflow + " more" : "")
-      );
+      return title + (sensorOverflow > 0 ? " + " + sensorOverflow : "");
     });
+
+    /**
+     * Fetch data from server if props change
+     */
+    watch(
+      () => props.sensorNames,
+      () => {
+        console.log(props.sensorNames);
+        fetchSensorData();
+      }
+    );
 
     return {
       chartOptions,
