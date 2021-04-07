@@ -43,7 +43,7 @@
       <Slider
         class="mx-4"
         v-model="sliderValue"
-        :step="1"
+        :disabled="false"
         :min="min"
         :max="max"
       />
@@ -64,6 +64,8 @@ import {
 import "leaflet/dist/leaflet.css";
 import { ref, watchEffect } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
+import Slider from "@vueform/slider";
+
 export default {
   components: {
     LMap,
@@ -71,12 +73,13 @@ export default {
     LControlLayers,
     LPolyline,
     LMarker,
+    Slider,
   },
-   props: {
+  props: {
     group: {
       type: Object,
       required: true,
-    }
+    },
   },
 
   setup(props) {
@@ -151,3 +154,4 @@ export default {
   background: white;
 }
 </style>
+<style src="@vueform/slider/themes/default.css"></style>

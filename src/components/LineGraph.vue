@@ -197,6 +197,7 @@ export default {
           autoSelected: "zoom",
           show: true,
         },
+
         animations: {
           enabled: false,
         },
@@ -209,16 +210,14 @@ export default {
       stroke: {
         width: 1,
       },
-      /* title: {
-        text: props.sensorNames.map((e) => e.toString()),
-        align: "center",
-      }, */
-
       dataLabels: {
         enabled: false,
       },
       fill: {
         opacity: 1,
+      },
+      theme: {
+        palette: "palette6", // upto palette10
       },
       markers: {
         size: 0,
@@ -272,10 +271,9 @@ export default {
         selection: {
           enabled: true,
         },
-        /* toolbar: {
-          autoSelected: "selection",
-          show: false,
-        }, */
+        animations: {
+          enabled: false,
+        },
       },
       legend: {
         show: false,
@@ -286,6 +284,9 @@ export default {
           opacityFrom: 0.91,
           opacityTo: 0.1,
         },
+      },
+      markers: {
+        size: 0,
       },
       xaxis: {
         type: "datetime",
