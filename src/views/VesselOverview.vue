@@ -1,14 +1,14 @@
 
 <template>
-  <div class="container p-1">
-    <VesselDatatable/>
+  <div class="container-md p-1">
+    <VesselDatatable />
   </div>
 </template>
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import VesselDatatable from '@/components/VesselDatatable.vue';
+import { defineComponent } from "vue";
+import VesselDatatable from "@/components/VesselDatatable.vue";
 
 export default defineComponent({
   components: {

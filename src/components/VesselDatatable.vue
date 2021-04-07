@@ -1,43 +1,36 @@
 <template>
   <div class="card mt-4">
-    <table class="table m-0 table-bordered table-hover">
-      <thead>
-        <tr>
-          <th>
-            <div class="row">
-              <div class="col-md-9 order-1 order-md-0">
-                <button
-                  type="button"
-                  class="btn btn-outline-primary"
-                  @click="sort"
-                >
-                  Navn <BIconArrowDownUp />
-                </button>
-              </div>
-              <div class="col-md-3 mb-2 mb-md-0">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Fartøy navn"
-                  v-model="input"
-                />
-              </div>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody data-link="row" class="rowlink">
-        <tr v-for="vessel in vessels" :vessel="vessel" :key="vessel.name">
-          <td
-            scope="row"
-            v-show="filter(vessel)"
-            @click="routeToVessel(vessel)"
-          >
-            {{ vessel.name }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="card-header bg-transparent shadow-0 border-0">
+      <div class="row">
+        <div class="col-md-9 order-1 order-md-0">
+          <button type="button" class="btn btn-outline-primary" @click="sort">
+            Navn <BIconArrowDownUp />
+          </button>
+        </div>
+        <div class="col-md-3 mb-2 mb-md-0">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Fartøy navn"
+            v-model="input"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="card-body pt-0">
+      <div
+        class="row py-2 boatrow border-top"
+        v-for="vessel in vessels"
+        :vessel="vessel"
+        :key="vessel.name"
+        v-show="filter(vessel)"
+        @click="routeToVessel(vessel)"
+      >
+        <div class="col">
+          {{ vessel.name }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -108,7 +101,13 @@ a {
   font-weight: 400;
 }
 
-td:hover {
+.boatrow {
+  font-size: 20px;
+}
+
+.boatrow:hover {
   cursor: pointer;
+  background-color: rgb(224, 224, 224);
+  border-radius: 5px;
 }
 </style>

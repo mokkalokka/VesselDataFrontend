@@ -37,9 +37,11 @@
         class="h-25 container"
       >
         <div class="row">
-          <div class="col-1 p-0 d-flex justify-content-around">
+          <div
+            class="col-1 p-0 d-flex justify-content-around align-items-center"
+          >
             <button
-              class="btn btn-outline-primary w-100 text-center"
+              class="btn btn-outline-primary h-50 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time tilbake"
@@ -55,9 +57,11 @@
               :series="series"
             ></apexchart>
           </div>
-          <div class="col-1 p-0 d-flex justify-content-around">
+          <div
+            class="col-1 p-0 d-flex justify-content-around align-items-center"
+          >
             <button
-              class="btn btn-outline-primary w-100 text-center"
+              class="btn btn-outline-primary h-50 text-center"
               data-toggle="tooltip"
               data-placement="top"
               title="Hent 1 time frem"
@@ -69,35 +73,22 @@
       </div>
       <div class="container">
         <div class="row">
-          <div
+          <ToggleButton
             v-if="numberOfSensors == 1"
-            class="form-check form-switch col d-flex justify-content-center"
+            :id="'flexSwitchCheckStats'"
+            :checkedValue="false"
+            @toggle="toggleStatistics"
           >
-            <input
-              @click="toggleStatistics"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Statistics</label
-            >
-          </div>
-          <div
+            Vis statistikk
+          </ToggleButton>
+          <ToggleButton
             v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
-            class="form-check form-switch col d-flex justify-content-center"
+            :id="'flexSwitchCheckTimeline'"
+            :checkedValue="showTimeLine"
+            @toggle="toggleTimeLine"
           >
-            <input
-              :checked="showTimeLine"
-              @click="toggleTimeLine"
-              class="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckDefault"
-            />
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              Show Timeline</label
-            >
-          </div>
+            Vis tidslinje
+          </ToggleButton>
         </div>
       </div>
     </div>
@@ -109,6 +100,7 @@ import { useSensorData } from "@/composables/useSensorData";
 import { ref, watchEffect, computed } from "vue";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default {
   name: "LineGraph",
@@ -126,6 +118,7 @@ export default {
       required: true,
     },
   },
+  components: { ToggleButton },
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
@@ -150,11 +143,11 @@ export default {
     let avarage = 0;
     let stdDeviation = 0;
 
-    /* const forceZoom = (xaxis) => {
+    /*     const forceZoom = (fromDateTime, toDateTime) => {
       console.log("zooming!");
       console.log("From: " + new Date(xaxis.min));
       console.log("To: " + new Date(xaxis.max));
-      window.ApexCharts.exec(chartId + "1", "zoomX", (xaxis.min, xaxis.max));
+      window.ApexCharts.exec(chartId + "1", "zoomX", (fromDateTime, toDateTime));
     } */
 
     // Setting up the chart options

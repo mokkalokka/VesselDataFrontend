@@ -92,6 +92,7 @@ export default {
     const zoomedPosition = ref([60], [2]);
     const zoomedPositionUpdated = ref(0);
     const showPosition = ref(false);
+    const dataLoaded = ref(false);
 
     /**
      * Fetches data and sets the position array, max and min position
@@ -105,6 +106,7 @@ export default {
       max.value = position.value.length - 1;
       if (position.value.length > 1) {
         showPosition.value = true;
+        dataLoaded.value = true;
       }
     });
 
@@ -112,7 +114,7 @@ export default {
      * Watches for changes in zoomedDateTime to make a line of the zoomed position
      */
     watchEffect(() => {
-      if (props.group.zoomedFromDateTime) {
+      if (props.group.zoomedFromDateTime && dataLoaded.value) {
         zoomedPositionUpdated.value++;
         zoomedPosition.value = getPosition(
           props.group.zoomedFromDateTime,

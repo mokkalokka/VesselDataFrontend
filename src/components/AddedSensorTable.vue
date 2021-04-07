@@ -2,276 +2,261 @@
   <div class="d-flex justify-content-center">
     <h2>Valgte sensorer</h2>
   </div>
-  <div class="card mt-4">
-    <form @submit.prevent="setSensorsToRender" id="form">
-      <div class="accordion p-0 accordion-flush">
-        <div
-          class="accordion-item"
-          v-for="group in tempGroups"
-          :key="group.id"
-          v-show="group.sensors.length != 0"
-        >
-          <h2 class="accordion-header" :id="'heading' + group.id">
-            <button
-              class="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              :data-bs-target="'#collapse' + group.id"
-              aria-expanded="true"
-              :aria-controls="'collapse' + group.id"
-            >
-              Gruppe {{ group.id }}
-            </button>
-          </h2>
-          <div
-            :id="'collapse' + group.id"
-            class="accordion-collapse collapse show"
-            :aria-labelledby="'heading' + group.id"
-          >
-            <div class="accordion-body p-0">
-              <div class="d-flex justify-content-center">
-                <h5 class="my-3" text-center>Instillinger for gruppen</h5>
-              </div>
-
-              <div class="table-responsive">
-                <table class="table m-0 table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Datovisning</th>
-                      <th>Dato fra</th>
-                      <th>Dato til</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="form-check form-switch">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            checked
-                            @click="group.groupDate = !group.groupDate"
-                            :disabled="group.sensors.length == 1"
-                          />
-                          <label class="form-check-label"> Datovisning </label>
-                        </div>
-                      </td>
-                      <td>
-                        <input
-                          type="date"
-                          class="form-control"
-                          v-model="group.fromDate"
-                          :disabled="!group.groupDate"
-                          :max="group.toDate"
-                          @change="
-                            updateGroupSensorsDateTime(group);
-                            validateGroupTime(group);
-                            checkIfValidInput();
-                          "
-                          :required="group.groupDate"
-                        />
-                        <input
-                          type="time"
-                          :id="'groupFromTime' + group.id"
-                          class="form-control"
-                          v-model="group.fromTime"
-                          step="1"
-                          :disabled="!group.groupDate"
-                          :max="
-                            group.fromDate == group.toDate ? group.toTime : ''
-                          "
-                          @blur="
-                            updateGroupSensorsDateTime(group);
-                            validateGroupTime(group);
-                            checkIfValidInput();
-                          "
-                          :required="group.groupDate"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="date"
-                          class="form-control"
-                          v-model="group.toDate"
-                          :disabled="!group.groupDate"
-                          :min="group.fromDate"
-                          @change="
-                            updateGroupSensorsDateTime(group);
-                            validateGroupTime(group);
-                            checkIfValidInput();
-                          "
-                          :required="group.groupDate"
-                        />
-                        <input
-                          type="time"
-                          :id="'groupToTime' + group.id"
-                          class="form-control"
-                          v-model="group.toTime"
-                          step="1"
-                          :disabled="!group.groupDate"
-                          :min="
-                            group.fromDate == group.toDate ? group.fromTime : ''
-                          "
-                          @blur="
-                            updateGroupSensorsDateTime(group);
-                            validateGroupTime(group);
-                            checkIfValidInput();
-                          "
-                          :required="group.groupDate"
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="d-flex justify-content-center">
-                <h5 class="my-3" text-center>Instillinger for sensorene</h5>
-              </div>
-              <div class="table-responsive">
-                <table class="table m-0 table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Sensor</th>
-                      <th>Dato fra</th>
-                      <th>Dato til</th>
-                      <th>Gruppe</th>
-                      <th>Sammenlign med</th>
-                      <th>Graftype</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="sensor in group.sensors" :key="sensor.id">
-                      <td>{{ sensor.sensorName }}</td>
-                      <td>
-                        <input
-                          type="date"
-                          class="form-control"
-                          v-model="sensor.fromDate"
-                          :disabled="group.groupDate"
-                          :max="sensor.toDate"
-                          :required="!group.groupDate"
-                          @change="
-                            updateDateTime(sensor);
-                            checkIfValidInput();
-                            validateSensorTime(sensor);
-                          "
-                        />
-                        <input
-                          type="time"
-                          :id="'sensorFromTime' + sensor.id"
-                          class="form-control"
-                          v-model="sensor.fromTime"
-                          step="1"
-                          :disabled="group.groupDate"
-                          :max="
-                            sensor.fromDate == sensor.toDate
-                              ? sensor.toTime
-                              : ''
-                          "
-                          :required="!group.groupDate"
-                          @blur="
-                            updateDateTime(sensor);
-                            checkIfValidInput();
-                            validateSensorTime(sensor);
-                          "
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="date"
-                          class="form-control"
-                          v-model="sensor.toDate"
-                          :disabled="group.groupDate"
-                          :min="sensor.fromDate"
-                          :required="!group.groupDate"
-                          @change="
-                            updateDateTime(sensor);
-                            checkIfValidInput();
-                            validateSensorTime(sensor);
-                          "
-                        />
-                        <input
-                          type="time"
-                          :id="'sensorToTime' + sensor.id"
-                          class="form-control"
-                          v-model="sensor.toTime"
-                          step="1"
-                          :disabled="group.groupDate"
-                          :min="
-                            sensor.fromDate == sensor.toDate
-                              ? sensor.fromTime
-                              : ''
-                          "
-                          :required="!group.groupDate"
-                          @blur="
-                            updateDateTime(sensor);
-                            checkIfValidInput();
-                            validateSensorTime(sensor);
-                          "
-                        />
-                      </td>
-                      <td>
-                        <select @change="addSensorToGroup(sensor, $event)">
-                          <option
-                            :value="group.id"
-                            v-for="group in tempGroups"
-                            :key="group.id"
-                            :selected="true ? sensor.group == group.id : false"
-                          >
-                            {{ group.id }}
-                          </option>
-                          <option :value="tempGroups.length + 1">
-                            Legg til ny gruppe
-                          </option>
-                        </select>
-                      </td>
-                      <td>
-                        <Multiselect
-                          :searchable="true"
-                          :createTag="false"
-                          mode="tags"
-                          v-model="sensor.sensorsToCompare"
-                          :options="filterSensors(sensor, group)"
-                          @change="updateCurrent(sensor, group)"
-                          @input="addAllDeselectedSensorsToGroup"
-                          @select="removeSelectedSensorFromGroup"
-                          @deselect="addDeselectedSensorToGroup"
-                        />
-                      </td>
-                      <td>
-                        <select class="form-select" v-model="sensor.graphType">
-                          <option
-                            v-for="graphType in graphTypes"
-                            :key="graphType.value"
-                          >
-                            {{ graphType.type }}
-                          </option>
-                        </select>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+  <form @submit.prevent="setSensorsToRender" id="form">
+    <Accordion>
+      <AccordionItem
+        v-for="group in tempGroups"
+        :key="group.id"
+        v-show="group.sensors.length != 0"
+      >
+        <AccordionHeader
+          :item="group"
+          :headerId="group.id"
+          :tabHeader="'Gruppe'"
+        />
+        <AccordionBody :item="group" :multiCollapse="false">
+          <div class="d-flex justify-content-center">
+            <h5 class="my-3" text-center>Instillinger for gruppen</h5>
           </div>
-        </div>
-      </div>
-      <div class="d-flex justify-content-center mt-4">
-        <button
-          type="submit"
-          class="btn btn-outline-primary"
-          :data-bs-target="isInputsValid ? '.multi-collapse' : ''"
-          :data-bs-toggle="isInputsValid ? 'collapse' : ''"
-          :aria-controls="
-            isInputsValid ? 'sensorTableCollapse graphCollapse' : ''
-          "
-        >
-          Vis grafer
-        </button>
-      </div>
-    </form>
-  </div>
+          <DataTable :id="'groupSettingsTable'" :hoverable="false">
+            <thead>
+              <tr>
+                <th>Datovisning</th>
+                <th>Dato fra</th>
+                <th>Dato til</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <!-- <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      checked
+                      @click="group.groupDate = !group.groupDate"
+                      :disabled="group.sensors.length == 1"
+                    />
+                    <label class="form-check-label"> Datovisning </label>
+                  </div> -->
+                  <ToggleButton
+                    :id="'formCheckShowDate' + group.id"
+                    :checkedValue="true"
+                    @toggle="toggleDate(group)"
+                  >
+                    Datovisning
+                  </ToggleButton>
+                </td>
+                <td>
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="group.fromDate"
+                    :disabled="!group.groupDate"
+                    :max="group.toDate"
+                    @change="
+                      updateGroupSensorsDateTime(group);
+                      validateGroupTime(group);
+                      checkIfValidInput();
+                    "
+                    :required="group.groupDate"
+                  />
+                  <input
+                    type="time"
+                    :id="'groupFromTime' + group.id"
+                    class="form-control"
+                    v-model="group.fromTime"
+                    step="1"
+                    :disabled="!group.groupDate"
+                    :max="group.fromDate == group.toDate ? group.toTime : ''"
+                    @blur="
+                      updateGroupSensorsDateTime(group);
+                      validateGroupTime(group);
+                      checkIfValidInput();
+                    "
+                    :required="group.groupDate"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="group.toDate"
+                    :disabled="!group.groupDate"
+                    :min="group.fromDate"
+                    @change="
+                      updateGroupSensorsDateTime(group);
+                      validateGroupTime(group);
+                      checkIfValidInput();
+                    "
+                    :required="group.groupDate"
+                  />
+                  <input
+                    type="time"
+                    :id="'groupToTime' + group.id"
+                    class="form-control"
+                    v-model="group.toTime"
+                    step="1"
+                    :disabled="!group.groupDate"
+                    :min="group.fromDate == group.toDate ? group.fromTime : ''"
+                    @blur="
+                      updateGroupSensorsDateTime(group);
+                      validateGroupTime(group);
+                      checkIfValidInput();
+                    "
+                    :required="group.groupDate"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </DataTable>
+          <!-- </table>
+              </div> -->
+          <div class="d-flex justify-content-center">
+            <h5 class="my-3" text-center>Instillinger for sensorene</h5>
+          </div>
+          <!-- <div class="table-responsive">
+                <table class="table m-0 table-bordered"> -->
+          <DataTable :id="'sensorSettingsTable'" :hoverable="false">
+            <thead>
+              <tr>
+                <th>Sensor</th>
+                <th>Dato fra</th>
+                <th>Dato til</th>
+                <th>Gruppe</th>
+                <th>Sammenlign med</th>
+                <th>Graftype</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sensor in group.sensors" :key="sensor.id">
+                <td>{{ sensor.sensorName }}</td>
+                <td>
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="sensor.fromDate"
+                    :disabled="group.groupDate"
+                    :max="sensor.toDate"
+                    :required="!group.groupDate"
+                    @change="
+                      updateDateTime(sensor);
+                      checkIfValidInput();
+                      validateSensorTime(sensor);
+                    "
+                  />
+                  <input
+                    type="time"
+                    :id="'sensorFromTime' + sensor.id"
+                    class="form-control"
+                    v-model="sensor.fromTime"
+                    step="1"
+                    :disabled="group.groupDate"
+                    :max="sensor.fromDate == sensor.toDate ? sensor.toTime : ''"
+                    :required="!group.groupDate"
+                    @blur="
+                      updateDateTime(sensor);
+                      checkIfValidInput();
+                      validateSensorTime(sensor);
+                    "
+                  />
+                </td>
+                <td>
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="sensor.toDate"
+                    :disabled="group.groupDate"
+                    :min="sensor.fromDate"
+                    :required="!group.groupDate"
+                    @change="
+                      updateDateTime(sensor);
+                      checkIfValidInput();
+                      validateSensorTime(sensor);
+                    "
+                  />
+                  <input
+                    type="time"
+                    :id="'sensorToTime' + sensor.id"
+                    class="form-control"
+                    v-model="sensor.toTime"
+                    step="1"
+                    :disabled="group.groupDate"
+                    :min="
+                      sensor.fromDate == sensor.toDate ? sensor.fromTime : ''
+                    "
+                    :required="!group.groupDate"
+                    @blur="
+                      updateDateTime(sensor);
+                      checkIfValidInput();
+                      validateSensorTime(sensor);
+                    "
+                  />
+                </td>
+                <td>
+                  <select @change="addSensorToGroup(sensor, $event)">
+                    <option
+                      :value="group.id"
+                      v-for="group in tempGroups"
+                      :key="group.id"
+                      :selected="true ? sensor.group == group.id : false"
+                    >
+                      {{ group.id }}
+                    </option>
+                    <option :value="tempGroups.length + 1">
+                      Legg til ny gruppe
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <Multiselect
+                    :searchable="true"
+                    :createTag="false"
+                    mode="tags"
+                    v-model="sensor.sensorsToCompare"
+                    :options="filterSensors(sensor, group)"
+                    @change="updateCurrent(sensor, group)"
+                    @input="addAllDeselectedSensorsToGroup"
+                    @select="removeSelectedSensorFromGroup"
+                    @deselect="addDeselectedSensorToGroup"
+                  />
+                </td>
+                <td>
+                  <select class="form-select" v-model="sensor.graphType">
+                    <option
+                      v-for="graphType in graphTypes"
+                      :key="graphType.value"
+                    >
+                      {{ graphType.type }}
+                    </option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </DataTable>
+          <!-- </table>
+              </div> -->
+        </AccordionBody>
+        <!-- </div>
+          </div> -->
+      </AccordionItem>
+    </Accordion>
+    <div class="d-flex justify-content-center mt-4">
+      <button
+        type="submit"
+        class="btn btn-outline-primary"
+        :data-bs-target="isInputsValid ? '.multi-collapse' : ''"
+        :data-bs-toggle="isInputsValid ? 'collapse' : ''"
+        :aria-controls="
+          isInputsValid ? 'sensorTableCollapse graphCollapse' : ''
+        "
+      >
+        Vis grafer
+      </button>
+    </div>
+  </form>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
@@ -280,9 +265,23 @@ import { Sensor } from "@/Interfaces/sensorInterface";
 import { Group } from "@/Interfaces/groupInterface";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import lodash from "lodash";
+import Accordion from "@/components/reusable/accordion/Accordion.vue";
+import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
+import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
+import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
+import DataTable from "@/components/reusable/DataTable.vue";
+import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default defineComponent({
   name: "AddedSensorTable",
+  components: {
+    Accordion,
+    AccordionItem,
+    AccordionHeader,
+    AccordionBody,
+    DataTable,
+    ToggleButton,
+  },
 
   setup: () => {
     // selected sensors from SensorTable.
@@ -559,6 +558,14 @@ export default defineComponent({
       groups.value = lodash.cloneDeep(tempGroups.value);
     };
 
+    const toggleDate = (group: Group) => {
+      if (group.groupDate) {
+        group.groupDate = false;
+      } else {
+        group.groupDate = true;
+      }
+    };
+
     return {
       graphTypes,
       filterSensors,
@@ -575,6 +582,7 @@ export default defineComponent({
       isInputsValid,
       validateGroupTime,
       validateSensorTime,
+      toggleDate,
     };
   },
 });
