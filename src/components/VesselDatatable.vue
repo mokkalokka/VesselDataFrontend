@@ -19,7 +19,7 @@
     </div>
     <div class="card-body p-0">
       <div
-        class="row py-2 px-0 boatrow border-top"
+        class="row py-2 mx-0 boatrow border-top"
         v-for="vessel in vessels"
         :vessel="vessel"
         :key="vessel.name"
