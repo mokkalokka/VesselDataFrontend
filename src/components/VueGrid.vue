@@ -11,6 +11,7 @@
         </ToggleButton>
 
         <ToggleButton
+          v-if="!resizable"
           :id="'flexSwitchCheckMap'"
           :checkedValue="showMap"
           @toggle="toggleMap"

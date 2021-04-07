@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <div :key="zoomedPositionUpdated" :style="'height: 90%; width: 100%'">
+    <div :style="'height: 85%; width: 100%'">
       <l-map
         v-model="zoom"
         v-model:zoom="zoom"
