@@ -135,11 +135,11 @@ export default {
     let avarage = 0;
     let stdDeviation = 0;
 
-    /* const forceZoom = (xaxis) => {
+    /*     const forceZoom = (fromDateTime, toDateTime) => {
       console.log("zooming!");
       console.log("From: " + new Date(xaxis.min));
       console.log("To: " + new Date(xaxis.max));
-      window.ApexCharts.exec(chartId + "1", "zoomX", (xaxis.min, xaxis.max));
+      window.ApexCharts.exec(chartId + "1", "zoomX", (fromDateTime, toDateTime));
     } */
 
     // Setting up the chart options

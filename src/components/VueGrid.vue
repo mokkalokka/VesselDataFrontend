@@ -17,20 +17,6 @@
         >
           Vis kart
         </ToggleButton>
-        <!-- <div
-          class="form-check form-switch col m-auto d-flex justify-content-center"
-        >
-          <input
-            :checked="currentGroup.groupDate"
-            @click="currentGroup.groupDate = !currentGroup.groupDate"
-            class="form-check-input"
-            type="checkbox"
-            id="flexSwitchCheckDefault"
-          />
-          <label class="form-check-label ms-2" for="flexSwitchCheckDefault">
-            Syncronize charts</label
-          >
-        </div> -->
         <ToggleButton
           v-if="currentGroup.sensors.length > 1"
           :id="'flexSwitchCheckSynchronize'"
@@ -42,15 +28,16 @@
       </div>
 
       <grid-layout
-        :key="updated"
         v-model:layout="layout"
-        :col-num="3"
-        :row-height="400"
+        :col-num="GRID_COLUMNS"
+        :row-height="GRID_HEIGHT"
         :is-draggable="draggable"
         :is-resizable="resizable"
-        :vertical-compact="compact"
-        :use-css-transforms="true"
+        :vertical-compact="true"
+        :margin="[GRID_MARGIN, GRID_MARGIN]"
+        v-bind:style="{ height: gridLayoutHeight + 'px' }"
       >
+        <!-- :use-css-transforms="true" -->
         <grid-item
           v-for="(item, index) in layout"
           :key="index"
@@ -60,7 +47,7 @@
           :h="item.h"
           :i="item.i"
         >
-          <div class="v-100 h-100" v-if="!draggable">
+          <div class="v-100 h-100" v-show="!draggable">
             <line-graph
               v-if="item.i != 9999999"
               :sensorNames="item.sensorNames"
@@ -71,7 +58,7 @@
               <Map :group="currentGroup" />
             </div>
           </div>
-          <div class="v-100 h-100" v-else>
+          <div class="v-100 h-100" v-show="draggable">
             <div
               class="w-100 h-100 card bg-light d-flex justify-content-center"
             >
@@ -87,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch, computed } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
 import LineGraph from "@/components/LineGraph.vue";
 import Map from "@/components/Map.vue";
@@ -113,10 +100,27 @@ export default defineComponent({
     const currentGroup = ref(groups.value[props.groupId - 1]);
     const draggable = ref(false);
     const resizable = ref(false);
-    const compact = true;
-    const updated = ref(1);
     const showMap = ref(false);
 
+    // Grid setup
+    const GRID_HEIGHT = 400;
+    const GRID_MARGIN = 10;
+    const GRID_COLUMNS = 3;
+
+    /**
+     * Computed value for grid height in terms of number of grids and map + margins
+     */
+    const gridLayoutHeight = computed(() => {
+      if (layout.value.length > 0) {
+        const numberOfGridsHeights =
+          layout.value[layout.value.length - 1].y + (showMap.value ? 2 : 1);
+        const marginOffset = GRID_MARGIN * (numberOfGridsHeights + 1);
+
+        return numberOfGridsHeights * GRID_HEIGHT + marginOffset;
+      } else {
+        return GRID_HEIGHT;
+      }
+    });
     /**
      * Toggles the ability to reorder and resize grids.
      */
@@ -147,7 +151,6 @@ export default defineComponent({
         layout.value.splice(layout.value.indexOf({ sensorName: "map" }), 1);
       }
       showMap.value = !showMap.value;
-      updated.value++;
     };
 
     const setLayout = () => {
@@ -178,7 +181,6 @@ export default defineComponent({
 
         setLayout();
         showMap.value = false;
-        updated.value++;
       },
 
       { deep: true }
@@ -188,63 +190,29 @@ export default defineComponent({
       layout,
       draggable,
       resizable,
-      compact,
       toggleReorder,
       toggleMap,
-      updated,
       currentGroup,
       showMap,
+      gridLayoutHeight,
+      GRID_HEIGHT,
+      GRID_MARGIN,
+      GRID_COLUMNS,
     };
   },
 });
 </script>
 
 <style>
-.content {
-  width: 100%;
-}
-
-.layoutJSON {
-  border: 1px solid black;
-  margin-top: 10px;
-  padding: 10px;
-}
-
-.columns {
-  -moz-columns: 120px;
-  -webkit-columns: 120px;
-  columns: 120px;
-}
-
 .vue-grid-item > .vue-resizable-handle {
   z-index: 5000;
   position: absolute;
-  width: 20%;
-  height: 20%;
+  width: 1vw;
+  height: 1vw;
   bottom: 0;
-  background-size: 20%;
+  background-size: 1vw;
   right: 0;
   box-sizing: border-box;
   cursor: se-resize;
-}
-
-.vue-grid-item.resizing {
-  opacity: 0.9;
-}
-
-.vue-grid-item .text {
-  font-size: 24px;
-  text-align: center;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  height: 24px;
-}
-
-.vue-grid-item .minMax {
-  font-size: 12px;
 }
 </style>
