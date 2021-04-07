@@ -68,58 +68,86 @@
       </tr>
     </tbody>
   </DataTable>
-  <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center mt-3">
-      <li v-bind:class="activePage === 0 ? 'page-item disabled' : 'page-item'">
-        <a
-          class="page-link"
-          href="#"
-          aria-label="Previous"
-          @click.prevent="
-            activePage > 0 ? activePage-- : (activePage = activePage)
-          "
-        >
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <div v-for="page in sensorPages" :key="sensorPages.indexOf(page)">
-        <li
-          v-bind:class="
-            sensorPages.indexOf(page) === activePage
-              ? 'page-item active'
-              : 'page-item'
-          "
-        >
-          <a
-            class="page-link"
-            href="#"
-            @click.prevent="activePage = sensorPages.indexOf(page)"
-            >{{ sensorPages.indexOf(page) + 1 }}</a
+
+  <div class="row">
+    <div class="col"></div>
+    <div class="col">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center mt-3">
+          <li
+            v-bind:class="activePage === 0 ? 'page-item disabled' : 'page-item'"
           >
-        </li>
+            <a
+              class="page-link"
+              href="#"
+              aria-label="Previous"
+              @click.prevent="
+                activePage > 0 ? activePage-- : (activePage = activePage)
+              "
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <div v-for="page in sensorPages" :key="sensorPages.indexOf(page)">
+            <li
+              v-bind:class="
+                sensorPages.indexOf(page) === activePage
+                  ? 'page-item active'
+                  : 'page-item'
+              "
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="activePage = sensorPages.indexOf(page)"
+                >{{ sensorPages.indexOf(page) + 1 }}</a
+              >
+            </li>
+          </div>
+          <li
+            v-bind:class="
+              activePage === sensorPages.length - 1
+                ? 'page-item disabled'
+                : 'page-item'
+            "
+          >
+            <a
+              class="page-link"
+              href="#"
+              aria-label="Next"
+              @click.prevent="
+                activePage < sensorPages.length - 1
+                  ? activePage++
+                  : (activePage = activePage)
+              "
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="col my-auto">
+      <div class="row">
+        <div class="col d-flex justify-content-end my-auto">
+          <label for="sensorsPerPageSelect">Sensorer per side:</label>
+        </div>
+        <div class="col d-flex justify-content-start">
+          <select
+            id="sensorsPerPageSelect"
+            v-model.number="sensorsPerPage"
+            class="form-select"
+          >
+            <option>5</option>
+            <option>10</option>
+            <option>15</option>
+            <option :value="sensorNames.length">Vis alle</option>
+          </select>
+        </div>
       </div>
-      <li
-        v-bind:class="
-          activePage === sensorPages.length - 1
-            ? 'page-item disabled'
-            : 'page-item'
-        "
-      >
-        <a
-          class="page-link"
-          href="#"
-          aria-label="Next"
-          @click.prevent="
-            activePage < sensorPages.length - 1
-              ? activePage++
-              : (activePage = activePage)
-          "
-        >
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -160,6 +188,9 @@ export default defineComponent({
     // temporary groups for settings
     const tempGroups = useTempGroups();
 
+    // sensors per page
+    const sensorsPerPage = ref(10);
+
     /**
      * Method for filtering sensors
      * @param {Sensor} sensor - sensor to match filter string on (match on either name or description).
@@ -183,7 +214,7 @@ export default defineComponent({
       sensorPages.value.length = 0;
       sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
 
-      const size = 10;
+      const size = sensorsPerPage.value;
       const subArrSize: number = Math.ceil(sensors.value.length / size);
 
       for (let i = 0; i < subArrSize; i++) {
@@ -275,6 +306,7 @@ export default defineComponent({
       searchFilter,
       clearSelectedSensors,
       selectAllSensors,
+      sensorsPerPage,
     };
   },
 });
