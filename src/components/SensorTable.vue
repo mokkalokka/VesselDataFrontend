@@ -211,10 +211,20 @@ export default defineComponent({
 
         // If the sensor is in the group remove it
         if (tempGroups.value[sensor.group - 1].sensors.includes(sensor)) {
-          tempGroups.value[sensor.group - 1].sensors.splice(
-            tempGroups.value[sensor.group - 1].sensors.indexOf(sensor),
-            1
-          );
+          const indexOfSensor = tempGroups.value[
+            sensor.group - 1
+          ].sensors.indexOf(sensor);
+
+          // Add the back the sensors to the group from the removed sensors sensorToCompare array
+          sensor.sensorsToCompare.map((id) => {
+            tempGroups.value[0].sensors.push(
+              selectedSensors.value.find((s) => s.id == id)
+            );
+          });
+
+          sensor.sensorsToCompare = [];
+
+          tempGroups.value[sensor.group - 1].sensors.splice(indexOfSensor, 1);
         }
         // If the sensor is not in the group remove it from sensorsToCompare
         else {
