@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="/"
         ><h3 class="navbar-brand">
@@ -97,9 +97,14 @@ export default {};
 
 
 <style scoped lang="scss">
-.navbar {
-  /*  height: 10vh; */
+
+@media only screen and (min-width: 768px) {
+  .navbar {
+    height: 10vh;
+  }
 }
+
+
 
 .navbar-light .navbar-brand h3 {
   color: hsl(204deg 100% 20%);
