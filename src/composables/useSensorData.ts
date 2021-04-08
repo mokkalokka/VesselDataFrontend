@@ -39,15 +39,21 @@ export function useSensorData() {
         sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))
     }
 
-    function getSensorDataById(sensorIds: number[]) {
+    function getSensorDataById(sensorIds: number[], pointsPerMinute: number) {
         //Adds time 
         sensorIds.unshift(0)
 
         // Extract the sensors from the response
-        const sensors = sensorIds.map(id => Object.values(response.value[id])[0]) as [Date[],]
+        let sensors = sensorIds.map(id => Object.values(response.value[id])[0]) as any[][]
+
+        const decimation = (sensors[0].length / 60) / pointsPerMinute
 
         // Parse dates
         sensors[0] = sensors[0].map(t => new Date(t))
+
+        // Modulus filter
+        sensors = sensors.map(e => e.filter((_, index) => index % decimation == 0))
+
         return sensors
     }
 
@@ -69,6 +75,7 @@ export function useSensorData() {
                 pos.value.push([lat[index], lon[index], time[index]])
             }
         })
+
         /* console.log(position.value.length) */
         return pos
 
