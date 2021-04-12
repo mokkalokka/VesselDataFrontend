@@ -11,6 +11,7 @@
         </ToggleButton>
 
         <ToggleButton
+          v-if="!resizable"
           :id="'flexSwitchCheckMap'"
           :checkedValue="showMap"
           @toggle="toggleMap"
@@ -25,6 +26,25 @@
         >
           Synkroniser grafer
         </ToggleButton>
+        <div class="col">
+          <div class="row">
+            <div class="col d-flex justify-content-end my-auto">
+              <label for="pointsPerMinuteSelect">Punkter per minutt:</label>
+            </div>
+            <div class="col mx-3 d-flex justify-content-start">
+              <select
+                id="pointsPerMinuteSelect"
+                v-model.number="pointsPerMinute"
+                class="form-select"
+              >
+                <option>5</option>
+                <option>15</option>
+                <option>30</option>
+                <option :value="60">Vis alle</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
 
       <grid-layout
@@ -53,9 +73,10 @@
               :sensorNames="item.sensorNames"
               :sensorIds="item.sensorIds"
               :groupId="currentGroup.id"
+              :pointsPerMinute="pointsPerMinute"
             />
             <div v-if="item.i == 9999999" class="card h-100 v-100">
-              <Map :group="currentGroup" />
+              <Map :group="currentGroup" :pointsPerMinute="pointsPerMinute" />
             </div>
           </div>
           <div class="v-100 h-100" v-show="draggable">
@@ -101,11 +122,12 @@ export default defineComponent({
     const draggable = ref(false);
     const resizable = ref(false);
     const showMap = ref(false);
+    const pointsPerMinute = ref(60);
 
     // Grid setup
     const GRID_HEIGHT = 400;
     const GRID_MARGIN = 10;
-    const GRID_COLUMNS = 3;
+    const GRID_COLUMNS = 4;
 
     /**
      * Computed value for grid height in terms of number of grids and map + margins
@@ -141,7 +163,7 @@ export default defineComponent({
           y:
             layout.value[layout.value.length - 1].y +
             layout.value[layout.value.length - 1].h,
-          w: 3,
+          w: GRID_COLUMNS,
           h: 2,
           i: 9999999,
           sensorName: "map",
@@ -160,7 +182,7 @@ export default defineComponent({
         return {
           x: 0,
           y: 0,
-          w: 3,
+          w: GRID_COLUMNS,
           h: 1,
           i: e.id,
           sensorIds: [...e.sensorsToCompare].concat(e.id),
@@ -198,6 +220,7 @@ export default defineComponent({
       GRID_HEIGHT,
       GRID_MARGIN,
       GRID_COLUMNS,
+      pointsPerMinute,
     };
   },
 });

@@ -84,12 +84,10 @@ import {
   resetGroups,
   resetTempGroups,
   useGroups,
-  useTempGroups,
 } from "@/composables/useGroups";
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
-import lodash from "lodash";
 import Accordion from "@/components/reusable/accordion/Accordion.vue";
 import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
 import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
@@ -119,14 +117,8 @@ export default defineComponent({
     // ??
     const graphActive = ref([0] as number[]);
 
-    // ??
-    const sensorListUpdated = ref(1 as number);
-
     // array of groups to render graphs in
     const groups = useGroups();
-
-    //array of temporary groups i selection phase, before rendering graphs
-    const tempGroups = useTempGroups();
 
     // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
     const graphToggleClass = ref("accordion-collapse collapse multi-collapse");
@@ -165,7 +157,6 @@ export default defineComponent({
       graphFilter,
       graphActive,
       filter,
-      sensorListUpdated,
       groups,
       graphToggleClass,
     };

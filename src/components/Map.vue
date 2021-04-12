@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <div :key="zoomedPositionUpdated" :style="'height: 90%; width: 100%'">
+    <div :style="'height: 85%; width: 100%'">
       <l-map
         v-model="zoom"
         v-model:zoom="zoom"
@@ -76,6 +76,10 @@ export default {
       type: Object,
       required: true,
     },
+    pointsPerMinute: {
+      type: Number,
+      required: true,
+    },
   },
 
   setup(props) {
@@ -96,7 +100,8 @@ export default {
     fetchData().then(() => {
       position.value = getPosition(
         props.group.fromDateTime,
-        props.group.toDateTime
+        props.group.toDateTime,
+        props.pointsPerMinute
       ).value;
       min.value = 0;
       max.value = position.value.length - 1;
@@ -128,7 +133,8 @@ export default {
         min.value < props.group.hoverIndex < max.value &&
         props.group.hoverIndex != -1
       ) {
-        sliderValue.value = props.group.hoverIndex;
+        sliderValue.value =
+          props.group.hoverIndex * (60 / props.pointsPerMinute);
       }
     });
 

@@ -1,8 +1,7 @@
 <template>
   <div class="card p-2 pb-4 shadow-sm h-100">
-    <div id="wrapper" class="h-100" v-if="showGraphs">
+    <div :key="updated" id="wrapper" class="h-100" v-if="showGraphs">
       <div
-        :key="updated"
         id="chart-line2"
         v-bind:class="{
           'h-100':
@@ -76,7 +75,7 @@
           <ToggleButton
             v-if="numberOfSensors == 1"
             :id="'flexSwitchCheckStats'"
-            :checkedValue="false"
+            :checkedValue="showStatistics"
             @toggle="toggleStatistics"
           >
             Vis statistikk
@@ -114,6 +113,10 @@ export default {
       required: true,
     },
     groupId: {
+      type: Number,
+      required: true,
+    },
+    pointsPerMinute: {
       type: Number,
       required: true,
     },
@@ -201,7 +204,8 @@ export default {
       },
 
       stroke: {
-        width: 1,
+        width: 0.8,
+        //curve: "smooth", // "stepline"
       },
       dataLabels: {
         enabled: false,
@@ -258,7 +262,6 @@ export default {
         type: "area",
         brush: {
           target: chartId + "1",
-
           enabled: true,
         },
         selection: {
@@ -274,9 +277,12 @@ export default {
       fill: {
         type: "gradient",
         gradient: {
-          opacityFrom: 0.91,
-          opacityTo: 0.1,
+          opacityFrom: 0.4,
+          opacityTo: 0,
         },
+      },
+      theme: {
+        palette: "palette6", // upto palette10
       },
       markers: {
         size: 0,
@@ -305,7 +311,6 @@ export default {
     });
 
     watchEffect(() => {
-      /* console.log(currentGroup.groupDate); */
       if (currentGroup.groupDate) {
         chartOptions.value.chart = {
           ...chartOptions.value.chart,
@@ -319,16 +324,19 @@ export default {
         chartOptions.value = {
           ...chartOptions.value,
         };
-        //group: "group-" + currentGroup.id + "-1",
       }
       updated.value++;
     });
 
     const fetchSensorData = () => {
       series.value = [];
+      numberOfSensors.value = 0;
       // Fetching data and setting up the chart
       fetchData().then(() => {
-        res.value = getSensorDataById([...props.sensorIds]);
+        res.value = getSensorDataById(
+          [...props.sensorIds],
+          props.pointsPerMinute
+        );
         time.value = res.value[0];
 
         // adding all the sensors into the series
@@ -498,9 +506,8 @@ export default {
      * Fetch data from server if props change
      */
     watch(
-      () => props.sensorNames,
+      () => [props.sensorNames, props.pointsPerMinute],
       () => {
-        console.log(props.sensorNames);
         fetchSensorData();
       }
     );
