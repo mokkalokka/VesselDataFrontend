@@ -300,6 +300,13 @@ export default defineComponent({
     // array of groups to render graphs in
     const groups = useGroups();
 
+    // Used for saving the current group and sesnor because vueform multiselect would not take it in as a parameter.
+    const currentGroup = ref(null as Group);
+    const currentSensor = ref(null as Sensor);
+
+    // Used for storing if the inputs are valid or not
+    const isInputsValid = ref(true as boolean);
+
     /**
      * Add selected sensor to seletced group.
      * @param {Sensor} sensor - The selected sensor.
@@ -342,6 +349,7 @@ export default defineComponent({
     };
     /**
      * Updates the datetime attribute for either the sensor or the group
+     * @param {Sensor | Group} object - the sensor or the group where the
      */
     const updateDateTime = (object: Sensor | Group) => {
       const fromYear = parseInt(object.fromDate.substring(0, 4));
@@ -404,10 +412,6 @@ export default defineComponent({
         .filter((s) => s.id != sensor.id && group.id == s.group) // array of sensors that is not the currenct sensor and in the same group
         .map((s) => ({ value: s.id, label: s.sensorName }));
     };
-
-    // Used for saving the current group and sesnor because vueform multiselect would not let take it in as a parameter.
-    const currentGroup = ref(null as Group);
-    const currentSensor = ref(null as Sensor);
 
     /**
      * Update the current group with the group that is being worked on
@@ -485,9 +489,6 @@ export default defineComponent({
       }
     };
 
-    // Used for storing if the inputs are valid or not
-    const isInputsValid = ref(true);
-
     /**
      * Checks if the time is equal for the group
      */
@@ -558,6 +559,10 @@ export default defineComponent({
       groups.value = lodash.cloneDeep(tempGroups.value);
     };
 
+    /**
+     * Toggles between using the date for the whole group or just for individual sensors
+     * @param {Group} group - the group that changes
+     */
     const toggleDate = (group: Group) => {
       if (group.groupDate) {
         group.groupDate = false;
