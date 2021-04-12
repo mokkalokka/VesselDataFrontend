@@ -25,6 +25,8 @@
         :key="vessel.name"
         v-show="filter(vessel)"
         @click="routeToVessel(vessel)"
+        tabindex="0"
+        @keypress.enter="routeToVessel(vessel)"
       >
         <div class="col ps-2">
           {{ vessel.name }}
@@ -109,5 +111,10 @@ a {
   cursor: pointer;
   background-color: rgb(236, 236, 236);
   /* border-radius: 5px; */
+}
+
+.boatrow:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(160, 208, 255);
 }
 </style>

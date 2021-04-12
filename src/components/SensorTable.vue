@@ -62,6 +62,8 @@
         v-bind:id="sensor.id"
         @click="toggleSelectedSensor(sensor)"
         v-bind:class="{ 'table-active': activeRows.includes(sensor.id) }"
+        tabindex="0"
+        @keypress.enter="toggleSelectedSensor(sensor)"
       >
         <td>{{ sensor.sensorName }}</td>
         <td>{{ sensor.description }}</td>
@@ -328,5 +330,10 @@ a:hover.page-link {
 
 th button {
   font-weight: bold;
+}
+
+tbody tr:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(160, 208, 255);
 }
 </style>
