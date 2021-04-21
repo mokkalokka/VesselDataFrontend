@@ -18,7 +18,8 @@
             color="green"
           ></l-polyline>
           <l-polyline
-            v-if="zoomedPositionUpdated"
+            :key="zoomedPositionUpdated"
+            v-if="showZoomedPosition"
             v-model:lat-lngs="zoomedPosition"
             color="red"
           ></l-polyline>
@@ -92,6 +93,7 @@ export default {
     const zoomedPosition = ref([60], [2]);
     const zoomedPositionUpdated = ref(0);
     const showPosition = ref(false);
+    const showZoomedPosition = ref(false);
     const dataLoaded = ref(false);
 
     /**
@@ -115,12 +117,16 @@ export default {
      * Watches for changes in zoomedDateTime to make a line of the zoomed position
      */
     watchEffect(() => {
+      /* console.log(props.group.zoomedFromDateTime, dataLoaded.value); */
       if (props.group.zoomedFromDateTime && dataLoaded.value) {
         zoomedPositionUpdated.value++;
         zoomedPosition.value = getPosition(
           props.group.zoomedFromDateTime,
           props.group.zoomedToDateTime
         ).value;
+        showZoomedPosition.value = true;
+      } else {
+        showZoomedPosition.value = false;
       }
     });
 
@@ -148,6 +154,7 @@ export default {
       zoomedPosition,
       zoomedPositionUpdated,
       showPosition,
+      showZoomedPosition,
     };
   },
 };

@@ -10,9 +10,12 @@
         {{ getGraphTitle }}
       </p>
 
-      <vue-echarts
-        :groupId="currentGroup.id.toString()"
+      <ECharts
+        :group="currentGroup.id.toString()"
         :option="options"
+        :autoresize="true"
+        @dataZoom="zoomHandler"
+        @restore="resetZoomedPosition"
         style="height: 90%"
         ref="chart"
       />
@@ -42,15 +45,16 @@
 
 <script>
 import { computed, ref, watch, watchEffect } from "vue";
-import { VueEcharts } from "vue3-echarts";
+import ECharts from "vue-echarts";
+import * as echarts from "echarts";
 import { useSensorData } from "@/composables/useSensorData";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
 import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default {
-  name: "LineGraph",
-  components: { ToggleButton, VueEcharts },
+  name: "Echarts",
+  components: { ToggleButton, ECharts },
   props: {
     sensorNames: {
       type: Array[String],
@@ -78,24 +82,20 @@ export default {
     const currentGroup = groups.value.find((e) => e.id == props.groupId);
     const showTimeLine = ref(!currentGroup.groupDate);
     const showStatistics = ref(false);
-    const updated = ref(0);
-    const chartId =
-      "chart-group=" +
-      currentGroup.id +
-      "-sensors=[" +
-      props.sensorIds.toString() +
-      "]-#";
     const maxVal = ref(0);
     const minVal = ref(0);
     const avarage = ref(0);
     const stdDeviation = ref(0);
     const chart = ref(null);
 
+    // Sets the Echart graph options as a computed value for reactivity
     const options = computed(() => {
       return {
         tooltip: {
           trigger: "axis",
-          position: function (pt) {
+          position: function (pt, params) {
+            // sets the hover position for map position
+            currentGroup.hoverIndex = params[0].dataIndex;
             return [pt[0], "10%"];
           },
         },
@@ -109,26 +109,57 @@ export default {
           feature: {
             dataZoom: {
               yAxisIndex: "none",
+              title: {
+                zoom: "Zoom",
+                back: "Zoom ut",
+              },
             },
-            restore: {},
-            saveAsImage: {},
+            restore: {
+              title: "Tilbakestill",
+            },
+            saveAsImage: {
+              title: "lagre bilde",
+            },
+            /* magicType: {
+              type: ["line", "bar"],
+            }, */
           },
         },
         xAxis: {
           type: "time",
-          boundaryGap: false,
+          /* boundaryGap: false,
+          axisPointer: {
+            triggerTooltip: false,
+          }, */
         },
         yAxis: {
           type: "value",
-          boundaryGap: [0, "100%"],
+          /* boundaryGap: [0, 0], */
+          /* min: "dataMin",
+          max: "dataMax", */
+          /* min: null,
+          max: null, */
+          min: parseFloat(
+            (
+              minVal.value +
+              Math.sign(minVal.value) * -minVal.value * 0.005
+            ).toFixed(2)
+          ),
+          max: parseFloat(
+            (
+              maxVal.value +
+              Math.sign(maxVal.value) * maxVal.value * 0.005
+            ).toFixed(2)
+          ),
         },
+        legend: {},
         dataZoom: [
           {
             id: "dataZoomX",
             type: "slider",
             show: showTimeLine.value,
             brushSelect: false,
-            xAxisIndex: [0],
+            /* xAxisIndex: [0], */
             filterMode: "none",
             start: 0,
             end: 100,
@@ -140,9 +171,12 @@ export default {
             yAxisIndex: [0],
             filterMode: "none",
             start: 0,
-            end: 60,
+            end: 100,
           },
         ],
+        /* emphasis: {
+          lineStyle: { opacity: 0.9 },
+        }, */
         series: res.value.slice(1).map((s, index) => {
           {
             return {
@@ -151,7 +185,7 @@ export default {
               smooth: true,
               symbol: "none",
               lineStyle: {
-                width: 1.5,
+                width: 1.0,
               },
               data: s.map((e, i) => {
                 return [res.value[0][i], e];
@@ -165,7 +199,7 @@ export default {
                         yAxis: maxVal.value,
                         label: {
                           formatter: "Maks",
-                          position: "middle",
+                          position: "end",
                         },
                       },
                       {
@@ -173,14 +207,14 @@ export default {
                         yAxis: minVal.value,
                         label: {
                           formatter: "Min",
-                          position: "insideMiddleBottom",
+                          position: "end",
                         },
                       },
                       {
                         name: "avg",
                         yAxis: avarage.value,
                         label: {
-                          formatter: "Gjennomsnitt",
+                          formatter: "Gjennomsnitt ",
                           position: "start",
                         },
                       },
@@ -257,7 +291,11 @@ export default {
       };
     });
 
+    /**
+     * Fetching the sensor data and analyse statistics
+     */
     const fetchSensorData = () => {
+      res.value = [];
       // Fetching data and setting up the chart
       fetchData().then(() => {
         res.value = getSensorDataById(
@@ -266,18 +304,18 @@ export default {
         );
 
         /* Analyse data */
-        maxVal.value = max(res.value[1]);
-        minVal.value = min(res.value[1]);
+        maxVal.value = max(res.value.slice(1));
+        minVal.value = min(res.value.slice(1));
         avarage.value = mean(res.value[1]);
         stdDeviation.value = std(res.value[1]);
-
-        /* console.log(chart); 
-        VueEcharts.connect("group-" + currentGroup.id); */
       });
     };
 
     fetchSensorData();
 
+    /**
+     * Computed value for graph title
+     */
     const getGraphTitle = computed(() => {
       let title = "";
       let sensorOverflow = 0;
@@ -305,17 +343,66 @@ export default {
       }
     );
 
-    /*     watchEffect(() => {
-      updated.value;
+    /* watchEffect(() => {
+      console.log(props.sensorNames, props.pointsPerMinute);
+      fetchSensorData();
     }); */
+
+    /**
+     * Watches for changes in syncronization setting in current group. connects or disconnects according to this value
+     */
     watchEffect(() => {
-      // This effect runs before the DOM is updated, and consequently,
-      // the template ref does not hold a reference to the element yet.
-      console.log(chart.value);
-      console.log(echarts);
-      /* chart.value ? chart.value.connect("1") : null; */
-      /* chart.value.connect("1"); */
+      if (currentGroup.groupDate) {
+        echarts.connect(currentGroup.id);
+      } else {
+        echarts.disconnect(currentGroup.id);
+      }
     });
+
+    /**
+     * Handles zoom events and updates current groups zoom date. This is for connecting the map to the graph
+     * @param {event} e - zoom event from Echarts
+     */
+    const zoomHandler = (e) => {
+      /* console.log(e); */
+      // Check if the zoom event is comming from toolbar zoom or from timeline
+      if (e.batch) {
+        //Zoom is from toolbar
+        /* console.log(new Date(e.batch[0].startValue)); */
+        currentGroup.zoomedFromDateTime = new Date(e.batch[0].startValue);
+        currentGroup.zoomedToDateTime = new Date(e.batch[0].endValue);
+      } else if (e.dataZoomId == "dataZoomX") {
+        // Zoom is from timeline (dataZoom)
+        const fromIndex = Math.floor(
+          (e.start / 100) * (res.value[0].length - 1)
+        );
+        const toIndex = Math.floor((e.end / 100) * (res.value[0].length - 1));
+        currentGroup.zoomedFromDateTime = res.value[0][fromIndex];
+        currentGroup.zoomedToDateTime = res.value[0][toIndex];
+      }
+    };
+
+    /**
+     * Resets the current group zoom dates to undefined (no red line on map)
+     *
+     */
+    const resetZoomedPosition = (e) => {
+      chart.value.setOption(options.value, true);
+      currentGroup.zoomedFromDateTime = undefined;
+      currentGroup.zoomedToDateTime = undefined;
+    };
+
+    /**
+     * Reset the map zoomed position if showTimeLine is false
+     */
+    watch(
+      () => showTimeLine.value,
+      () => {
+        if (!showTimeLine.value) {
+          resetZoomedPosition();
+        }
+      }
+    );
 
     return {
       options,
@@ -326,6 +413,8 @@ export default {
       getGraphTitle,
       showStatistics,
       chart,
+      zoomHandler,
+      resetZoomedPosition,
     };
   },
 };

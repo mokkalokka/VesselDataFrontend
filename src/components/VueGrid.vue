@@ -68,7 +68,7 @@
           :i="item.i"
         >
           <div class="v-100 h-100" v-show="!draggable">
-            <line-graph
+            <echarts
               v-if="item.i != 9999999"
               :sensorNames="item.sensorNames"
               :sensorIds="item.sensorIds"
@@ -97,7 +97,8 @@
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-import LineGraph from "@/components/LineGraph.vue";
+/* import LineGraph from "@/components/LineGraph.vue"; */
+import Echarts from "@/components/Echarts.vue";
 import Map from "@/components/Map.vue";
 import { Group } from "@/Interfaces/groupInterface";
 import { useGroups } from "@/composables/useGroups";
@@ -105,7 +106,7 @@ import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
 export default defineComponent({
   name: "VueGrid",
-  components: { LineGraph, Map, ToggleButton },
+  components: { Echarts, Map, ToggleButton },
 
   props: {
     groupId: {
