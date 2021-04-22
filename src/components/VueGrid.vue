@@ -119,7 +119,7 @@ export default defineComponent({
     const selectedSensors = useSelectedSensors();
     const layout = ref([]);
     const groups = useGroups();
-    const currentGroup = ref(groups.value[props.groupId - 1]);
+    const currentGroup = ref(groups.value[(props.groupId as number) - 1]);
     const draggable = ref(false);
     const resizable = ref(false);
     const showMap = ref(false);
@@ -198,9 +198,9 @@ export default defineComponent({
     setLayout();
 
     watch(
-      () => groups.value[props.groupId - 1].sensors,
+      () => groups.value[(props.groupId as number) - 1].sensors,
       () => {
-        currentGroup.value = groups.value[props.groupId - 1];
+        currentGroup.value = groups.value[(props.groupId as number) - 1];
 
         setLayout();
         showMap.value = false;

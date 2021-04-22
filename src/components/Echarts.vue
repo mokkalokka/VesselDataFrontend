@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
 import ECharts from "vue-echarts";
 import * as echarts from "echarts";
@@ -51,6 +51,7 @@ import { useSensorData } from "@/composables/useSensorData";
 import { std, mean, max, min } from "mathjs";
 import { useGroups } from "@/composables/useGroups";
 import ToggleButton from "@/components/reusable/ToggleButton.vue";
+import { Group } from "@/Interfaces/groupInterface";
 
 export default {
   name: "Echarts",
@@ -76,17 +77,19 @@ export default {
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
-    const res = ref([]);
-    const showGraphs = ref(false);
-    const groups = useGroups();
-    const currentGroup = groups.value.find((e) => e.id == props.groupId);
-    const showTimeLine = ref(!currentGroup.groupDate);
-    const showStatistics = ref(false);
-    const maxVal = ref(0);
-    const minVal = ref(0);
-    const avarage = ref(0);
-    const stdDeviation = ref(0);
-    const chart = ref(null);
+    const res = ref([] as number[]);
+    const showGraphs = ref(false as boolean);
+    const groups = useGroups() as Group[];
+    const currentGroup = groups.value.find(
+      (e) => e.id == props.groupId
+    ) as Group;
+    const showTimeLine = ref(!currentGroup.groupDate as boolean);
+    const showStatistics = ref(false as boolean);
+    const maxVal = ref(0 as number);
+    const minVal = ref(0 as number);
+    const avarage = ref(0 as number);
+    const stdDeviation = ref(0 as number);
+    const chart = ref(null as null | object);
 
     // Sets the Echart graph options as a computed value for reactivity
     const options = computed(() => {
@@ -304,10 +307,10 @@ export default {
         );
 
         /* Analyse data */
-        maxVal.value = max(res.value.slice(1));
-        minVal.value = min(res.value.slice(1));
-        avarage.value = mean(res.value[1]);
-        stdDeviation.value = std(res.value[1]);
+        maxVal.value = max(res.value.slice(1)) as number;
+        minVal.value = min(res.value.slice(1)) as number;
+        avarage.value = mean(res.value[1]) as number;
+        stdDeviation.value = std(res.value[1]) as number;
       });
     };
 
@@ -317,20 +320,21 @@ export default {
      * Computed value for graph title
      */
     const getGraphTitle = computed(() => {
-      let title = "";
-      let sensorOverflow = 0;
-      props.sensorNames.map((e, index) => {
+      let title = "" as string;
+      let sensorOverflow = 0 as number;
+      props.sensorNames.map((sensorName: string, index: number) => {
         if (index < 2) {
           if (index != props.sensorNames.length - 1) {
-            title += e + ", ";
+            title += sensorName + ", ";
           } else {
-            title += e;
+            title += sensorName;
           }
         } else {
           sensorOverflow++;
         }
       });
-      return title + (sensorOverflow > 0 ? " + " + sensorOverflow : "");
+      return (title +
+        (sensorOverflow > 0 ? " + " + sensorOverflow : "")) as string;
     });
 
     /**
@@ -363,8 +367,7 @@ export default {
      * Handles zoom events and updates current groups zoom date. This is for connecting the map to the graph
      * @param {event} e - zoom event from Echarts
      */
-    const zoomHandler = (e) => {
-      /* console.log(e); */
+    const zoomHandler = (e: object) => {
       // Check if the zoom event is comming from toolbar zoom or from timeline
       if (e.batch) {
         //Zoom is from toolbar
@@ -375,8 +378,10 @@ export default {
         // Zoom is from timeline (dataZoom)
         const fromIndex = Math.floor(
           (e.start / 100) * (res.value[0].length - 1)
-        );
-        const toIndex = Math.floor((e.end / 100) * (res.value[0].length - 1));
+        ) as number;
+        const toIndex = Math.floor(
+          (e.end / 100) * (res.value[0].length - 1)
+        ) as number;
         currentGroup.zoomedFromDateTime = res.value[0][fromIndex];
         currentGroup.zoomedToDateTime = res.value[0][toIndex];
       }
@@ -387,6 +392,8 @@ export default {
      *
      */
     const resetZoomedPosition = (e) => {
+      console.log(typeof chart.value);
+
       chart.value.setOption(options.value, true);
       currentGroup.zoomedFromDateTime = undefined;
       currentGroup.zoomedToDateTime = undefined;
