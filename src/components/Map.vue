@@ -142,6 +142,9 @@ export default {
         sliderValue.value =
           props.group.hoverIndex * (60 / props.pointsPerMinute);
       }
+      if (!sliderValue.value) {
+        sliderValue.value = 0;
+      }
     });
 
     return {
