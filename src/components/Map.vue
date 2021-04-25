@@ -143,10 +143,6 @@ export default {
       },
     ];
 
-    watchEffect(() => {
-      console.log(tileProviders);
-    });
-
     /**
      * Fetches data and sets the position array, max and min position
      */
