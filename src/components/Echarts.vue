@@ -58,11 +58,11 @@ export default {
   components: { ToggleButton, ECharts },
   props: {
     sensorNames: {
-      type: Array[String],
+      type: Array,
       required: true,
     },
     sensorIds: {
-      type: Array[Number],
+      type: Array,
       required: true,
     },
     groupId: {
@@ -77,9 +77,9 @@ export default {
 
   setup(props) {
     const { getSensorDataById, fetchData } = useSensorData();
-    const res = ref([] as number[]);
+    const res = ref([]);
     const showGraphs = ref(false as boolean);
-    const groups = useGroups() as Group[];
+    const groups = useGroups();
     const currentGroup = groups.value.find(
       (e) => e.id == props.groupId
     ) as Group;
@@ -89,7 +89,7 @@ export default {
     const minVal = ref(0 as number);
     const avarage = ref(0 as number);
     const stdDeviation = ref(0 as number);
-    const chart = ref(null as null | object);
+    const chart = ref(null);
 
     // Sets the Echart graph options as a computed value for reactivity
     const options = computed(() => {
@@ -302,7 +302,7 @@ export default {
       // Fetching data and setting up the chart
       fetchData().then(() => {
         res.value = getSensorDataById(
-          [...props.sensorIds],
+          [...props.sensorIds] as number[],
           props.pointsPerMinute
         );
 
@@ -357,9 +357,9 @@ export default {
      */
     watchEffect(() => {
       if (currentGroup.groupDate) {
-        echarts.connect(currentGroup.id);
+        echarts.connect(currentGroup.id.toString());
       } else {
-        echarts.disconnect(currentGroup.id);
+        echarts.disconnect(currentGroup.id.toString());
       }
     });
 
@@ -367,7 +367,7 @@ export default {
      * Handles zoom events and updates current groups zoom date. This is for connecting the map to the graph
      * @param {event} e - zoom event from Echarts
      */
-    const zoomHandler = (e: object) => {
+    const zoomHandler = (e) => {
       // Check if the zoom event is comming from toolbar zoom or from timeline
       if (e.batch) {
         //Zoom is from toolbar
@@ -391,7 +391,7 @@ export default {
      * Resets the current group zoom dates to undefined (no red line on map)
      *
      */
-    const resetZoomedPosition = (e) => {
+    const resetZoomedPosition = () => {
       console.log(typeof chart.value);
 
       chart.value.setOption(options.value, true);
