@@ -57,12 +57,14 @@ export function useSensorData() {
         return sensors
     }
 
-    function getPosition(fromDateTime, toDateTime) {
+    function getPosition(fromDateTime, toDateTime, pointsPerMinute) {
         const lat = response.value[81]['Nav_Pos.lat'] as number[]
         const lon = response.value[82]['Nav_Pos.lon'] as number[]
         const time = response.value[0]['time'] as number[]
         const timeIndexes = []
         const pos = ref([])
+        const decimation = (time.length / 60) / pointsPerMinute
+
         time.map((e, index) => {
             const date = new Date(e).toString()
             if ((date == fromDateTime.toString()) || (date == toDateTime.toString())) {
@@ -75,6 +77,8 @@ export function useSensorData() {
                 pos.value.push([lat[index], lon[index], time[index]])
             }
         })
+
+        pos.value = pos.value.filter((_, index) => index % decimation == 0)
 
         /* console.log(position.value.length) */
         return pos
