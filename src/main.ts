@@ -10,11 +10,16 @@ import { BIconArrowDownUp, BIconSearch } from 'bootstrap-icons-vue';
 import "bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css";
 
-createApp(App)
+const app = createApp(App)
     .use(router)
     .use(VueApexCharts)
     .use(VueGridLayout)
     .component("Multiselect", Multiselect)
     .component("BIconArrowDownUp", BIconArrowDownUp)
     .component("BIconSearch", BIconSearch)
-    .mount('#app')
+
+if (process.env.NODE_ENV === 'development') {
+    app.config.performance = true;
+}
+
+app.mount('#app')
