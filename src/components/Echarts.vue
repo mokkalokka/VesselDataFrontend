@@ -295,7 +295,7 @@ export default {
     });
 
     /**
-     * Fetching the sensor data and analyse statistics
+     * Fetching the sensor data from API and analyse statistics
      */
     const fetchSensorData = () => {
       res.value = [];
@@ -313,8 +313,6 @@ export default {
         stdDeviation.value = std(res.value[1]) as number;
       });
     };
-
-    fetchSensorData();
 
     /**
      * Computed value for graph title
@@ -338,19 +336,15 @@ export default {
     });
 
     /**
-     * Fetch data from server if props change
+     * Fetch data from server on start and if props change.
      */
     watch(
       () => [props.sensorNames, props.pointsPerMinute],
       () => {
         fetchSensorData();
-      }
+      },
+      { immediate: true }
     );
-
-    /* watchEffect(() => {
-      console.log(props.sensorNames, props.pointsPerMinute);
-      fetchSensorData();
-    }); */
 
     /**
      * Watches for changes in syncronization setting in current group. connects or disconnects according to this value
@@ -371,7 +365,6 @@ export default {
       // Check if the zoom event is comming from toolbar zoom or from timeline
       if (e.batch) {
         //Zoom is from toolbar
-        /* console.log(new Date(e.batch[0].startValue)); */
         currentGroup.zoomedFromDateTime = new Date(e.batch[0].startValue);
         currentGroup.zoomedToDateTime = new Date(e.batch[0].endValue);
       } else if (e.dataZoomId == "dataZoomX") {
@@ -392,8 +385,6 @@ export default {
      *
      */
     const resetZoomedPosition = () => {
-      console.log(typeof chart.value);
-
       chart.value.setOption(options.value, true);
       currentGroup.zoomedFromDateTime = undefined;
       currentGroup.zoomedToDateTime = undefined;
