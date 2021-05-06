@@ -21,7 +21,7 @@
           <DataTable :id="'groupSettingsTable'" :hoverable="false">
             <thead>
               <tr>
-                <th>Datovisning</th>
+                <th>Felles dato</th>
                 <th>Dato fra</th>
                 <th>Dato til</th>
               </tr>
@@ -29,22 +29,12 @@
             <tbody>
               <tr>
                 <td>
-                  <!-- <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      checked
-                      @click="group.groupDate = !group.groupDate"
-                      :disabled="group.sensors.length == 1"
-                    />
-                    <label class="form-check-label"> Datovisning </label>
-                  </div> -->
                   <ToggleButton
                     :id="'formCheckShowDate' + group.id"
                     :checkedValue="true"
                     @toggle="toggleDate(group)"
                   >
-                    Datovisning
+                    Felles dato på alle sensorene i gruppen
                   </ToggleButton>
                 </td>
                 <td>
@@ -110,13 +100,9 @@
               </tr>
             </tbody>
           </DataTable>
-          <!-- </table>
-              </div> -->
           <div class="d-flex justify-content-center">
             <h5 class="my-3" text-center>Instillinger for sensorene</h5>
           </div>
-          <!-- <div class="table-responsive">
-                <table class="table m-0 table-bordered"> -->
           <DataTable :id="'sensorSettingsTable'" :hoverable="false">
             <thead>
               <tr>
@@ -125,7 +111,6 @@
                 <th>Dato til</th>
                 <th>Gruppe</th>
                 <th>Sammenlign med</th>
-                <th>Graftype</th>
               </tr>
             </thead>
             <tbody>
@@ -221,24 +206,10 @@
                     @deselect="addDeselectedSensorToGroup"
                   />
                 </td>
-                <td>
-                  <select class="form-select" v-model="sensor.graphType">
-                    <option
-                      v-for="graphType in graphTypes"
-                      :key="graphType.value"
-                    >
-                      {{ graphType.type }}
-                    </option>
-                  </select>
-                </td>
               </tr>
             </tbody>
           </DataTable>
-          <!-- </table>
-              </div> -->
         </AccordionBody>
-        <!-- </div>
-          </div> -->
       </AccordionItem>
     </Accordion>
     <div class="d-flex justify-content-center mt-4">
@@ -286,13 +257,6 @@ export default defineComponent({
   setup: () => {
     // selected sensors from SensorTable.
     const selectedSensors = useSelectedSensors();
-
-    // Different graph rendering options.
-    const graphTypes = [
-      { type: "Linje", value: "Linje" },
-      { type: "Bar", value: "Bar" },
-      { type: "Pai", value: "Pai" },
-    ];
 
     // temp groups for changing things and not effetcing the rendering at once.
     const tempGroups = useTempGroups();
@@ -572,7 +536,6 @@ export default defineComponent({
     };
 
     return {
-      graphTypes,
       filterSensors,
       tempGroups,
       addSensorToGroup,
