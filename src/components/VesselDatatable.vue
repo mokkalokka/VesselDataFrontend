@@ -50,10 +50,10 @@ export default defineComponent({
     // Used for searching the vessels
     const input = ref("" as string);
 
-    const { response, fetchData } = useFetch("http://localhost:3000/vessels");
+    const { fetchData } = useFetch("http://localhost:3000/vessels");
 
-    fetchData().then(() => {
-      vessels.value = response.value;
+    fetchData().then((response) => {
+      vessels.value = response;
     });
 
     /**

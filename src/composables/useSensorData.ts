@@ -5,24 +5,31 @@ import { Sensor } from "@/Interfaces/sensorInterface"
 
 const sensorNames = ref([] as Sensor[])
 const position = ref([])
+const time = ref([])
+const names = ref([])
 
 
 
 export function useSensorData() {
-    const { response, error, fetching, fetchData } = useFetch('http://localhost:3000/sensors');
+    /* const { response: time, error, fetching, fetchData } = useFetch('http://localhost:3000/time'); */
+
 
 
     function setSensorNames() {
         /* TODO: filter null values */
-        const fromDateTime = new Date(response.value[0].time[0])
-        const toDateTime = new Date(response.value[0].time[3599])
+        /* const fromDateTime = new Date(response.value[0].time[0])
+        const toDateTime = new Date(response.value[0].time[3599]) */
+
+        const fromDateTime = new Date(time.value[0])
+        const toDateTime = new Date(time.value[time.value.length - 1])
 
 
-        sensorNames.value = response.value.map((e: Sensor, index: number) => {
-            const namefields = Object.keys(e)[0].split(".");
+        sensorNames.value = names.value.map((e: string, index: number) => {
+
+            const namefields = e.split(".");
             return {
                 id: index,
-                filterkey: Object.keys(e)[0],
+                filterkey: e,
                 sensorName: (namefields.length > 1 ? namefields[namefields.length - 2] + " " + namefields[namefields.length - 1] : namefields[0]),
                 description: namefields[0],
                 fromDateTime: fromDateTime,
@@ -36,73 +43,78 @@ export function useSensorData() {
                 toTime: toDateTime.toLocaleTimeString("en-GB"),
             }
         }) as Sensor[]
-        sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null))
+        /* sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null)) */
     }
 
-    function getSensorDataById(sensorIds: number[], pointsPerMinute: number) {
+    async function getSensorDataById(sensorIds: number[], pointsPerMinute: number) {
         //Adds time 
-        sensorIds.unshift(0)
+        const data = ref([])
+        const baseUrl = 'http://localhost:3000/'
+        const urls = [baseUrl + 'time']
 
-        // Extract the sensors from the response
-        let sensors = sensorIds.map(id => Object.values(response.value[id])[0]) as any[][]
 
-        const decimation = (sensors[0].length / 60) / pointsPerMinute
+        sensorIds.map(id => urls.push(baseUrl + names.value[id]))
 
-        // Parse dates
-        sensors[0] = sensors[0].map(t => new Date(t))
+        data.value = await Promise.all(urls.map(url => {
+            const { fetchData } = useFetch(url);
+            return fetchData()
+        }))
 
         // Modulus filter
-        sensors = sensors.map(e => e.filter((_, index) => index % decimation == 0))
+        /*   sensors = sensors.map(e => e.filter((_, index) => index < pointsPerMinute)) */
 
-        return sensors
+        return data.value
     }
 
-    function getPosition(fromDateTime, toDateTime, pointsPerMinute) {
-        const lat = response.value[81]['Nav_Pos.lat'] as number[]
-        const lon = response.value[82]['Nav_Pos.lon'] as number[]
-        const time = response.value[0]['time'] as number[]
-        const timeIndexes = []
-        const pos = ref([])
-        const decimation = (time.length / 60) / pointsPerMinute
+    async function getPosition() {
+        const data = ref([])
+        const baseUrl = 'http://localhost:3000/'
+        const urls = [
+            baseUrl + 'Nav_Pos.lat',
+            baseUrl + 'Nav_Pos.lon'
+        ]
 
-        time.map((e, index) => {
-            const date = new Date(e).toString()
-            if ((date == fromDateTime.toString()) || (date == toDateTime.toString())) {
-                timeIndexes.push(index)
-            }
-        })
+        data.value = await Promise.all(urls.map(url => {
+            const { fetchData } = useFetch(url);
+            return fetchData()
+        }))
 
-        lat.map((_, index) => {
-            if (index >= timeIndexes[0] && index <= timeIndexes[1]) {
-                pos.value.push([lat[index], lon[index], time[index]])
-            }
-        })
+        data.value.push(time.value)
 
-        pos.value = pos.value.filter((_, index) => index % decimation == 0)
-
-        /* console.log(position.value.length) */
-        return pos
+        return data.value
 
     }
 
 
     function initialize() {
-        fetchData().then(() => {
-            setSensorNames()
+        const { fetchData: fetchTime } = useFetch('http://localhost:3000/time');
+        const { fetchData: fetchNames } = useFetch('http://localhost:3000/names');
+
+        fetchNames().then((namesResponse) => {
+            names.value = namesResponse
+            fetchTime().then((timeResponse) => {
+                time.value = timeResponse
+                setSensorNames()
+
+            })
         })
+
+        /* fetchData().then(() => {
+            setSensorNames()
+        }) */
     }
 
     return {
         getSensorDataById,
         sensorNames,
-        error,
+        /* error,
         fetching,
-        fetchData,
+        fetchData, */
         setSensorNames,
         initialize,
         getPosition,
         position,
-        response
+        /* response */
     }
 }
 

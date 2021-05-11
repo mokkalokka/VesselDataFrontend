@@ -31,7 +31,7 @@
           ></l-polyline>
           <l-polyline
             :key="zoomedPositionUpdated"
-            v-if="showZoomedPosition"
+            v-if="zoomedPosition.length > 1"
             v-model:lat-lngs="zoomedPosition"
             color="red"
           ></l-polyline>
@@ -103,12 +103,12 @@ export default {
   },
 
   setup(props) {
-    const { getPosition, fetching, fetchData } = useSensorData();
+    const { getPosition, fetching } = useSensorData();
     const position = ref([[60], [2]]);
     const sliderValue = ref(0);
     const min = ref(0);
     const max = ref(1);
-    const zoomedPosition = ref([60], [2]);
+    /* const zoomedPosition = ref([60], [2]); */
     const zoomedPositionUpdated = ref(0);
     const showPosition = ref(false);
     const showZoomedPosition = ref(false);
@@ -147,12 +147,19 @@ export default {
      * Fetches data and sets the position array, max and min position
      */
     const initPosition = () => {
-      fetchData().then(() => {
-        position.value = getPosition(
-          props.group.fromDateTime,
-          props.group.toDateTime,
-          props.pointsPerMinute
-        ).value;
+      getPosition(
+        props.group.fromDateTime,
+        props.group.toDateTime,
+        props.pointsPerMinute
+      ).then((response) => {
+        const lat = response[0];
+        const lon = response[1];
+        const time = response[2];
+
+        position.value = time.map((_, index) => {
+          return [lat[index], lon[index], time[index]];
+        });
+
         min.value = 0;
         max.value = position.value.length - 1;
         if (position.value.length > 1) {
@@ -213,7 +220,7 @@ export default {
     /**
      * Watches for changes in zoomedDateTime to make a line of the zoomed position
      */
-    watch(
+    /* watch(
       () => [
         props.group.zoomedFromDateTime,
         props.group.zoomedToDateTime,
@@ -233,7 +240,7 @@ export default {
         }
       },
       { immediate: true }
-    );
+    ); */
 
     const centerPosition = computed(() => {
       if (dataLoaded.value) {
@@ -244,6 +251,28 @@ export default {
       } else {
         return [60, 2];
       }
+    });
+
+    const zoomedPosition = computed(() => {
+      const timeIndexes = [];
+
+      if (props.group.zoomedFromDateTime && props.group.zoomedToDateTime) {
+        position.value.map((e, index) => {
+          const time = e[2];
+          const date = new Date(time).toString();
+
+          if (
+            date == props.group.zoomedFromDateTime.toString() ||
+            date == props.group.zoomedToDateTime.toString()
+          ) {
+            timeIndexes.push(index);
+          }
+        });
+
+        return position.value.filter((_, index) => {
+          return timeIndexes.includes(index);
+        });
+      } else return [];
     });
 
     return {
@@ -270,3 +299,6 @@ export default {
   background: white;
 }
 </style>
+
+
+

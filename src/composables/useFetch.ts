@@ -1,4 +1,4 @@
-import {toRefs, reactive} from 'vue';
+import { toRefs, reactive } from 'vue';
 
 
 
@@ -12,14 +12,14 @@ export function useFetch(url: string, options: {} = {}) {
     state.fetching = true;
     try {
       const res = await fetch(url, options);
-      const json = await res.json();
-      state.response = json;
+      return await res.json();
+      /* state.response = json; */
     } catch (errors) {
       state.error = errors;
     } finally {
       state.fetching = false;
     }
   };
-  return {...toRefs(state), fetchData};
+  return { ...toRefs(state), fetchData };
 }
 

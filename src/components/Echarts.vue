@@ -31,7 +31,6 @@
           Vis statistikk
         </ToggleButton>
         <ToggleButton
-          v-if="!currentGroup.groupDate || currentGroup.sensors.length == 1"
           :id="'flexSwitchCheckTimeline'"
           :checkedValue="showTimeLine"
           @toggle="showTimeLine = !showTimeLine"
@@ -76,14 +75,14 @@ export default {
   },
 
   setup(props) {
-    const { getSensorDataById, fetchData } = useSensorData();
+    const { getSensorDataById } = useSensorData();
     const res = ref([]);
     const showGraphs = ref(false as boolean);
     const groups = useGroups();
     const currentGroup = groups.value.find(
       (e) => e.id == props.groupId
     ) as Group;
-    const showTimeLine = ref(!currentGroup.groupDate as boolean);
+    const showTimeLine = ref(false);
     const showStatistics = ref(false as boolean);
     const maxVal = ref(0 as number);
     const minVal = ref(0 as number);
@@ -300,11 +299,11 @@ export default {
     const fetchSensorData = () => {
       res.value = [];
       // Fetching data and setting up the chart
-      fetchData().then(() => {
-        res.value = getSensorDataById(
-          [...props.sensorIds] as number[],
-          props.pointsPerMinute
-        );
+      getSensorDataById(
+        props.sensorIds as number[],
+        props.pointsPerMinute
+      ).then((response) => {
+        res.value = response;
 
         /* Analyse data */
         maxVal.value = max(res.value.slice(1)) as number;
@@ -375,8 +374,8 @@ export default {
         const toIndex = Math.floor(
           (e.end / 100) * (res.value[0].length - 1)
         ) as number;
-        currentGroup.zoomedFromDateTime = res.value[0][fromIndex];
-        currentGroup.zoomedToDateTime = res.value[0][toIndex];
+        currentGroup.zoomedFromDateTime = new Date(res.value[0][fromIndex]);
+        currentGroup.zoomedToDateTime = new Date(res.value[0][toIndex]);
       }
     };
 
