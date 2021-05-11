@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useFetch } from "@/composables/useFetch"
 import { Sensor } from "@/Interfaces/sensorInterface"
 
-const sensorNames = ref([] as Sensor[])
+const sensors = ref([] as Sensor[])
 const position = ref([])
 const time = ref([])
 const names = ref([])
@@ -11,20 +11,14 @@ const names = ref([])
 
 
 export function useSensorData() {
-    /* const { response: time, error, fetching, fetchData } = useFetch('http://localhost:3000/time'); */
 
-
-
-    function setSensorNames() {
-        /* TODO: filter null values */
-        /* const fromDateTime = new Date(response.value[0].time[0])
-        const toDateTime = new Date(response.value[0].time[3599]) */
+    function setSensors() {
 
         const fromDateTime = new Date(time.value[0])
         const toDateTime = new Date(time.value[time.value.length - 1])
 
 
-        sensorNames.value = names.value.map((e: string, index: number) => {
+        sensors.value = names.value.map((e: string, index: number) => {
 
             const namefields = e.split(".");
             return {
@@ -43,7 +37,6 @@ export function useSensorData() {
                 toTime: toDateTime.toLocaleTimeString("en-GB"),
             }
         }) as Sensor[]
-        /* sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null)) */
     }
 
     async function getSensorDataById(sensorIds: number[]) {
@@ -90,27 +83,18 @@ export function useSensorData() {
             names.value = namesResponse
             fetchTime().then((timeResponse) => {
                 time.value = timeResponse
-                setSensorNames()
+                setSensors()
 
             })
         })
-
-        /* fetchData().then(() => {
-            setSensorNames()
-        }) */
     }
 
     return {
         getSensorDataById,
-        sensorNames,
-        /* error,
-        fetching,
-        fetchData, */
-        setSensorNames,
+        sensors,
         initialize,
         getPosition,
         position,
-        /* response */
     }
 }
 

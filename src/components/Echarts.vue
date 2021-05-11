@@ -289,7 +289,7 @@ export default {
       // Fetching data
       getSensorDataById(props.sensorIds as number[]).then((response) => {
         /**
-         * This part is for demonstration, but will be done on API call when the API is
+         * This part is for demonstration, but will be done on API call when the API is ready
          */
         // Setting the decimation
         const decimation = response[0].length / 60 / props.pointsPerMinute;

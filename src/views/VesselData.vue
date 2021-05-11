@@ -22,7 +22,7 @@
           data-bs-parent="#sensorAccordion"
         >
           <div class="accordion-body">
-            <SensorTable :sensorNames="sensorNames" />
+            <SensorTable :sensors="sensors" />
             <div v-show="selectedSensors.length != 0">
               <AddedSensorTable />
             </div>
@@ -93,12 +93,11 @@ import Accordion from "@/components/reusable/accordion/Accordion.vue";
 import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
 import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
 import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
-import { Vessel } from "@/Interfaces/vesselInterface";
 
 export default defineComponent({
   components: {
-    /* LineGraph, */ SensorTable,
-    /* Map */ VueGrid,
+    SensorTable,
+    VueGrid,
     AddedSensorTable,
     Accordion,
     AccordionItem,
@@ -143,6 +142,7 @@ export default defineComponent({
     // bootstrap class for accordion, changes depending on open-/close-state of graph accordion tab
     const graphToggleClass = ref("accordion-collapse collapse multi-collapse");
 
+    // Reset pagestate
     resetTempGroups();
     resetGroups();
     resetSelectedSensors();
@@ -166,13 +166,13 @@ export default defineComponent({
     };
 
     // From server
-    const { sensorNames, initialize } = useSensorData();
+    const { sensors, initialize } = useSensorData();
 
     initialize();
 
     return {
       showSensorData,
-      sensorNames,
+      sensors,
       selectedSensors,
       graphFilter,
       graphActive,

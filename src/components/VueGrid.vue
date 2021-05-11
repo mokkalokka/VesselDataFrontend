@@ -97,10 +97,8 @@
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from "vue";
 import { useSelectedSensors } from "@/composables/useSelectedSensors";
-/* import LineGraph from "@/components/LineGraph.vue"; */
 import Echarts from "@/components/Echarts.vue";
 import Map from "@/components/Map.vue";
-import { Group } from "@/Interfaces/groupInterface";
 import { useGroups } from "@/composables/useGroups";
 import ToggleButton from "@/components/reusable/ToggleButton.vue";
 
@@ -135,16 +133,11 @@ export default defineComponent({
      */
     const gridLayoutHeight = computed(() => {
       if (layout.value.length > 0) {
-        /* const numberOfGridsHeights =
-          layout.value[layout.value.length - 1].y + (showMap.value ? 2 : 1); */
-
         const numberOfGridsHeights = layout.value.reduce(
           (accumulator, currentValue) => ({
             h: accumulator.h + currentValue.h,
           })
         ).h;
-
-        console.log(numberOfGridsHeights);
 
         const marginOffset = GRID_MARGIN * (numberOfGridsHeights + 1);
 

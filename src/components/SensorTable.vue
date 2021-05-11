@@ -20,7 +20,7 @@
         type="button"
         class="btn btn-primary"
         @click="selectAllSensors"
-        :disabled="selectedSensors.length === sensorNames.length"
+        :disabled="selectedSensors.length === sensors.length"
       >
         Velg alle sensorer
       </button>
@@ -144,7 +144,7 @@
             <option>5</option>
             <option>10</option>
             <option>15</option>
-            <option :value="sensorNames.length">Vis alle</option>
+            <option :value="sensors.length">Vis alle</option>
           </select>
         </div>
       </div>
@@ -164,8 +164,7 @@ import DataTable from "@/components/reusable/DataTable.vue";
 
 export default defineComponent({
   name: "SensorTable",
-  // components: { DataTable },
-  props: ["sensorNames"],
+  props: ["sensors"],
   components: { DataTable },
 
   setup: (props) => {
@@ -214,7 +213,7 @@ export default defineComponent({
      */
     const fillPagesArray = () => {
       sensorPages.value.length = 0;
-      sensors.value = props.sensorNames.filter((s: Sensor) => searchFilter(s));
+      sensors.value = props.sensors.filter((s: Sensor) => searchFilter(s));
 
       const size = sensorsPerPage.value;
       const subArrSize: number = Math.ceil(sensors.value.length / size);

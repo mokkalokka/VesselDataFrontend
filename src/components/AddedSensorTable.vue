@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center">
     <h2>Valgte sensorer</h2>
   </div>
-  <form @submit.prevent="setSensorsToRender" id="form">
+  <form @submit.prevent="setGroupsToRender" id="form">
     <Accordion>
       <AccordionItem
         v-for="group in tempGroups"
@@ -519,7 +519,7 @@ export default defineComponent({
     /**
      * Takes the sensors and group settings from tempGroups and set it equal to groups.
      */
-    const setSensorsToRender = () => {
+    const setGroupsToRender = () => {
       groups.value = lodash.cloneDeep(tempGroups.value);
     };
 
@@ -545,7 +545,7 @@ export default defineComponent({
       addDeselectedSensorToGroup,
       updateCurrent,
       addAllDeselectedSensorsToGroup,
-      setSensorsToRender,
+      setGroupsToRender,
       checkIfValidInput,
       isInputsValid,
       validateGroupTime,

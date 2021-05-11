@@ -63,7 +63,6 @@
             ><span class="m-2">Om oss</span></router-link
           >
         </div>
-        <!-- <div class="navbar-nav ms-auto h4"> -->
         <router-link
           aria-current="page"
           class="nav-link active h3 ms-auto"
@@ -85,7 +84,6 @@
             ></path></svg
           ><span class="m-2">Innstillinger</span>
         </router-link>
-        <!-- </div> -->
       </div>
     </div>
   </nav>

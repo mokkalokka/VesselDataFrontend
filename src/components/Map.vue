@@ -108,13 +108,13 @@ export default {
     const sliderValue = ref(0);
     const min = ref(0);
     const max = ref(1);
-    /* const zoomedPosition = ref([60], [2]); */
     const zoomedPositionUpdated = ref(0);
     const showPosition = ref(false);
     const showZoomedPosition = ref(false);
     const dataLoaded = ref(false);
     const zoom = ref(7);
 
+    // Different map overlays and actual maps
     const tileProviders = [
       {
         name: "OpenStreetMap",
@@ -169,8 +169,6 @@ export default {
       });
     };
 
-    initPosition();
-
     /**
      * Watches for changes in decimation and fetches map points
      */
@@ -182,7 +180,7 @@ export default {
         showZoomedPosition.value = false;
         initPosition();
       },
-      { deep: true }
+      { deep: true, immediate: true }
     );
 
     /**
@@ -218,31 +216,7 @@ export default {
       }
     };
 
-    /**
-     * Watches for changes in zoomedDateTime to make a line of the zoomed position
-     */
-    /* watch(
-      () => [
-        props.group.zoomedFromDateTime,
-        props.group.zoomedToDateTime,
-        dataLoaded.value,
-      ],
-      () => {
-        if (props.group.zoomedFromDateTime && dataLoaded.value) {
-          zoomedPositionUpdated.value++;
-          zoomedPosition.value = getPosition(
-            props.group.zoomedFromDateTime,
-            props.group.zoomedToDateTime,
-            props.pointsPerMinute
-          ).value;
-          showZoomedPosition.value = true;
-        } else {
-          showZoomedPosition.value = false;
-        }
-      },
-      { immediate: true }
-    ); */
-
+    // Center map to the location of the vessel
     const centerPosition = computed(() => {
       if (dataLoaded.value) {
         return [
@@ -254,6 +228,7 @@ export default {
       }
     });
 
+    // Highlight the position with the zoom interval from graph
     const zoomedPosition = computed(() => {
       const timeIndexes = [];
 

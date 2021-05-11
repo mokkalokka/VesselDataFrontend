@@ -100,14 +100,9 @@ a {
   font-weight: 400;
 }
 
-/* .boatrow {
-  font-size: 20px;
-} */
-
 .boatrow:hover {
   cursor: pointer;
   background-color: rgb(236, 236, 236);
-  /* border-radius: 5px; */
 }
 
 .boatrow:focus {

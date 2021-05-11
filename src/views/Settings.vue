@@ -2,21 +2,21 @@
   <div class="container-md p-1">
     <div class="card mt-4 border-0">
       <div class="card-header bg-transparent">
-        <h1 class="justify-content-center">Your settings</h1>
+        <h1 class="justify-content-center">Innstillinger</h1>
       </div>
       <div v-if="saved" class="alert alert-primary" role="alert">
-        Settings saved
+        Lagret innstillinger
       </div>
       <div v-if="reverted" class="alert alert-danger" role="alert">
-        Settings reverted to default
+        Tilbakestilte innstillinger
       </div>
       <div class="table-responsive">
         <table id="settingstable" class="table table-bordered align-middle">
           <caption></caption>
           <thead>
             <tr class="table-light">
-              <th scope="col">Description</th>
-              <th scope="col">Value</th>
+              <th scope="col">Beskrivelse</th>
+              <th scope="col">Verdi</th>
             </tr>
           </thead>
           <tbody>
@@ -35,7 +35,7 @@
                   ]"
                   @click="settings[0]['light'] = true"
                 >
-                  Light
+                  Lys
                 </button>
                 <button
                   id="darkbutton"
@@ -47,7 +47,7 @@
                   ]"
                   @click="settings[0]['light'] = false"
                 >
-                  Dark
+                  Mørk
                 </button>
               </td>
             </tr>
@@ -81,9 +81,9 @@
             </tr>
           </tbody>
         </table>
-        <button class="btn btn-primary m-3" @click="saved = true">Save</button>
+        <button class="btn btn-primary m-3" @click="saved = true">Lagre</button>
         <button class="btn btn-danger m-3" @click="setDefault">
-          Revert to default
+          Tilbakestill
         </button>
       </div>
     </div>
@@ -98,15 +98,15 @@ export default defineComponent({
 
   setup() {
     let settings = reactive([
-      { description: "Color theme", light: true },
-      { description: "Default vessel", value: "None" },
-      { description: "Default number of datapoints per hour", value: "60" },
+      { description: "Fargetema", light: true },
+      { description: "Standard skip", value: "None" },
+      { description: "Standard antal punkter per time", value: "60" },
     ]);
 
     const defaultSettings = reactive([
-      { description: "Color theme", light: true },
-      { description: "Default vessel", value: "None" },
-      { description: "Default number of datapoints per hour", value: "60" },
+      { description: "Fargetema", light: true },
+      { description: "Standard skip", value: "None" },
+      { description: "Standard antal punkter per time", value: "60" },
     ]);
 
     const saved = ref(false);

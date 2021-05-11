@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-/* const backgroundImage = require('@/assets/coverimage.jpg') */
 
 export default defineComponent({
   name: "Home",
@@ -17,6 +16,7 @@ export default defineComponent({
 .home {
   height: 90vh;
   width: 100%;
+  // Picture from https://www.pexels.com/photo/white-boats-on-body-of-water-2156972/
   background-image: url('~@/assets/coverimage.jpg');
   background-size: cover;
   background-position: center;
