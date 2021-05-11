@@ -9,14 +9,18 @@ const time = ref([])
 const names = ref([])
 
 
-
+/**
+ * Function for handeling API calls for sensor data and structuring sensor data
+ * @return getSensorDataById, sensors, initialize, getPosition, position,
+ */
 export function useSensorData() {
 
+    /**
+     * Goes trough the response from /names and creates a list of sensors with metadata
+     */
     function setSensors() {
-
         const fromDateTime = new Date(time.value[0])
         const toDateTime = new Date(time.value[time.value.length - 1])
-
 
         sensors.value = names.value.map((e: string, index: number) => {
 
@@ -39,6 +43,11 @@ export function useSensorData() {
         }) as Sensor[]
     }
 
+    /**
+     * 
+     * @param {number[]} sensorIds - list of sensorId's to be fetched 
+     * @returns data.value - a bundled promise array with sensor data
+     */
     async function getSensorDataById(sensorIds: number[]) {
         const data = ref([])
         const baseUrl = 'http://localhost:3000/'
@@ -55,6 +64,10 @@ export function useSensorData() {
         return data.value
     }
 
+    /**
+     * Fetch all positions for the current vessel
+     * @returns data.value - a bundled promise array with position data and time 
+     */
     async function getPosition() {
         const data = ref([])
         const baseUrl = 'http://localhost:3000/'
@@ -75,6 +88,9 @@ export function useSensorData() {
     }
 
 
+    /**
+     * Fetches all the times and sensor names.  Initializes sensors variabel.
+     */
     function initialize() {
         const { fetchData: fetchTime } = useFetch('http://localhost:3000/time');
         const { fetchData: fetchNames } = useFetch('http://localhost:3000/names');
