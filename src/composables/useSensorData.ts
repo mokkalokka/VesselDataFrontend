@@ -46,12 +46,11 @@ export function useSensorData() {
         /* sensorNames.value = sensorNames.value.filter((sensor: any, index: number) => response.value[index][sensor.filterkey][0] != (null)) */
     }
 
-    async function getSensorDataById(sensorIds: number[], pointsPerMinute: number) {
-        //Adds time 
+    async function getSensorDataById(sensorIds: number[]) {
         const data = ref([])
         const baseUrl = 'http://localhost:3000/'
+        //Adds time 
         const urls = [baseUrl + 'time']
-
 
         sensorIds.map(id => urls.push(baseUrl + names.value[id]))
 
@@ -59,9 +58,6 @@ export function useSensorData() {
             const { fetchData } = useFetch(url);
             return fetchData()
         }))
-
-        // Modulus filter
-        /*   sensors = sensors.map(e => e.filter((_, index) => index < pointsPerMinute)) */
 
         return data.value
     }

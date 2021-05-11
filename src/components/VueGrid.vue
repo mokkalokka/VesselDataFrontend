@@ -135,8 +135,17 @@ export default defineComponent({
      */
     const gridLayoutHeight = computed(() => {
       if (layout.value.length > 0) {
-        const numberOfGridsHeights =
-          layout.value[layout.value.length - 1].y + (showMap.value ? 2 : 1);
+        /* const numberOfGridsHeights =
+          layout.value[layout.value.length - 1].y + (showMap.value ? 2 : 1); */
+
+        const numberOfGridsHeights = layout.value.reduce(
+          (accumulator, currentValue) => ({
+            h: accumulator.h + currentValue.h,
+          })
+        ).h;
+
+        console.log(numberOfGridsHeights);
+
         const marginOffset = GRID_MARGIN * (numberOfGridsHeights + 1);
 
         return numberOfGridsHeights * GRID_HEIGHT + marginOffset;

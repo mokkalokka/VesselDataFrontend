@@ -299,11 +299,13 @@ export default {
     const fetchSensorData = () => {
       res.value = [];
       // Fetching data and setting up the chart
-      getSensorDataById(
-        props.sensorIds as number[],
-        props.pointsPerMinute
-      ).then((response) => {
-        res.value = response;
+      getSensorDataById(props.sensorIds as number[]).then((response) => {
+        const decimation = response[0].length / 60 / props.pointsPerMinute;
+
+        // Modulus filter
+        res.value = response.map((e) =>
+          e.filter((_, index) => index % decimation == 0)
+        );
 
         /* Analyse data */
         maxVal.value = max(res.value.slice(1)) as number;

@@ -195,7 +195,8 @@ export default {
           position.value.length > props.group.hoverIndex &&
           props.group.hoverIndex > -1
         ) {
-          sliderValue.value = props.group.hoverIndex;
+          sliderValue.value =
+            (props.group.hoverIndex * 60) / props.pointsPerMinute;
         }
       }
     );
