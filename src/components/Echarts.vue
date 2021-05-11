@@ -79,6 +79,8 @@ export default {
     const res = ref([]);
     const showGraphs = ref(false as boolean);
     const groups = useGroups();
+
+    // finding the current group
     const currentGroup = groups.value.find(
       (e) => e.id == props.groupId
     ) as Group;
@@ -88,6 +90,7 @@ export default {
     const minVal = ref(0 as number);
     const avarage = ref(0 as number);
     const stdDeviation = ref(0 as number);
+    // reference to the chart object in template
     const chart = ref(null);
 
     // Sets the Echart graph options as a computed value for reactivity
@@ -122,25 +125,13 @@ export default {
             saveAsImage: {
               title: "lagre bilde",
             },
-            /* magicType: {
-              type: ["line", "bar"],
-            }, */
           },
         },
         xAxis: {
           type: "time",
-          /* boundaryGap: false,
-          axisPointer: {
-            triggerTooltip: false,
-          }, */
         },
         yAxis: {
           type: "value",
-          /* boundaryGap: [0, 0], */
-          /* min: "dataMin",
-          max: "dataMax", */
-          /* min: null,
-          max: null, */
           min: parseFloat(
             (
               minVal.value +
@@ -161,7 +152,6 @@ export default {
             type: "slider",
             show: showTimeLine.value,
             brushSelect: false,
-            /* xAxisIndex: [0], */
             filterMode: "none",
             start: 0,
             end: 100,
@@ -176,9 +166,7 @@ export default {
             end: 100,
           },
         ],
-        /* emphasis: {
-          lineStyle: { opacity: 0.9 },
-        }, */
+        // Map trough the fetched sensor data and format on form [[timestamp, data],...]
         series: res.value.slice(1).map((s, index) => {
           {
             return {
@@ -298,8 +286,12 @@ export default {
      */
     const fetchSensorData = () => {
       res.value = [];
-      // Fetching data and setting up the chart
+      // Fetching data
       getSensorDataById(props.sensorIds as number[]).then((response) => {
+        /**
+         * This part is for demonstration, but will be done on API call when the API is
+         */
+        // Setting the decimation
         const decimation = response[0].length / 60 / props.pointsPerMinute;
 
         // Modulus filter
@@ -307,7 +299,7 @@ export default {
           e.filter((_, index) => index % decimation == 0)
         );
 
-        /* Analyse data */
+        // Analyse data
         maxVal.value = max(res.value.slice(1)) as number;
         minVal.value = min(res.value.slice(1)) as number;
         avarage.value = mean(res.value[1]) as number;
@@ -386,6 +378,7 @@ export default {
      *
      */
     const resetZoomedPosition = () => {
+      // refreshes the chart options after zoom reset
       chart.value.setOption(options.value, true);
       currentGroup.zoomedFromDateTime = undefined;
       currentGroup.zoomedToDateTime = undefined;
@@ -411,9 +404,9 @@ export default {
       showTimeLine,
       getGraphTitle,
       showStatistics,
-      chart,
       zoomHandler,
       resetZoomedPosition,
+      chart,
     };
   },
 };
