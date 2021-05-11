@@ -172,7 +172,7 @@ export default {
             return {
               name: props.sensorNames[index],
               type: "line",
-              smooth: true,
+              smooth: false,
               symbol: "none",
               lineStyle: {
                 width: 1.0,
