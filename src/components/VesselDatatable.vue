@@ -38,23 +38,22 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useFetch } from "@/composables/useFetch";
 import router from "@/router";
+import { Vessel } from "@/Interfaces/vesselInterface";
+import { useVessels } from "@/composables/useVessels";
 
 export default defineComponent({
   name: "VesselDataTable",
 
   setup: () => {
-    const vessels = ref([] as Vessel[]);
+    const { fetchVessels, vessels } = useVessels();
+
+    fetchVessels().then((response) => {
+      vessels.value = response;
+    });
 
     // Used for searching the vessels
     const input = ref("" as string);
-
-    const { fetchData } = useFetch("http://localhost:3000/vessels");
-
-    fetchData().then((response) => {
-      vessels.value = response;
-    });
 
     /**
      * Checks if the input is in the vessel name
@@ -77,7 +76,10 @@ export default defineComponent({
      * @param {Vessel} vessel - The clicked vessel
      */
     const routeToVessel = (vessel: Vessel) => {
-      router.push({ name: "VesselData", params: { id: vessel.id } });
+      router.push({
+        name: "VesselData",
+        params: { id: vessel.id },
+      });
     };
 
     return {
@@ -89,11 +91,6 @@ export default defineComponent({
     };
   },
 });
-
-interface Vessel {
-  name: string;
-  id: number;
-}
 </script>
 
 <style lang="scss">

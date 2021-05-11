@@ -23,7 +23,8 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/vesseldata/:id*',
     name: 'VesselData',
-    component: () => import('../views/VesselData.vue')
+    component: () => import('../views/VesselData.vue'),
+    props: true,
   },
   {
     path: '/settings',

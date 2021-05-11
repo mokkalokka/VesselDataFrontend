@@ -1,6 +1,6 @@
 <template>
   <div class="container p-1">
-    <h1 class="d-flex justify-content-center">"Båtnavn"</h1>
+    <h1 class="d-flex justify-content-center">{{ vesselName }}</h1>
     <div class="accordion" id="sensorAccordion">
       <div class="accordion-item">
         <h2 class="accordion-header" id="flush-headingOne">
@@ -12,7 +12,7 @@
             aria-expanded="false"
             aria-controls="sensorTableCollapse"
           >
-            Sensorer for "Båtnavn"
+            Sensorer for {{ vesselName }}
           </button>
         </h2>
         <div
@@ -85,6 +85,7 @@ import {
   resetTempGroups,
   useGroups,
 } from "@/composables/useGroups";
+import { getVesselById, useVessels } from "@/composables/useVessels";
 import SensorTable from "@/components/SensorTable.vue";
 import AddedSensorTable from "@/components/AddedSensorTable.vue";
 import VueGrid from "@/components/VueGrid.vue";
@@ -92,6 +93,7 @@ import Accordion from "@/components/reusable/accordion/Accordion.vue";
 import AccordionItem from "@/components/reusable/accordion/AccordionItem.vue";
 import AccordionHeader from "@/components/reusable/accordion/AccordionHeader.vue";
 import AccordionBody from "@/components/reusable/accordion/AccordionBody.vue";
+import { Vessel } from "@/Interfaces/vesselInterface";
 
 export default defineComponent({
   components: {
@@ -104,7 +106,25 @@ export default defineComponent({
     AccordionBody,
   },
   name: "VesselData",
-  setup() {
+
+  props: ["id"],
+
+  setup(props) {
+    const { fetchVessels, vessels } = useVessels();
+
+    // name of the current vessel
+    const vesselName = ref("" as string);
+
+    // check if vessels is populated
+    if (vessels.value.length == 0) {
+      fetchVessels().then((response) => {
+        vessels.value = response;
+        vesselName.value = getVesselById(props.id).name;
+      });
+    } else {
+      vesselName.value = getVesselById(props.id).name;
+    }
+
     // array of selected sensors
     const selectedSensors = useSelectedSensors();
 
@@ -159,6 +179,7 @@ export default defineComponent({
       filter,
       groups,
       graphToggleClass,
+      vesselName,
     };
   },
 });
