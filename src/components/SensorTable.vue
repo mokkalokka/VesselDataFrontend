@@ -164,7 +164,9 @@ import DataTable from "@/components/reusable/DataTable.vue";
 
 export default defineComponent({
   name: "SensorTable",
-  props: ["sensors"],
+  props: {
+    sensors: [] as any
+  },
   components: { DataTable },
 
   setup: (props) => {

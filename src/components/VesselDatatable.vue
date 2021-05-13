@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-4">
+  <div class="card mt-4" data-test="vessels">
     <div class="card-header bg-transparent shadow-0 border-0">
       <div class="row">
         <div class="col-md-9 order-1 order-md-0">
@@ -19,6 +19,7 @@
     </div>
     <div class="card-body p-0">
       <div
+        
         class="row py-2 mx-0 boatrow border-top"
         v-for="vessel in vessels"
         :vessel="vessel"
@@ -27,8 +28,9 @@
         @click="routeToVessel(vessel)"
         tabindex="0"
         @keypress.enter="routeToVessel(vessel)"
+        
       >
-        <div class="col ps-2">
+        <div data-test="vesseldiv" class="col ps-2">
           {{ vessel.name }}
         </div>
       </div>
