@@ -21,6 +21,7 @@
     "vue": "^3.0.0",
     "vue-echarts": "^6.0.0-rc.4",
     "vue-grid-layout": "^3.0.0-beta1",
+    "vue-jest": "^5.0.0-alpha.9",
     "vue-router": "^4.0.0-0",
     "vue-slider-component": "^4.0.0-beta.3"
   },
@@ -36,9 +37,11 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
+    "@vue/test-utils": "^2.0.0-rc.6",
     "concurrently": "^5.3.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
+    "jest": "^26.6.3",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3"
