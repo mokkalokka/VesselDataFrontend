@@ -6,11 +6,23 @@ import { resetTempGroups, useGroups, useTempGroups } from "@/composables/useGrou
 
 describe('VesselDataTable.vue', () => {
   it('checks filter method', () => {
-    const wrapper = mount(VesselDataTable, {})
+    const wrapper = mount(VesselDataTable, {
+      global: {
+        stubs: {
+          BIconArrowDownUp: true,
+        }
+      }
+    })
     expect(wrapper.vm.filter({ id: 1, name: "Titanic" })).toBe(true)
   })
   it('Checks sorted vessel array', async () => {
-    const wrapper = mount(VesselDataTable, {})
+    const wrapper = mount(VesselDataTable, {
+      global: {
+        stubs: {
+          BIconArrowDownUp: true,
+        }
+      }
+    })
     await expect(wrapper.find('[data-test="vessels"]').text()).toBe('Navn');
   })
 })
@@ -47,7 +59,13 @@ describe('useGroups.ts', () => {
 
 describe('AddedSensorTable.vue', () => {
   it('checks if groups is set equal to tempgroup', async () => {
-    const wrapper = mount(AddedSensorTable, {});
+    const wrapper = mount(AddedSensorTable, {
+      global: {
+        stubs: {
+          Multiselect: true,
+        }
+      }
+    });
     wrapper.vm.setGroupsToRender();
     await expect(useGroups()).toEqual(useTempGroups());
   })
@@ -65,7 +83,14 @@ describe('AddedSensorTable.vue', () => {
       toDateTime: new Date(),
     }
 
-    const wrapper = mount(AddedSensorTable, {});
+    const wrapper = mount(AddedSensorTable, {
+      global: {
+        stubs: {
+          Multiselect: true,
+
+        }
+      }
+    });
     wrapper.vm.toggleDate(group)
     await expect(group.groupDate).toBe(false)
   })
