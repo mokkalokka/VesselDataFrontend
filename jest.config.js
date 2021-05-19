@@ -14,7 +14,9 @@ module.exports = {
     '!src/main.ts',
     '!src/App.vue',
     '!src/views/*.vue',
-    '!src/router/*.ts'
+    '!src/router/*.ts',
+    '!src/components/NavBar.vue',
+    '!src/components/reusable/**/*.{ts,vue}'
   ],
   transformIgnorePatterns: ["/node_modules/(?!echarts|zrender).+\.js$"]
   //transformIgnorePatterns: ['<rootDir>/node_modules/']
