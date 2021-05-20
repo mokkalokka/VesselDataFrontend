@@ -290,14 +290,18 @@ export default {
       getSensorDataById(props.sensorIds as number[]).then((response) => {
         /**
          * This part is for demonstration, but will be done on API call when the API is ready
+         * When using dummy data it dosent work
          */
+        
         // Setting the decimation
-        const decimation = response[0].length / 60 / props.pointsPerMinute;
+        // const decimation = response[0].length / 60 / props.pointsPerMinute;
 
         // Modulus filter
-        res.value = response.map((e) =>
-          e.filter((_, index) => index % decimation == 0)
-        );
+        // res.value = response.map((e) =>
+        //   e.filter((_, index) => index % decimation == 0)
+        // );
+
+        res.value = response
 
         // Analyse data
         maxVal.value = max(res.value.slice(1)) as number;
