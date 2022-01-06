@@ -2,10 +2,11 @@
   <div style="height: 100%; width: 100%">
     <div :style="'height: 85%; width: 100%'">
       <l-map
+        ref="map"
         :min-zoom="4"
         :max-zoom="18"
         v-model:zoom="zoom"
-        :center="centerPosition"
+        @ready="setCenterPosition"
       >
         <l-tile-layer
           v-for="tileProvider in tileProviders"
@@ -75,7 +76,7 @@ import {
   LControlScale,
 } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
-import { ref, watch, computed, watchEffect } from "vue";
+import { ref, watch, computed } from "vue";
 import { useSensorData } from "@/composables/useSensorData";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
@@ -113,6 +114,7 @@ export default {
     const showZoomedPosition = ref(false);
     const dataLoaded = ref(false);
     const zoom = ref(7);
+    const map = ref(null);
 
     // Different map overlays and actual maps
     const tileProviders = [
@@ -217,7 +219,7 @@ export default {
     };
 
     // Center map to the location of the vessel
-    const centerPosition = computed(() => {
+    /*     const centerPosition = computed(() => {
       if (dataLoaded.value) {
         return [
           mean(position.value.map((e) => e[0])),
@@ -226,7 +228,7 @@ export default {
       } else {
         return [60, 2];
       }
-    });
+    }); */
 
     // Highlight the position with the zoom interval from graph
     const zoomedPosition = computed(() => {
@@ -245,11 +247,22 @@ export default {
           }
         });
 
-        return position.value.filter((_, index) => {
+        return position.value.slice(timeIndexes[0], timeIndexes[1] + 1);
+        /* return position.value.filter((_, index) => {
           return timeIndexes.includes(index);
-        });
+        }); */
       } else return [];
     });
+
+    const setCenterPosition = (mapObject) => {
+      mapObject.setView(
+        [
+          mean(position.value.map((e) => e[0])),
+          mean(position.value.map((e) => e[1])),
+        ],
+        5
+      );
+    };
 
     return {
       zoom,
@@ -263,8 +276,10 @@ export default {
       showPosition,
       showZoomedPosition,
       getLatLang,
-      centerPosition,
+      /* centerPosition, */
       tileProviders,
+      map,
+      setCenterPosition,
     };
   },
 };
