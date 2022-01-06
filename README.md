@@ -1,13 +1,19 @@
-# vesseldatafrontend
+# VesselDataFrontend
+
+Bachelor thesis written by Marius Torbjørnsen, Jan Loennechen and Michael S. Larsen in collaboration with SINTEF Ocean.
+
+The project is a Vue 3 front-end application for visualizing vessel sensor data.
+
+Graphing is done by Echarts and mock API is hosted by json-server.
 
 ## Project setup
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Run project
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
