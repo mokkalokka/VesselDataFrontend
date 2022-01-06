@@ -6,6 +6,10 @@ The project is a Vue 3 front-end application for visualizing vessel sensor data.
 
 Graphing is done by Echarts and mock API is hosted by json-server.
 
+## Preview
+
+<img src="readme_images/preview.png" width="100%">
+
 ## Project setup
 ```
 npm install
